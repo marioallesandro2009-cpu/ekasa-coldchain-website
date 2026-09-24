@@ -1,0 +1,258 @@
+<?php
+
+use App\Models\HeroSlide;
+use App\Models\HeroStat;
+use App\Models\Service;
+use App\Models\SiteSetting;
+use App\Models\TrustLogo;
+use App\Support\FrontendData;
+use App\Support\PlaceholderImage;
+use Illuminate\Support\Facades\Cache;
+
+beforeEach(fn () => seedSite());
+
+it('renders the home page with title, meta description and headline in the raw HTML', function () {
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('<title>PT Ekasa Cold Chain | Cold Chain Logistics in Indonesia</title>', false)
+        ->assertSee('<meta name="description" content="PT Ekasa Cold Chain handles temperature-controlled warehousing', false)
+        ->assertSee('<html lang="en">', false)
+        ->assertSee('<meta property="og:locale" content="en_US">', false)
+        ->assertSee('<link rel="canonical"', false)
+        ->assertSee('Keep your products fresh with')
+        ->assertSee('Temperature-Controlled Logistics');
+});
+
+it('puts the navbar, mega menu links, final statistics and a single h1 in the HTML', function () {
+    $html = $this->get('/')->getContent();
+
+    foreach (['Services', 'Locations', 'About Us', 'Clients', 'Contact', 'Get a Quote', 'Explore Services'] as $text) {
+        expect($html)->toContain($text);
+    }
+
+    // Navbar: Services, Locations, About Us, Clients, Contact; no Insights or Careers sections.
+    preg_match_all('#data-spy="([a-z-]+)"#', $html, $spy);
+    expect(array_values(array_unique($spy[1])))->toBe(['services', 'locations', 'about', 'clients', 'contact'])
+        ->and($html)->not->toContain('id="insights"')
+        ->not->toContain('id="careers"');
+
+    expect($html)
+        ->toContain('href="#cold-storage"')
+        ->toContain('600+')
+        ->toContain('-25°C to 6°C')
+        ->not->toContain('Contact Us')
+        ->and(substr_count($html, '<h1'))->toBe(1);
+});
+
+it('preloads the first hero photo with the same srcset/sizes as the image', function () {
+    $html = $this->get('/')->getContent();
+
+    expect($html)->toMatch('#<link rel="preload" as="image" href="[^"]+hero-cold-storage[^"]*" imagesrcset="[^"]+" imagesizes="100vw" fetchpriority="high">#')
+        ->toMatch('#<img\s+src="[^"]+hero-cold-storage[^"]*"\s+srcset="[^"]+"\s+sizes="100vw"#');
+});
+
+it('outputs valid JSON-LD with the organization and the services', function () {
+    $html = $this->get('/')->getContent();
+    preg_match('#<script type="application/ld\+json">(.*?)</script>#s', $html, $match);
+
+    $data = json_decode($match[1], true, flags: JSON_THROW_ON_ERROR);
+    $types = array_column($data['@graph'], '@type');
+
+    expect($types)->toContain('Organization', 'WebSite', 'WebPage', 'ItemList')
+        ->and(collect($data['@graph'])->firstWhere('@type', 'ItemList')['itemListElement'])->toHaveCount(5);
+});
+
+it('leaves empty contact fields out of the JSON-LD and adds them once filled', function () {
+    $jsonLd = function (): array {
+        preg_match('#<script type="application/ld\+json">(.*?)</script>#s', $this->get('/')->getContent(), $match);
+
+        return json_decode($match[1], true, flags: JSON_THROW_ON_ERROR);
+    };
+
+    $hasEmpty = function (array $data) use (&$hasEmpty): bool {
+        foreach ($data as $value) {
+            if ($value === null || $value === '' || $value === [] || (is_array($value) && $hasEmpty($value))) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    $empty = $jsonLd();
+    $organization = collect($empty['@graph'])->firstWhere('@type', 'Organization');
+
+    expect($organization)->not->toHaveKeys(['telephone'])
+        ->not->toHaveKey('email')
+        ->not->toHaveKey('sameAs')
+        ->and($hasEmpty($empty))->toBeFalse();
+
+    SiteSetting::current()->update([
+        'phone' => '+62 21 1234 5678',
+        'email' => 'hello@example.test',
+        'instagram_url' => 'https://www.instagram.com/example',
+    ]);
+
+    $organization = collect($jsonLd()['@graph'])->firstWhere('@type', 'Organization');
+
+    expect($organization['telephone'])->toBe('+62 21 1234 5678')
+        ->and($organization['email'])->toBe('hello@example.test')
+        ->and($organization['sameAs'])->toBe(['https://www.instagram.com/example']);
+});
+
+it('shows only active slides and services, in their sort order', function () {
+    Service::query()->where('slug', 'omnichannel-integration')->update(['is_active' => false]);
+    HeroSlide::query()->where('label->en', 'Linehaul Transport')->firstOrFail()->update(['is_active' => false]);
+    Service::query()->where('slug', 'logistic-partnership')->firstOrFail()->update(['sort_order' => 0]);
+    FrontendData::flush();
+
+    $data = FrontendData::all('en');
+
+    expect(array_column($data['services'], 'title'))
+        ->toBe(['Logistic Partnership', 'Cold Storage', 'Linehaul Transport', 'Hyperlocal Fulfilment'])
+        ->and(array_column($data['heroSlides'], 'label'))
+        ->toBe(['Cold Storage', 'Hyperlocal Fulfilment', 'Logistic Partnership']);
+
+    $this->get('/')->assertDontSee('Omnichannel Integration')->assertDontSee('Show Linehaul Transport');
+});
+
+it('reflects admin changes immediately (cache is flushed on save)', function () {
+    FrontendData::all();
+
+    HeroSlide::query()->where('label->en', 'Cold Storage')->firstOrFail()->update(['label' => 'Frozen Storage']);
+    HeroStat::query()->where('label->en', 'Warehouses')->firstOrFail()->update(['value' => 20]);
+
+    $this->get('/')->assertSee('Frozen Storage')->assertSee('20+');
+});
+
+it('renders a static hero with a single active slide', function () {
+    HeroSlide::query()->where('label->en', '!=', 'Cold Storage')->update(['is_active' => false]);
+    FrontendData::flush();
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('Cold Storage')
+        ->assertDontSee('x-data="hero(', false)
+        ->assertDontSee('aria-label="Choose a service"', false);
+});
+
+it('renders without errors when no slide is active', function () {
+    HeroSlide::query()->update(['is_active' => false]);
+    FrontendData::flush();
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('Keep your products fresh with')
+        ->assertDontSee('rel="preload" as="image"', false)
+        ->assertDontSee('class="hero-photo', false);
+});
+
+it('falls back to the original image when conversions are off (same payload shape)', function () {
+    config(['site.image_conversions' => 'off']);
+    FrontendData::flush();
+
+    $image = FrontendData::all()['heroSlides'][0]['image'];
+
+    expect($image['large']['url'])->toBe($image['small']['url'])
+        ->and($image['large']['width'])->toBeGreaterThan(0);
+});
+
+it('puts the featured services in the mega menu grid and the others in the row below', function () {
+    $html = $this->get('/')->getContent();
+    $panel = substr($html, (int) strpos($html, 'id="mega-menu-services"'));
+    $divider = strpos($panel, 'border-t border-navy/10');
+
+    expect(Service::query()->where('is_featured', true)->count())->toBe(4)
+        ->and($divider)->toBeGreaterThan(strpos($panel, 'Logistic Partnership'))
+        ->and(strpos($panel, 'Omnichannel Integration'))->toBeGreaterThan($divider);
+
+    Service::query()->where('slug', 'omnichannel-integration')->update(['is_featured' => true]);
+    FrontendData::flush();
+
+    expect($this->get('/')->getContent())->not->toContain('border-t border-navy/10');
+});
+
+it('caches only the front page data, never the rendered HTML', function () {
+    $this->get('/')->assertOk();
+
+    $cached = Cache::get(config('site.cache_key').'.en');
+
+    expect($cached)->toBeArray()
+        ->and(array_keys($cached))->toBe(['settings', 'services', 'heroSlides', 'heroStats', 'sections', 'trustLogos'])
+        ->and(serialize($cached))->not->toContain('<html')
+        ->not->toContain('/build/assets/');
+});
+
+it('links the CSS and JS files listed in the current Vite manifest', function () {
+    $manifest = json_decode((string) file_get_contents(public_path('build/manifest.json')), true);
+    $html = $this->get('/')->getContent();
+
+    foreach (['resources/css/app.css', 'resources/js/app.js'] as $entry) {
+        $file = $manifest[$entry]['file'];
+
+        expect($html)->toContain('/build/'.$file)
+            ->and(file_exists(public_path('build/'.$file)))->toBeTrue();
+    }
+});
+
+/**
+ * A trust logo with a real PNG file (built without GD).
+ */
+function trustLogo(string $name, bool $active = true): TrustLogo
+{
+    $path = tempnam(sys_get_temp_dir(), 'logo').'.png';
+    PlaceholderImage::create($path, 120, 40, 'logo');
+
+    $logo = TrustLogo::query()->create(['name' => $name, 'is_active' => $active]);
+    $logo->addMedia($path)->toMediaCollection('logo');
+
+    return $logo;
+}
+
+it('does not render the trust row without active logos', function () {
+    trustLogo('Hidden Client', active: false);
+    FrontendData::flush();
+
+    expect($this->get('/')->getContent())
+        ->not->toContain('Trusted by')
+        ->not->toContain('Hidden Client');
+});
+
+it('renders at most five active trust logos in admin order, with the editable label', function () {
+    foreach (range(1, 6) as $i) {
+        trustLogo("Client {$i}");
+    }
+    TrustLogo::query()->where('name', 'Client 1')->update(['sort_order' => 99]);
+    SiteSetting::current()->update(['ui_texts' => ['en' => ['trust_label' => 'Our clients']]]);
+    FrontendData::flush();
+
+    $html = $this->get('/')->getContent();
+
+    expect($html)->toContain('Our clients')
+        ->not->toContain('alt="Client 1"')
+        ->and(substr_count($html, 'alt="Client '))->toBe(5)
+        ->and(strpos($html, 'alt="Client 2"'))->toBeLessThan(strpos($html, 'alt="Client 6"'));
+});
+
+it('shows the statistic icons chosen in the admin and keeps an empty slot for stats without one', function () {
+    HeroStat::query()->where('label->en', 'Warehouses')->update(['icon' => null]);
+    FrontendData::flush();
+
+    $html = $this->get('/')->getContent();
+    $bar = substr($html, (int) strpos($html, '<dl'));
+
+    expect(substr_count($bar, 'size-5 text-ice'))->toBe(3)
+        ->and(substr_count($bar, '<span class="mb-2 block size-5 lg:shorter:mb-1.5" aria-hidden="true"></span>'))->toBe(1);
+});
+
+it('loads only the site bundle on public pages, without Livewire or Filament scripts', function () {
+    foreach (['/', '/id'] as $url) {
+        $html = $this->get($url)->getContent();
+
+        preg_match_all('#<script[^>]*\ssrc="([^"]+)"#', $html, $scripts);
+
+        expect($scripts[1])->toHaveCount(1)
+            ->and($scripts[1][0])->toContain('/build/assets/app-')
+            ->and($html)->not->toMatch('/livewire|filament/i');
+    }
+});

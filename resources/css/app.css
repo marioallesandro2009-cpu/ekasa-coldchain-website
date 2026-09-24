@@ -1,0 +1,602 @@
+@import 'tailwindcss';
+
+@source '../views';
+
+/* Short desktop viewports: tighter hero spacing and a smaller headline
+   (short: e.g. 1440x800; shorter: under 700px high, e.g. 1366x650 laptops). */
+@custom-variant short (@media (height < 880px));
+@custom-variant shorter (@media (height < 700px));
+
+/* Self-hosted Plus Jakarta Sans (latin subset, OFL-1.1). */
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('../fonts/plus-jakarta-sans-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('../fonts/plus-jakarta-sans-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('../fonts/plus-jakarta-sans-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('../fonts/plus-jakarta-sans-latin-700-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Plus Jakarta Sans';
+    font-style: normal;
+    font-weight: 800;
+    font-display: swap;
+    src: url('../fonts/plus-jakarta-sans-latin-800-normal.woff2') format('woff2');
+}
+
+@theme {
+    --font-sans:
+        'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system,
+        'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+    --color-navy: #0f2a4a;
+    --color-navy-light: #153a63;
+    --color-navy-dark: #0a1d33;
+    --color-ice: #4fb3e8;
+    --color-teal: #2bb3a6;
+    /* Only for the primary CTA (text on it: navy-dark, 5.6:1). */
+    --color-accent: #f26a21;
+    --color-accent-hover: #f47c3c;
+    --color-surface: #f5f8fb;
+    --color-ink: #1a2b3c;
+    --color-ink-muted: #5b6b7b;
+
+    --radius-card: 12px;
+}
+
+/* Container: 1280px, 16px gutter on mobile, 24px from md. */
+/* Scrollable without a visible scrollbar (e.g. the hero logo row on phones). */
+@utility scrollbar-none {
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+@utility container-site {
+    width: 100%;
+    max-width: 1280px;
+    margin-inline: auto;
+    padding-inline: 16px;
+
+    @media (width >= 48rem) {
+        padding-inline: 24px;
+    }
+}
+
+@layer base {
+    html {
+        /* Native anchor offset for the fixed navbar (68px desktop when scrolled, 64px mobile). */
+        scroll-padding-top: 64px;
+        -webkit-tap-highlight-color: transparent;
+
+        @media (width >= 64rem) {
+            scroll-padding-top: 68px;
+        }
+
+        @media (prefers-reduced-motion: no-preference) {
+            scroll-behavior: smooth;
+        }
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-ice);
+        outline-offset: 3px;
+    }
+
+    [tabindex='-1']:focus {
+        outline: none;
+    }
+
+    [x-cloak] {
+        display: none !important;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * Navbar
+ * ------------------------------------------------------------------------- */
+
+/* Without JS the header is always solid; with JS it starts transparent. */
+.site-header {
+    background-color: color-mix(in srgb, var(--color-navy) 92%, transparent);
+    box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--color-navy-dark) 55%, transparent);
+    transition:
+        background-color 250ms ease-out,
+        box-shadow 250ms ease-out;
+}
+
+.js .site-header:not(.is-solid) {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.js .site-header.is-solid {
+    backdrop-filter: blur(12px);
+}
+
+/* Navbar CTA: white outline while the navbar is transparent, solid accent after
+   scrolling past 40px. Without JS the header is solid, so the CTA stays solid. */
+.nav-cta {
+    transition-property: background-color, color, box-shadow;
+    transition-duration: 250ms;
+    transition-timing-function: ease-out;
+}
+
+.js .site-header:not(.is-scrolled) .nav-cta {
+    background-color: transparent;
+    color: var(--color-white);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-white) 60%, transparent);
+}
+
+.js .site-header:not(.is-scrolled) .nav-cta:hover {
+    background-color: color-mix(in srgb, var(--color-white) 10%, transparent);
+}
+
+/* 80px -> 68px once scrolled (desktop). */
+.nav-bar {
+    transition: height 250ms ease-out;
+}
+
+@media (width >= 64rem) {
+    .nav-bar.is-compact {
+        height: 68px;
+    }
+}
+
+/* Controls that only work with JavaScript. */
+html:not(.js) .js-only {
+    display: none !important;
+}
+
+.nav-link::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0.75rem;
+    bottom: -2px;
+    height: 2px;
+    border-radius: 9999px;
+    background-color: var(--color-ice);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 200ms ease-out;
+}
+
+/* Active item: text stays white (never orange), 2px ice underline. */
+.nav-link.is-active {
+    color: var(--color-white);
+}
+
+.nav-link.is-active::after {
+    transform: scaleX(1);
+}
+
+/* Mega menu: CSS hover/focus fallback without JS, Alpine takes over with JS. */
+.mega-panel {
+    display: none;
+}
+
+html:not(.js) .mega:hover .mega-panel,
+html:not(.js) .mega:focus-within .mega-panel,
+.js .mega-panel.is-open {
+    display: block;
+}
+
+.js .mega-panel.is-open {
+    animation: mega-in 200ms ease-out;
+}
+
+@keyframes mega-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+}
+
+/* Soft layered shadow (no hard edge). */
+.mega-card {
+    box-shadow:
+        0 1px 2px color-mix(in srgb, var(--color-navy-dark) 6%, transparent),
+        0 8px 16px -4px color-mix(in srgb, var(--color-navy-dark) 8%, transparent),
+        0 24px 48px -12px color-mix(in srgb, var(--color-navy-dark) 18%, transparent);
+}
+
+/* Page dimmer behind the open mega menu (JS only). */
+.mega-backdrop {
+    background-color: color-mix(in srgb, var(--color-navy-dark) 40%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 200ms ease-out;
+}
+
+.mega-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+html:not(.js) .mega-backdrop {
+    display: none;
+}
+
+/* Mobile menu: `:target` fallback without JS, Alpine with JS. */
+.mobile-menu {
+    display: none;
+}
+
+html:not(.js) .mobile-menu:target,
+.js .mobile-menu.is-open {
+    display: block;
+}
+
+.js .mobile-menu.is-open .mm-layer {
+    animation: mm-slide 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.js .mobile-menu.is-open .mm-layer-2 {
+    animation-delay: 70ms;
+}
+
+.js .mobile-menu.is-open .mm-panel {
+    animation-delay: 140ms;
+}
+
+.js .mobile-menu.is-open .mm-item {
+    animation: mm-item 350ms ease-out both;
+    animation-delay: calc(300ms + var(--i, 0) * 60ms);
+}
+
+.js .mobile-menu.is-closing .mm-layer {
+    animation: mm-slide-out 280ms cubic-bezier(0.64, 0, 0.78, 0) both;
+}
+
+@keyframes mm-slide {
+    from {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes mm-slide-out {
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes mm-item {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+/* Mobile "Services" accordion (native <details>). */
+.mm-details > summary {
+    list-style: none;
+}
+
+.mm-details > summary::-webkit-details-marker {
+    display: none;
+}
+
+.mm-details[open] .mm-chevron {
+    transform: rotate(180deg);
+}
+
+/* ---------------------------------------------------------------------------
+ * Hero
+ * ------------------------------------------------------------------------- */
+
+/* Slide 1 is visible from the first paint (LCP); the others only once JS shows them. */
+.hero-photo:not([data-index='0']) {
+    opacity: 0;
+}
+
+.hero.is-ready .hero-photo:not(.is-active, .is-previous) {
+    opacity: 0;
+}
+
+.hero-photo.is-active,
+.hero-photo.is-previous {
+    opacity: 1;
+}
+
+.hero-photo.is-active {
+    z-index: 2;
+}
+
+.hero-photo.is-previous {
+    z-index: 1;
+}
+
+/* Left scrim (lg+): one gradient with many stops, so the darkening fades out evenly
+   without a visible edge. Its width follows the text column instead of the screen:
+   the end of the subtext (container edge + 560px) always sits at 40% of the gradient
+   (~0.66 darkness), which keeps WCAG AA even on a plain white photo. On very wide
+   screens the gradient is wider than the screen and its faint end is cut off. */
+.hero-overlay-left {
+    --scrim: var(--color-navy-dark);
+    --text-end: calc(max(24px, (100% - 1280px) / 2 + 24px) + 560px);
+    background-image: linear-gradient(
+        90deg,
+        color-mix(in srgb, var(--scrim) 90%, transparent) 0%,
+        color-mix(in srgb, var(--scrim) 86%, transparent) 15%,
+        color-mix(in srgb, var(--scrim) 78%, transparent) 30%,
+        color-mix(in srgb, var(--scrim) 64%, transparent) 42%,
+        color-mix(in srgb, var(--scrim) 48%, transparent) 54%,
+        color-mix(in srgb, var(--scrim) 32%, transparent) 65%,
+        color-mix(in srgb, var(--scrim) 18%, transparent) 75%,
+        color-mix(in srgb, var(--scrim) 8%, transparent) 85%,
+        transparent 100%
+    );
+    background-repeat: no-repeat;
+    background-size: calc(var(--text-end) / 0.4) 100%;
+}
+
+/* Top scrim behind the transparent navbar, eased (many stops). Strong enough at the
+   height of the navbar text (~0.8 with the 18% layer) that the inactive language
+   (white 60%) and the menu links pass WCAG AA on any photo, even plain white. */
+.hero-overlay-top {
+    --scrim: var(--color-navy-dark);
+    background-image: linear-gradient(
+        180deg,
+        color-mix(in srgb, var(--scrim) 82%, transparent) 0%,
+        color-mix(in srgb, var(--scrim) 78%, transparent) 22%,
+        color-mix(in srgb, var(--scrim) 64%, transparent) 40%,
+        color-mix(in srgb, var(--scrim) 40%, transparent) 60%,
+        color-mix(in srgb, var(--scrim) 17%, transparent) 80%,
+        transparent 100%
+    );
+}
+
+/* Bottom scrim: from the statistics bar up ~35% of the hero, eased (many stops). */
+.hero-overlay-bottom {
+    --scrim: var(--color-navy-dark);
+    background-image: linear-gradient(
+        0deg,
+        color-mix(in srgb, var(--scrim) 85%, transparent) 0%,
+        color-mix(in srgb, var(--scrim) 72%, transparent) 12%,
+        color-mix(in srgb, var(--scrim) 54%, transparent) 28%,
+        color-mix(in srgb, var(--scrim) 34%, transparent) 46%,
+        color-mix(in srgb, var(--scrim) 17%, transparent) 64%,
+        color-mix(in srgb, var(--scrim) 6%, transparent) 82%,
+        transparent 100%
+    );
+}
+
+/* Crossfade: the new photo fades in over the previous one (a transition, so the
+   Ken Burns animation of the outgoing photo is not restarted). */
+.hero-photo.is-fading {
+    transition: opacity 1s ease-in-out;
+}
+
+/* Ken Burns (started by JS after window load). */
+.hero-photo.is-zooming {
+    animation: ken-burns var(--kb-duration, 6s) linear forwards;
+}
+
+.hero.is-paused .hero-photo,
+.hero.is-paused .hero-progress {
+    animation-play-state: paused;
+}
+
+@keyframes ken-burns {
+    from {
+        transform: scale(1);
+    }
+    to {
+        transform: scale(1.06);
+    }
+}
+
+.hero-progress {
+    transform: scaleX(0);
+    transform-origin: left;
+}
+
+.hero-progress.is-running {
+    animation: hero-progress var(--slide-duration, 5s) linear forwards;
+}
+
+@keyframes hero-progress {
+    to {
+        transform: scaleX(1);
+    }
+}
+
+/*
+ * Shiny text (white 70%, a white highlight sweeps left to right in 3s, then a
+ * 2s pause). Only transform is animated, so it runs on the compositor: the
+ * .shiny-glint window (a soft 120deg band) moves right while its ::after, a
+ * copy of the text, moves left by the same distance and so stays exactly on
+ * top of the text. The copy (white 30%) is added to the text (plus-lighter):
+ * 70% + 30% = white in the middle of the band, without thickening the letters.
+ */
+.shiny-text {
+    position: relative;
+    display: inline-block;
+    color: color-mix(in srgb, var(--color-white) 70%, transparent);
+}
+
+.shiny-glint {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(120deg, transparent 20%, #000 50%, transparent 80%);
+    mask-image: linear-gradient(120deg, transparent 20%, #000 50%, transparent 80%);
+    mix-blend-mode: plus-lighter;
+    transform: translateX(-100%);
+    animation: shine 5s linear infinite;
+}
+
+.shiny-glint::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    color: color-mix(in srgb, var(--color-white) 30%, transparent);
+    transform: translateX(100%);
+    animation: shine-counter 5s linear infinite;
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%);
+    }
+    60%,
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes shine-counter {
+    0% {
+        transform: translateX(100%);
+    }
+    60%,
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+/* Rotating text: characters enter from below and leave upwards. */
+.rt-word {
+    display: inline-flex;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+}
+
+.rt-char {
+    display: inline-block;
+}
+
+.rt-in .rt-char {
+    animation: rt-in 450ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--i, 0) * 20ms);
+}
+
+.rt-out .rt-char {
+    animation: rt-out 300ms ease-in both;
+}
+
+@keyframes rt-in {
+    from {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+}
+
+@keyframes rt-out {
+    to {
+        opacity: 0;
+        transform: translateY(-120%);
+    }
+}
+
+/*
+ * Hero entrance animations start at opacity 0.01, not 0: it looks the same, but
+ * Chrome ignores opacity 0 elements for Largest Contentful Paint, so hero text faded
+ * in from 0 only "appears" after JS and the animation (a late LCP). Below the hero
+ * the start stays at 0: those elements cannot be the LCP, and at 0 accessibility
+ * checkers skip them instead of reporting near-invisible text before they scroll in.
+ */
+
+/* Hidden until the words are split, so the headline does not flash. */
+.js-anim [data-blur-text]:not([data-split]) {
+    opacity: 0.01;
+}
+
+/*
+ * Blur text: words (split by JS) come in from blur + opacity 0.01 + 20px down.
+ * A blur cannot run on the compositor, so each word gets its own layer only
+ * while it animates (no repaint of the headline); JS drops will-change after.
+ */
+.blur-word {
+    display: inline-block;
+    animation: blur-in 280ms ease-out both;
+    animation-delay: calc(var(--i, 0) * 80ms);
+    will-change: transform, opacity, filter;
+}
+
+.blur-word.is-done {
+    will-change: auto;
+}
+
+@keyframes blur-in {
+    from {
+        opacity: 0.01;
+        filter: blur(10px);
+        transform: translateY(20px);
+    }
+}
+
+/* Animated content: hidden only once JS marks the document (keeps its space). */
+.js-anim [data-animate]:not(.is-in) {
+    opacity: 0;
+    transform: translateY(24px);
+}
+
+.js-anim #home [data-animate]:not(.is-in) {
+    opacity: 0.01;
+}
+
+/* data-animate="rise": only the 24px rise, always fully visible (e.g. the hero
+   subtext, the largest text block of the first screen). */
+.js-anim [data-animate='rise']:not(.is-in),
+.js-anim #home [data-animate='rise']:not(.is-in) {
+    opacity: 1;
+}
+
+[data-animate].is-in {
+    transition:
+        opacity 0.6s ease-out,
+        transform 0.6s ease-out;
+    transition-delay: var(--delay, 0s);
+}
+
+/* Reduced motion: show the final state everywhere. */
+@media (prefers-reduced-motion: reduce) {
+    .blur-word,
+    .rt-in .rt-char,
+    .hero-photo,
+    .js .mega-panel.is-open,
+    .js .mobile-menu .mm-layer,
+    .js .mobile-menu .mm-item {
+        animation: none !important;
+    }
+
+    .shiny-glint {
+        display: none;
+    }
+
+    .mega-backdrop {
+        transition: none;
+    }
+
+    [data-animate] {
+        transition: none !important;
+    }
+}
