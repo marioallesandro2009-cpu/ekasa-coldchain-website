@@ -256,3 +256,16 @@ it('loads only the site bundle on public pages, without Livewire or Filament scr
             ->and($html)->not->toMatch('/livewire|filament/i');
     }
 });
+
+it('shows the WhatsApp button in the mobile menu only when a number is set', function () {
+    SiteSetting::current()->update(['whatsapp_number' => null]);
+    FrontendData::flush();
+
+    expect($this->get('/')->getContent())->not->toContain('https://wa.me/');
+
+    SiteSetting::current()->update(['whatsapp_number' => '0812-3456-7890']);
+    FrontendData::flush();
+
+    expect($this->get('/')->getContent())->toContain('href="https://wa.me/6281234567890"')->toContain('Chat on WhatsApp')
+        ->and($this->get('/id')->getContent())->toContain('Chat via WhatsApp');
+});

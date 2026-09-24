@@ -580,9 +580,9 @@ Skor per run berganti antara ~75 dan ~87 (server lokal), jadi median Performance
 
 1. Tampilan dan animasi di browser nyata: blur headline, pergantian label per karakter, crossfade + Ken Burns, kilau badge, count-up, dan efek staggered menu mobile.
 2. Hover mega menu dan jeda tutup 150ms dengan mouse sungguhan.
-3. Magnet pada CTA hero: dipertahankan atau dihapus (bertentangan dengan poin Fase 2 no. 1).
+3. Magnet pada CTA hero sudah dihapus (tanpa efek kursor).
 4. Pilihan foto untuk hero dan mega menu (lihat bagian 14 no. 1).
-5. `craiyon_200122_image.png` di root proyek (gambar 250×70 tanpa isi berarti): tidak dipakai dan tidak dihapus. **Perlu keputusan Anda.**
+5. `craiyon_200122_image.png` sudah tidak ada di proyek.
 6. Isi kontak dan media sosial di **Pengaturan Situs › Umum**.
 7. Di hosting: skor Lighthouse setelah `media-library:regenerate`, redirect HTTPS dan www, serta header cache.
 
@@ -709,7 +709,7 @@ Section placeholder (`services`, `locations`, `about`, `clients`, `insights`, `c
 - **Performa di lokal belum bisa membuktikan target Lighthouse.** Semua fondasinya sudah benar (preload, fetchpriority, srcset, JS 22 KB, CLS 0,002), tetapi angka akhirnya bergantung pada WebP di server.
 - **Animasi belum saya lihat bergerak di browser nyata.** Semua status dan urutan kelas terverifikasi lewat Chrome headless dan screenshot, tetapi kesan kehalusannya (easing, tempo 20ms per karakter, efek staggered menu) perlu penilaian mata manusia.
 - **Hero di laptop pendek (1366x650)** memang pas satu layar, tetapi headline mengecil ke 42px dan jaraknya rapat. Di layar seperti itu hero terasa padat.
-- **Magnet** menambah kompleksitas kecil untuk efek yang nyaris tidak terasa (maks 6px), dan bertentangan dengan prinsip "tanpa efek kursor". Saran saya: hapus.
+- **Magnet** sudah dihapus (tanpa efek kursor).
 - **Teknis:**
   - Pengaman 3 detik untuk kelas `js`/`js-anim` bergantung pada `window.Alpine`. Jika bundle terlambat lebih dari 3 detik, animasi masuk dilewati (konten tetap tampil).
   - Konten dummy section masih berupa placeholder.

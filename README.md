@@ -73,7 +73,15 @@ Upload gambar di admin ditolak jika sisi terpanjangnya lebih dari 4000 px.
 ## Deploy ke cPanel
 
 Lihat bagian 17 di [laporan tahap 1-2](docs/laporan-tahap-1-2.md). Ringkasnya:
-unggah proyek (termasuk `public/build`), arahkan document root ke `public/`, isi `.env`, lalu
+unggah proyek (termasuk `public/build`), arahkan document root ke `public/`, isi `.env`.
+Server tidak butuh Node. Cek dulu versi PHP dan ekstensi GD di Terminal cPanel:
+
+```bash
+php -v                        # harus 8.3 atau lebih baru
+php -m | grep -iE "gd|intl|fileinfo|exif|zip|pdo_mysql"
+```
+
+Lalu:
 
 ```bash
 php artisan migrate --force --seed

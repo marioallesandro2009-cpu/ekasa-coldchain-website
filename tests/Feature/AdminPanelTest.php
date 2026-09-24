@@ -243,3 +243,27 @@ it('edits both languages side by side and flags a missing Indonesian version in 
         ->assertTableColumnStateSet('translation_id', 'Belum diisi', $service)
         ->assertTableColumnStateSet('translation_id', 'Lengkap', Service::query()->where('slug', 'linehaul-transport')->firstOrFail());
 });
+
+it('saves the Hero, Mega Menu and Translation tabs and shows them on the site', function () {
+    seedSite();
+    $this->actingAs(User::factory()->create());
+
+    Livewire::test(ManageSiteSettings::class)
+        ->set('data.hero_badge.en', 'Cold chain since day one')
+        ->set('data.hero_headline.en', 'Move chilled goods with')
+        ->set('data.hero_subtext.en', 'Storage and transport at the right temperature.')
+        ->set('data.mega_menu_title.en', 'Planning a new route?')
+        ->set('data.mega_menu_link_label.en', 'Ask our planners')
+        ->set('data.translation_glossary', [['en' => 'Reefer', 'id' => null], ['en' => 'Supply chain', 'id' => 'rantai pasok']])
+        ->call('save')
+        ->assertHasNoErrors();
+
+    $this->get('/')
+        ->assertSee('Cold chain since day one')
+        ->assertSee('Move chilled goods with')
+        ->assertSee('Storage and transport at the right temperature.')
+        ->assertSee('Planning a new route?')
+        ->assertSee('Ask our planners');
+
+    expect(SiteSetting::current()->glossary())->toBe([['en' => 'Reefer', 'id' => null], ['en' => 'Supply chain', 'id' => 'rantai pasok']]);
+});
