@@ -9,14 +9,15 @@ class ServiceSeeder extends Seeder
 {
     public function run(): void
     {
-        // slug, title [en, id], short description [en, id], icon
+        // slug, title [en, id], short description [en, id] (max. 60 characters), icon
+        // DUMMY - daftar dan deskripsi layanan harus dikonfirmasi klien (including the
+        // temperature range of Cold Storage).
         $services = [
-            // DUMMY - harus dikonfirmasi klien: temperature range.
-            ['cold-storage', ['Cold Storage', 'Cold Storage'], ['Chiller & frozen storage, -25°C to 6°C', 'Penyimpanan chiller & frozen, -25°C hingga 6°C'], 'snowflake'],
-            ['linehaul-transport', ['Linehaul Transport', 'Transportasi Linehaul'], ['Reefer & dry fleet for rent', 'Sewa armada reefer & dry'], 'truck'],
-            ['hyperlocal-fulfilment', ['Hyperlocal Fulfilment', 'Hyperlocal Fulfilment'], ['Fast delivery from city hubs', 'Pengiriman cepat dari hub dalam kota'], 'map-pin'],
-            ['logistic-partnership', ['Logistic Partnership', 'Kemitraan Logistik'], ['End-to-end supply chain solutions', 'Solusi rantai pasok menyeluruh'], 'handshake'],
-            ['omnichannel-integration', ['Omnichannel Integration', 'Integrasi Omnichannel'], ['Connected to major marketplaces', 'Terhubung ke marketplace besar'], 'network'],
+            ['cold-storage', ['Cold Storage', 'Cold Storage'], ['Chilled and frozen rooms from -25°C to 6°C', 'Ruang chiller dan frozen, -25°C hingga 6°C'], 'snowflake'],
+            ['linehaul-transport', ['Linehaul Transport', 'Transportasi Linehaul'], ['Refrigerated and dry trucks between cities', 'Truk berpendingin dan dry antarkota'], 'truck'],
+            ['hyperlocal-fulfilment', ['Hyperlocal Fulfilment', 'Hyperlocal Fulfilment'], ['Quick drop-offs from hubs inside the city', 'Antar cepat dari hub di dalam kota'], 'map-pin'],
+            ['logistic-partnership', ['Logistic Partnership', 'Kemitraan Logistik'], ['One team for storage, transport and delivery', 'Satu tim untuk gudang, transportasi, dan pengiriman'], 'handshake'],
+            ['omnichannel-integration', ['Omnichannel Integration', 'Integrasi Omnichannel'], ['Orders from every sales channel in one flow', 'Pesanan dari semua kanal penjualan dalam satu alur'], 'network'],
         ];
 
         foreach ($services as $index => [$slug, $title, $description, $icon]) {

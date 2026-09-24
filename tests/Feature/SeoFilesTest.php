@@ -34,7 +34,7 @@ it('serves llms.txt with the company summary and services', function () {
         ->toStartWith('# PT Ekasa Cold Chain')
         ->toContain('## Services')
         ->toContain('- [Cold Storage](')
-        ->toContain('Chiller & frozen storage')
+        ->toContain('Chilled and frozen rooms')
         ->toContain('## Contact');
 });
 
