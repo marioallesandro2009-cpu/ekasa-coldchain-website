@@ -22,6 +22,10 @@ Skrip ini hanya mengubah sesi terminal tersebut:
 source ./use-php83.sh    # Git Bash
 ```
 
+Skrip menampilkan "GD: aktif" di akhir. Jika `php.ini` PHP 8.3 tidak memuat GD, skrip
+memakai `scripts/php-ini/ekasa.ini` (GD + memory_limit 1024M), jadi konversi WebP dan
+favicon.ico juga jalan saat `php artisan serve` dijalankan dari terminal itu.
+
 ```bash
 composer install
 npm install
