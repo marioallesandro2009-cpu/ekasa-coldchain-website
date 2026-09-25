@@ -219,6 +219,8 @@ class ManageSiteSettings extends Page
                             self::uiText('whatsapp_button', 'Tombol WhatsApp (menu mobile)'),
                             self::uiText('footer_copyright', 'Teks hak cipta di footer', 'Tampil setelah "© tahun nama resmi perusahaan."'),
                             self::uiText('trust_label', 'Teks sebelum logo klien di hero', 'Baris logo tampil jika ada logo aktif di Konten Beranda › Logo Klien.'),
+                            self::uiText('service_card_link', 'Tautan di kartu layanan (beranda)', 'Menuju halaman detail layanan.'),
+                            self::uiText('service_supporting_label', 'Label pita layanan Pendukung (beranda)', 'Tampil di depan layanan Pendukung, di bawah grid kartu.'),
                             Text::make('Label di bawah ini tidak terlihat di layar, tetapi dibacakan oleh pembaca layar (tunanetra) dan dibaca mesin pencari.')
                                 ->color('gray'),
                             self::uiText('skip_link', 'Tautan "lewati ke konten"', 'Muncul saat pengguna keyboard menekan Tab pertama kali.'),

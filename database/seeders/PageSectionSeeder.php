@@ -26,8 +26,12 @@ class PageSectionSeeder extends Seeder
                 'show_in_nav' => $inNav,
                 'eyebrow' => $pair($eyebrow),
                 'title' => $pair($title),
-                // DUMMY: placeholder until the section is built.
-                'description' => [
+                // DUMMY: the services text is an example; the other sections are placeholders
+                // until they are built.
+                'description' => $key === PageSection::SERVICES ? [
+                    'en' => 'Storage, transport and delivery that keep your products at the right temperature, from the first mile to the last.',
+                    'id' => 'Penyimpanan, transportasi, dan pengiriman yang menjaga produk Anda di suhu yang tepat, dari awal hingga akhir perjalanan.',
+                ] : [
                     'en' => 'This section is a placeholder for the next stage.',
                     'id' => 'Bagian ini akan diisi pada tahap berikutnya.',
                 ],

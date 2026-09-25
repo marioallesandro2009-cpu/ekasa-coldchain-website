@@ -39,7 +39,7 @@ final class FrontendData
         try {
             return [
                 'settings' => SiteSetting::current()->toFrontend(),
-                'services' => array_values(Service::query()->active()->ordered()->get()->map->toFrontend()->all()),
+                'services' => array_values(Service::query()->active()->ordered()->with(['media', 'cardFleetVehicle.media'])->get()->map->toFrontend()->all()),
                 'heroSlides' => array_values(HeroSlide::query()->active()->ordered()->with('media')->get()
                     ->map->toFrontend()->filter()->all()),
                 'heroStats' => array_values(HeroStat::query()->active()->ordered()->get()->map->toFrontend()->all()),

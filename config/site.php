@@ -52,8 +52,8 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    // Bumped when the cached front page data changes shape (v5: tracker card removed).
-    'cache_key' => 'frontend.data.v5',
+    // Bumped when the cached front page data changes shape (v6: service cards).
+    'cache_key' => 'frontend.data.v6',
 
     /*
     |--------------------------------------------------------------------------

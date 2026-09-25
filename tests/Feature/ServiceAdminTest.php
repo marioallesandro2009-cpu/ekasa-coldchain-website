@@ -43,10 +43,10 @@ it('opens the edit page of every seeded record', function () {
 it('seeds the default block layouts of the four services, Omnichannel as draft', function () {
     $types = fn (string $slug): array => array_column((array) Service::query()->where('slug', $slug)->value('blocks'), 'type');
 
-    expect($types('cold-storage'))->toBe(['hero_layanan', 'pita_spesifikasi', 'zona_suhu', 'keunggulan', 'lokasi_gudang', 'industri', 'faq', 'cta_penutup'])
-        ->and($types('linehaul-transport'))->toBe(['hero_layanan', 'pita_spesifikasi', 'katalog_armada', 'skema_sewa', 'diagram_rute', 'cara_kerja', 'faq', 'cta_penutup'])
-        ->and($types('hyperlocal-fulfilment'))->toBe(['hero_layanan', 'pita_spesifikasi', 'lokasi_gudang', 'keunggulan', 'cara_kerja', 'faq', 'cta_penutup'])
-        ->and($types('logistic-partnership'))->toBe(['hero_layanan', 'alur_end_to_end', 'keunggulan', 'industri', 'faq', 'cta_penutup'])
+    expect($types('cold-storage'))->toBe(['hero_layanan', 'pita_spesifikasi', 'teks_gambar', 'zona_suhu', 'keunggulan', 'lokasi_gudang', 'industri', 'faq', 'cta_penutup'])
+        ->and($types('linehaul-transport'))->toBe(['hero_layanan', 'pita_spesifikasi', 'teks_gambar', 'katalog_armada', 'skema_sewa', 'diagram_rute', 'cara_kerja', 'faq', 'cta_penutup'])
+        ->and($types('hyperlocal-fulfilment'))->toBe(['hero_layanan', 'pita_spesifikasi', 'teks_gambar', 'lokasi_gudang', 'keunggulan', 'cara_kerja', 'faq', 'cta_penutup'])
+        ->and($types('logistic-partnership'))->toBe(['hero_layanan', 'alur_end_to_end', 'teks_gambar', 'keunggulan', 'industri', 'faq', 'cta_penutup'])
         ->and(Service::query()->where('slug', 'omnichannel-integration')->value('detail_status'))->toBe(Service::DRAFT);
 
     $linehaul = Service::query()->where('slug', 'linehaul-transport')->firstOrFail();

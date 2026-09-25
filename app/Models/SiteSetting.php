@@ -130,6 +130,8 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
         'hero_secondary_cta' => 'Explore Services',
         'whatsapp_button' => 'Chat on WhatsApp',
         'trust_label' => 'Trusted by',
+        'service_card_link' => 'Learn more',
+        'service_supporting_label' => 'Also available',
         'footer_copyright' => 'All rights reserved.',
         'skip_link' => 'Skip to content',
         'menu_open' => 'Open menu',

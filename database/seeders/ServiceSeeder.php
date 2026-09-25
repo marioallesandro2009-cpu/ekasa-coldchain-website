@@ -14,6 +14,9 @@ class ServiceSeeder extends Seeder
 {
     use SeedsImages;
 
+    /** Placeholder for the first gallery photo in seeded blocks. */
+    private const GALLERY_PHOTO = '@gallery';
+
     public function run(): void
     {
         // slug, title [en, id], short description [en, id] (max. 60 characters), icon
@@ -47,7 +50,49 @@ class ServiceSeeder extends Seeder
             foreach ($detail['images'] as $collection => $image) {
                 $this->attachServiceImage($service, $collection, $image, 2400, 1600);
             }
+
+            $this->linkGalleryPhoto($service);
         }
+    }
+
+    /**
+     * teks_gambar block with the service's detail photo (filled in by linkGalleryPhoto).
+     *
+     * @param  array<string, string>  $eyebrow
+     * @param  array<string, string>  $title
+     * @param  array<string, string>  $text
+     * @param  array<string, string>  $points
+     * @return array{type: string, data: array<string, mixed>}
+     */
+    private function textImage(string $position, array $eyebrow, array $title, array $text, array $points): array
+    {
+        return ServiceBlocks::make('teks_gambar', [
+            'eyebrow' => $eyebrow,
+            'title' => $title,
+            'text' => $text,
+            'points' => $points,
+            'image' => self::GALLERY_PHOTO,
+            'image_position' => $position,
+        ]);
+    }
+
+    /**
+     * The teks_gambar block points at the first gallery photo (media uuid), known
+     * only once the photo is attached; without seeded photos it has no image.
+     */
+    private function linkGalleryPhoto(Service $service): void
+    {
+        // Fresh media: the relation was loaded (empty) before the photos were attached.
+        $uuid = $service->load('media')->getFirstMedia('gallery')?->uuid;
+        $blocks = array_map(function (array $block) use ($uuid): array {
+            if (($block['data']['image'] ?? null) === self::GALLERY_PHOTO) {
+                $block['data']['image'] = $uuid;
+            }
+
+            return $block;
+        }, (array) $service->blocks);
+
+        $service->forceFill(['blocks' => $blocks])->saveQuietly();
     }
 
     /**
@@ -90,6 +135,12 @@ class ServiceSeeder extends Seeder
                             ['prefix' => '', 'value' => 8100, 'suffix' => '', 'count_up' => true, 'label' => $t('Pallet positions', 'Posisi palet')],
                             ['prefix' => '', 'value' => 24, 'suffix' => '/7', 'count_up' => false, 'label' => $t('Temperature logging', 'Pencatatan suhu')],
                         ]]),
+                        $this->textImage('right',
+                            $t('Inside the rooms', 'Di dalam ruang'),
+                            $t('Every pallet has its place and its temperature', 'Setiap palet punya tempat dan suhunya'),
+                            $t('Goods are checked on arrival, labelled and stored in the zone that suits them. Doors stay shut, the air stays steady and the log keeps running.', 'Barang dicek saat tiba, diberi label, lalu disimpan di zona yang sesuai. Pintu tetap tertutup, udara tetap stabil, dan pencatatan suhu terus berjalan.'),
+                            $t("Checked on arrival\nStored by temperature zone\nFirst in, first out", "Dicek saat tiba\nDisimpan per zona suhu\nMasuk pertama, keluar pertama"),
+                        ),
                         ServiceBlocks::make('zona_suhu', [
                             'eyebrow' => $t('Temperature zones', 'Zona suhu'),
                             'title' => $t('The right room for every product', 'Ruang yang tepat untuk setiap produk'),
@@ -146,6 +197,12 @@ class ServiceSeeder extends Seeder
                             ['prefix' => '', 'value' => 6, 'suffix' => '', 'count_up' => true, 'label' => $t('Regular routes', 'Rute rutin')],
                             ['prefix' => '', 'value' => 4000, 'suffix' => 'kg', 'count_up' => true, 'label' => $t('Largest payload', 'Muatan terbesar')],
                         ]]),
+                        $this->textImage('left',
+                            $t('On the road', 'Di perjalanan'),
+                            $t('Loaded cold, delivered cold', 'Dimuat dingin, sampai tetap dingin'),
+                            $t('The box is cooled before the first carton goes in, and the temperature is logged until the last one comes out at the other end.', 'Boks didinginkan sebelum karton pertama masuk, dan suhunya dicatat sampai karton terakhir diturunkan di tujuan.'),
+                            $t("Box pre-cooled before loading\nLogger on every trip\nDrivers trained for cold cargo", "Boks didinginkan sebelum dimuat\nPencatat suhu di setiap perjalanan\nSopir terlatih untuk muatan dingin"),
+                        ),
                         ServiceBlocks::make('katalog_armada', [
                             'eyebrow' => $t('Fleet', 'Armada'),
                             'title' => $t('Refrigerated box trucks', 'Truk boks berpendingin'),
@@ -193,6 +250,12 @@ class ServiceSeeder extends Seeder
                             ['prefix' => '', 'value' => 3, 'suffix' => 'h', 'count_up' => true, 'label' => $t('Average delivery time', 'Rata-rata waktu antar')],
                             ['prefix' => '', 'value' => 16, 'suffix' => 'h', 'count_up' => true, 'label' => $t('Hub opening hours', 'Jam buka hub')],
                         ]]),
+                        $this->textImage('right',
+                            $t('At the door', 'Sampai di pintu'),
+                            $t('Packed for the last few kilometres', 'Dikemas untuk beberapa kilometer terakhir'),
+                            $t('Each order leaves the hub in an insulated box with cold packs sized to what is inside, so it arrives as cold as it left.', 'Setiap pesanan keluar dari hub dalam boks berinsulasi dengan cold pack sesuai isinya, sehingga tiba sedingin saat berangkat.'),
+                            $t("Insulated boxes\nCold packs sized to the order\nDelivered the same day", "Boks berinsulasi\nCold pack sesuai pesanan\nDiantar di hari yang sama"),
+                        ),
                         ServiceBlocks::make('lokasi_gudang', [
                             'eyebrow' => $t('City hubs', 'Hub kota'),
                             'title' => $t('Close to your customers', 'Dekat dengan pelanggan Anda'),
@@ -244,6 +307,12 @@ class ServiceSeeder extends Seeder
                                 ['icon' => 'map-pin', 'title' => $t('Last mile', 'Pengiriman akhir'), 'text' => $t('Delivered to stores and homes.', 'Diantar ke toko dan rumah.')],
                             ],
                         ]),
+                        $this->textImage('left',
+                            $t('Working together', 'Bekerja bersama'),
+                            $t('One plan from warehouse to doorstep', 'Satu rencana dari gudang sampai ke pintu'),
+                            $t('We sit down with your team, look at the forecast and set up storage, trucks and delivery around it, then review the numbers with you every month.', 'Kami duduk bersama tim Anda, melihat perkiraan permintaan, lalu mengatur gudang, truk, dan pengiriman sesuai perkiraan itu, dan meninjau angkanya bersama Anda setiap bulan.'),
+                            $t("Shared forecast\nOne view of your stock\nMonthly review", "Perkiraan bersama\nSatu tampilan stok\nTinjauan bulanan"),
+                        ),
                         ServiceBlocks::make('keunggulan', [
                             'title' => $t('Why one partner works better', 'Mengapa satu mitra lebih efektif'),
                             'items' => [

@@ -9,10 +9,12 @@ use App\Models\Concerns\RegistersWebpConversions;
 use App\Models\Concerns\Sortable;
 use App\Models\Contracts\HasTranslatableFields;
 use App\Support\Locales;
+use App\Support\MediaPresenter;
 use App\Support\ServiceIcons;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -142,6 +144,39 @@ class Service extends Model implements HasMedia, HasTranslatableFields
     }
 
     /**
+     * Path of the detail page in a language: /services/{slug}, /id/layanan/{slug}.
+     */
+    public function detailPath(?string $locale = null): string
+    {
+        $locale ??= Locales::current();
+        $segment = (string) config("site.locales.{$locale}.segments.services", 'services');
+
+        return Locales::path($locale, "/{$segment}/".$this->slugFor($locale));
+    }
+
+    /**
+     * Card photo (4:3): the service's card photo, or the side view of a fleet truck
+     * cropped on screen around the focus point (the file itself is never edited).
+     *
+     * @return array<string, mixed>|null
+     */
+    public function cardImage(): ?array
+    {
+        $alt = (string) $this->translate('title');
+        $vehicle = $this->cardFleetVehicle;
+
+        $image = $vehicle
+            ? MediaPresenter::image($vehicle->getFirstMedia('side'), 'lg', 'sm', 1200, 600, $alt)
+            : MediaPresenter::image($this->getFirstMedia('card'), 'lg', 'sm', 1200, 600, $alt);
+
+        if (! $image) {
+            return null;
+        }
+
+        return [...$image, 'focus' => $vehicle ? "{$this->card_focus_x}% {$this->card_focus_y}%" : '50% 50%'];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function toFrontend(): array
@@ -153,6 +188,10 @@ class Service extends Model implements HasMedia, HasTranslatableFields
             'icon' => ServiceIcons::has($this->icon) ? $this->icon : ServiceIcons::DEFAULT,
             'anchor' => ltrim((string) ($this->anchor ?: $this->slug), '#'),
             'featured' => $this->is_featured,
+            'keyPoints' => $this->keyPoints(),
+            'image' => $this->cardImage(),
+            // Detail page link once it is published (and the page route exists).
+            'url' => $this->isPublished() && Route::has('services.show') ? $this->detailPath() : null,
         ];
     }
 }
