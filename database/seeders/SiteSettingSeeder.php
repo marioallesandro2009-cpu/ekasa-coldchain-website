@@ -62,10 +62,10 @@ class SiteSettingSeeder extends Seeder
 
         $settings->markTranslationsReviewed('id')->save();
 
-        // Text-only placeholders (no symbol) until the real logo is uploaded in the admin.
-        $this->attachSeedImage($settings, 'logo_white', 'logo-placeholder-white', 500, 140);
-        $this->attachSeedImage($settings, 'logo_color', 'logo-placeholder-navy', 500, 140);
-        $this->attachSeedImage($settings, 'favicon', 'favicon-placeholder', 256, 256);
+        // Client logo (horizontal) and symbol; the white version is derived from the color one.
+        $this->attachSeedImage($settings, 'logo_white', 'logo-white', 597, 229);
+        $this->attachSeedImage($settings, 'logo_color', 'logo-color', 597, 229);
+        $this->attachSeedImage($settings, 'favicon', 'favicon', 512, 512);
         $this->attachSeedImage($settings, 'mega_menu_image', 'menu-services', 800, 600);
         $this->attachSeedImage($settings, 'og_image', 'hero-cold-storage', 1920, 1080);
     }

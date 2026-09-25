@@ -18,13 +18,16 @@ dipublikasikan**.
 
 ## Logo dan favicon (placeholder)
 
-Logo asli Ekasa Cold Chain belum ada. Sampai logo asli diunggah lewat
-**Pengaturan Situs › Umum**, seeder memakai placeholder buatan proyek ini:
+Logo Ekasa Cold Chain diberikan pemilik proyek (PNG transparan, **PERLU DICEK**:
+file raster, belum ada versi vektor/SVG dari klien). Seeder memakai:
 
-| File | Isi |
-|---|---|
-| logo-placeholder-white.svg / logo-placeholder-navy.svg | Teks "PT Ekasa Cold Chain" (Plus Jakarta Sans 800, huruf besar-kecil biasa, diubah menjadi path SVG), tanpa simbol |
-| favicon-placeholder.png, `public/favicon.ico` | Huruf "E" putih di kotak navy #0F2A4A |
+| File | Sumber | Isi |
+|---|---|---|
+| logo-color.png (597 x 229) | `logountukweb.png` | Logo horizontal, padding transparan dipangkas |
+| logo-white.png (597 x 229) | Turunan logo-color.png | Semua warna diubah menjadi putih; jalan putih 45% agar tetap terpisah dari segi enam |
+| favicon.png (512 x 512), `public/favicon.ico` (16/32/48) | `favicon.png` | Simbol segi enam, dipangkas persegi |
+
+Versi logo bertumpuk (`mediastandarlogo.png`) belum dipakai karena belum ada slot yang cocok.
 
 Logo dan favicon dari situs referensi desain (coldspace.id) sudah dihapus dari
 seeder, storage, dan media library.
