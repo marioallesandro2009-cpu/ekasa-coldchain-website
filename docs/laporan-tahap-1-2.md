@@ -514,7 +514,7 @@ Tidak diterjemahkan: nama merek, nama resmi, kontak, wilayah layanan, nama klien
 | Cold Storage | Cold Storage | Istilah industri, dipertahankan |
 | Temperature-Controlled Logistics (badge) | Logistik Terkendali Suhu | Tagline orisinal. Di judul SEO dipakai "Logistik Rantai Dingin" agar cocok dengan kata kunci pencarian |
 | Linehaul Transport | Transportasi Linehaul | "Linehaul" dipertahankan |
-| Refrigerated and dry trucks | Truk berpendingin dan dry | "Dry" dipertahankan |
+| Refrigerated and dry trucks | Truk berpendingin dan non-pendingin | "Dry" diterjemahkan menjadi "non-pendingin" |
 | Hyperlocal Fulfilment | Hyperlocal Fulfilment | Dipertahankan |
 | Logistic Partnership | Kemitraan Logistik | |
 | Omnichannel Integration | Integrasi Omnichannel | |
