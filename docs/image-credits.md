@@ -23,11 +23,34 @@ file raster, belum ada versi vektor/SVG dari klien). Seeder memakai:
 
 | File | Sumber | Isi |
 |---|---|---|
-| logo-color.png (597 x 229) | `logountukweb.png` | Logo horizontal, padding transparan dipangkas |
+| logo-color.png (597 x 229) | `logountukweb.png` | Logo horizontal, padding transparan dipangkas, warna disesuaikan ke palet brand |
 | logo-white.png (597 x 229) | Turunan logo-color.png | Semua warna diubah menjadi putih; jalan putih 45% agar tetap terpisah dari segi enam |
-| favicon.png (512 x 512), `public/favicon.ico` (16/32/48) | `favicon.png` | Simbol segi enam, dipangkas persegi |
+| favicon.png (512 x 512), `public/favicon.ico` (16/32/48) | `favicon.png` | Simbol segi enam, dipangkas persegi, warna disesuaikan ke palet brand |
 
 Versi logo bertumpuk (`mediastandarlogo.png`) belum dipakai karena belum ada slot yang cocok.
+
+**Tindak lanjut ke klien:** minta file vektor (SVG) logo asli. Logo saat ini
+raster (PNG, kemungkinan hasil generator gambar, tepinya tidak sepenuhnya
+bersih) dan akan diganti begitu SVG tersedia: unggah di **Pengaturan Situs ›
+Umum** (logo berwarna, logo putih, favicon) dan ganti file di
+`database/seeders/images/`.
+
+#### Penyesuaian warna logo ke palet brand
+
+Warna hijau dan abu tua pada `logo-color.png` dan `favicon.png` dipetakan tepat ke
+palet brand. Bentuk dan tepi tidak berubah: kanal alfa identik dengan file asli
+(0 piksel berbeda). Salinan sebelum penyesuaian ada di
+`database/seeders/images/_original/` (tidak ter-commit).
+
+| Bagian | Sebelum (median, logo / favicon) | Rentang p5-p95 sebelum (R/G/B) | Sesudah |
+|---|---|---|---|
+| Hijau (segi enam, "COLD CHAIN") | #0F6140 / #0B6037 | 10-22 / 92-106 / 60-73 | #0F6B46 (rata, tanpa variasi) |
+| Abu tua (jalan, "EKASA") | #1B222C / #1E262E | 24-31 / 30-38 / 40-48 | #2D3748 (rata, tanpa variasi) |
+
+Cara: setiap piksel diproyeksikan ke garis abu tua-hijau lama lalu dipetakan ke
+#2D3748-#0F6B46; hanya piksel campuran di batas kedua warna yang tetap bernada
+antara. `logo-white.png` dan `public/favicon.ico` dibuat ulang dari hasil ini.
+Perbandingan visual: `docs/screenshots/logo-warna-sebelum-sesudah.png`.
 
 Logo dan favicon dari situs referensi desain (coldspace.id) sudah dihapus dari
 seeder, storage, dan media library.
