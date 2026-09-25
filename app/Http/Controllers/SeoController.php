@@ -11,11 +11,12 @@ use App\Models\TrustLogo;
 use App\Support\FrontendData;
 use App\Support\Locales;
 use App\Support\Seo;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\Carbon;
 
 /**
- * robots.txt, sitemap.xml and llms.txt, generated from the CMS data.
+ * robots.txt, sitemap.xml, llms.txt and site.webmanifest, generated from the CMS data.
  */
 class SeoController extends Controller
 {
@@ -75,6 +76,25 @@ class SeoController extends Controller
             'baseUrl' => Seo::baseUrl(),
             'alternates' => Locales::alternates(),
         ])->render());
+    }
+
+    /**
+     * Web app manifest: name, favicon and the brand green for the browser UI.
+     */
+    public function manifest(): JsonResponse
+    {
+        $settings = FrontendData::all()['settings'];
+        $favicon = $settings['favicon'];
+
+        return response()->json([
+            'name' => $settings['companyName'],
+            'short_name' => $settings['companyName'],
+            'start_url' => '/',
+            'display' => 'browser',
+            'theme_color' => $settings['colors']['brand'],
+            'background_color' => $settings['colors']['brand'],
+            'icons' => $favicon ? [['src' => $favicon['url'], 'type' => $favicon['mime'], 'sizes' => 'any']] : [],
+        ], 200, ['Content-Type' => 'application/manifest+json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     private function text(string $content): Response

@@ -14,10 +14,10 @@
     x-ref="mobileMenu"
     @keydown="trapFocus($event)"
 >
-    <div class="mm-layer absolute inset-0 bg-navy-dark" aria-hidden="true"></div>
-    <div class="mm-layer mm-layer-2 absolute inset-0 bg-navy-light" aria-hidden="true"></div>
+    <div class="mm-layer absolute inset-0 bg-brand-soft" aria-hidden="true"></div>
+    <div class="mm-layer mm-layer-2 absolute inset-0 bg-brand" aria-hidden="true"></div>
 
-    <div class="mm-layer mm-panel absolute inset-0 flex flex-col bg-navy text-white">
+    <div class="mm-layer mm-panel absolute inset-0 on-dark flex flex-col bg-dark text-white">
         <x-ui.container class="flex h-16 shrink-0 items-center justify-between">
             <x-layout.logo :logo="$settings['logoWhite']" :name="$settings['companyName']" :height="32" :max-width="180" @click="closeMobile(false)" />
             <a
@@ -39,7 +39,7 @@
                             <details class="mm-details group">
                                 <summary class="flex min-h-14 cursor-pointer items-center justify-between gap-4 py-3 text-xl font-semibold text-white/90">
                                     <span class="flex items-center gap-3">
-                                        <span class="h-5 w-0.5 rounded-full bg-ice" x-show="active === '{{ $item['id'] }}'" x-cloak aria-hidden="true"></span>
+                                        <span class="h-5 w-0.5 rounded-full bg-highlight" x-show="active === '{{ $item['id'] }}'" x-cloak aria-hidden="true"></span>
                                         {{ $item['navLabel'] }}
                                     </span>
                                     <x-ui.icon name="chevron-down" class="mm-chevron size-5 text-white/70 transition-transform duration-300 motion-reduce:transition-none" />
@@ -52,7 +52,7 @@
                                                 class="flex min-h-14 items-center gap-4 rounded-card px-2 py-2.5 transition-colors active:bg-white/10"
                                                 @click="closeMobile(false)"
                                             >
-                                                <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-white/10 text-ice">
+                                                <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-white/10 text-highlight">
                                                     <x-ui.icon :name="$service['icon']" class="size-5" />
                                                 </span>
                                                 <span class="min-w-0">
@@ -73,7 +73,7 @@
                                 :aria-current="active === '{{ $item['id'] }}' ? 'location' : null"
                                 @click="closeMobile(false)"
                             >
-                                <span class="h-5 w-0.5 rounded-full bg-ice" x-show="active === '{{ $item['id'] }}'" x-cloak aria-hidden="true"></span>
+                                <span class="h-5 w-0.5 rounded-full bg-highlight" x-show="active === '{{ $item['id'] }}'" x-cloak aria-hidden="true"></span>
                                 {{ $item['navLabel'] }}
                             </a>
                         @endif

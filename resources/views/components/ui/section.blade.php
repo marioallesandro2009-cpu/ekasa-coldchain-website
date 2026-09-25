@@ -1,6 +1,6 @@
 {{--
     Page section with consistent vertical spacing (64px mobile, 96px desktop).
-    variant: white | surface | navy
+    variant: white | surface | dark
 --}}
 @props([
     'id' => null,
@@ -11,7 +11,7 @@
     $variants = [
         'white' => 'bg-white text-ink',
         'surface' => 'bg-surface text-ink',
-        'navy' => 'bg-navy text-white',
+        'dark' => 'on-dark bg-dark text-white',
     ];
 @endphp
 <section

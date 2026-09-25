@@ -15,7 +15,7 @@
                     :title="$section['title']"
                     :description="$section['description']"
                     align="center"
-                    :tone="$section['background'] === 'navy' ? 'dark' : 'light'"
+                    :tone="$section['background'] === 'dark' ? 'dark' : 'light'"
                 />
             </x-ui.section>
         @endforeach

@@ -15,7 +15,7 @@ class PageSectionSeeder extends Seeder
             ['locations', true, ['Locations', 'Lokasi'], ['Locations', 'Lokasi'], ['Our Locations', 'Lokasi Kami'], 'white'],
             ['about', true, ['About Us', 'Tentang Kami'], ['About Us', 'Tentang Kami'], ['About PT Ekasa Cold Chain', 'Tentang PT Ekasa Cold Chain'], 'surface'],
             ['clients', true, ['Clients', 'Klien'], ['Clients', 'Klien'], ['Our Clients', 'Klien Kami'], 'white'],
-            [PageSection::CONTACT, true, ['Contact', 'Kontak'], ['Contact', 'Kontak'], ['Talk to Our Team', 'Bicara dengan Tim Kami'], 'navy'],
+            [PageSection::CONTACT, true, ['Contact', 'Kontak'], ['Contact', 'Kontak'], ['Talk to Our Team', 'Bicara dengan Tim Kami'], 'dark'],
         ];
 
         $pair = fn (?array $texts): ?array => $texts ? ['en' => $texts[0], 'id' => $texts[1]] : null;

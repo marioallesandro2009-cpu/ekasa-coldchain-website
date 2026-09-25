@@ -9,16 +9,16 @@
     <meta charset="utf-8">
     <title>Pustaka ikon Ekasa (pratinjau)</title>
     <style>
-        body { margin: 0; padding: 24px; font: 13px/1.4 system-ui, sans-serif; color: #1a2b3c; background: #f5f8fb; }
+        body { margin: 0; padding: 24px; font: 13px/1.4 system-ui, sans-serif; color: #2d3748; background: #f5f7fa; }
         h1 { margin: 0 0 4px; font-size: 20px; }
-        h2 { margin: 28px 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: #5b6b7b; }
+        h2 { margin: 28px 0 10px; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: #647084; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
-        .card { display: grid; grid-template-columns: 1fr 1fr; border-radius: 10px; overflow: hidden; border: 1px solid #dde5ee; }
+        .card { display: grid; grid-template-columns: 1fr 1fr; border-radius: 10px; overflow: hidden; border: 1px solid #d0d5de; }
         .tile { display: flex; align-items: center; justify-content: space-around; padding: 14px 8px; }
-        .light { background: #fff; color: #0f2a4a; }
-        .dark { background: #0f2a4a; color: #fff; }
-        .name { grid-column: 1 / -1; padding: 8px 10px; background: #fff; border-top: 1px solid #dde5ee; }
-        .name code { color: #5b6b7b; }
+        .light { background: #fff; color: #0f6b46; }
+        .dark { background: #16231d; color: #fff; }
+        .name { grid-column: 1 / -1; padding: 8px 10px; background: #fff; border-top: 1px solid #d0d5de; }
+        .name code { color: #647084; }
         .s16 svg { width: 16px; height: 16px; display: block; }
         .s24 svg { width: 24px; height: 24px; display: block; }
         .s48 svg { width: 48px; height: 48px; display: block; }
@@ -26,7 +26,7 @@
 </head>
 <body>
     <h1>Pustaka ikon Ekasa · batch 1</h1>
-    <p>{{ count($manifest['icons']) }} ikon orisinal · 16, 24, 48 px · latar putih dan navy</p>
+    <p>{{ count($manifest['icons']) }} ikon orisinal · 16, 24, 48 px · latar putih dan gelap</p>
     @foreach ($manifest['categories'] as $category => $categoryLabel)
         @php($keys = array_keys(array_filter($manifest['icons'], fn (array $icon): bool => $icon[1] === $category)))
         @if ($keys)

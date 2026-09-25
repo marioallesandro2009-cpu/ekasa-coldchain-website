@@ -102,19 +102,18 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
     public const FAVICON_MIMES = ['image/png', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon'];
 
     /**
-     * Brand colors (hex), editable in the admin. Each key overrides the CSS
-     * token --color-<key> from resources/css/app.css at runtime.
+     * Brand colors (hex), editable in the admin. The defaults are the semantic
+     * tokens of resources/css/app.css (PT Ekasa Cold Chain palette; keep both in
+     * sync); a value that differs from its default overrides --color-<key> at runtime.
      */
     public const COLOR_DEFAULTS = [
-        'navy' => '#0F2A4A',
-        'navy-light' => '#153A63',
-        'navy-dark' => '#0A1D33',
-        'ice' => '#4FB3E8',
-        'accent' => '#F26A21',
-        'accent-hover' => '#F47C3C',
-        'surface' => '#F5F8FB',
-        'ink' => '#1A2B3C',
-        'ink-muted' => '#5B6B7B',
+        'brand' => '#0F6B46',
+        'brand-soft' => '#38A169',
+        'highlight' => '#9AD5AF',
+        'dark' => '#16231D',
+        'surface' => '#F5F7FA',
+        'ink' => '#2D3748',
+        'ink-muted' => '#647084',
     ];
 
     public const HEX_PATTERN = '/^#[0-9A-Fa-f]{6}$/';
@@ -199,6 +198,7 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
             'areaServed' => $this->area_served,
             'texts' => $this->uiTexts(Locales::current()),
             'colors' => $this->brandColors(),
+            'colorOverrides' => array_diff_assoc($this->brandColors(), self::COLOR_DEFAULTS),
             'logoWhite' => MediaPresenter::logo($this->getFirstMedia('logo_white'), 'logo_webp'),
             'logoColor' => MediaPresenter::logo($this->getFirstMedia('logo_color'), 'logo_webp'),
             'favicon' => $favicon ? ['url' => $favicon->getUrl(), 'mime' => $favicon->mime_type] : null,

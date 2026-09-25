@@ -23,7 +23,8 @@ class SiteSettingSeeder extends Seeder
             ],
             'area_served' => 'Indonesia',
             'cta_label' => ['en' => 'Get a Quote', 'id' => 'Minta Penawaran'],
-            'hero_badge' => ['en' => 'Temperature-Controlled Logistics', 'id' => 'Logistik Terkendali Suhu'],
+            // Brand tagline. The Indonesian translation must be confirmed by the client.
+            'hero_badge' => ['en' => 'Fresher Tomorrow, Further Together', 'id' => 'Segar Hari Esok, Melangkah Bersama'],
             'hero_headline' => ['en' => 'Keep your products fresh with', 'id' => 'Jaga produk Anda tetap segar dengan'],
             'hero_subtext' => [
                 'en' => 'Temperature-controlled storage, transport, and fulfilment across Indonesia, keeping every shipment at the right temperature from origin to shelf.',

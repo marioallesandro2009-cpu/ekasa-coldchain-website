@@ -44,8 +44,8 @@ final class Seo
             'image' => $image,
             'imageAlt' => (string) ($firstSlide['alt'] ?? $settings['companyName']),
             'preload' => $firstSlide,
-            // Browser UI color on phones: the navy brand color.
-            'themeColor' => (string) $settings['colors']['navy'],
+            // Browser UI color on phones: the brand green.
+            'themeColor' => (string) $settings['colors']['brand'],
         ];
     }
 

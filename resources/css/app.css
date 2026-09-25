@@ -53,17 +53,67 @@
         'Plus Jakarta Sans', ui-sans-serif, system-ui, -apple-system,
         'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 
-    --color-navy: #0f2a4a;
-    --color-navy-light: #153a63;
-    --color-navy-dark: #0a1d33;
-    --color-ice: #4fb3e8;
-    --color-teal: #2bb3a6;
-    /* Only for the primary CTA (text on it: navy-dark, 5.6:1). */
-    --color-accent: #f26a21;
-    --color-accent-hover: #f47c3c;
-    --color-surface: #f5f8fb;
-    --color-ink: #1a2b3c;
-    --color-ink-muted: #5b6b7b;
+    /*
+     * Brand palette (PT Ekasa Cold Chain guideline). Scales 50-950 in OKLCH, built
+     * around the client's value at its own step (marked "client"): lightness is
+     * spread evenly toward 50 and 950, chroma peaks around the middle, hue stays.
+     * Raw scale steps are for tokens only: components use the semantic tokens below.
+     * The editable semantic tokens (admin › Pengaturan Situs › Warna) mirror
+     * SiteSetting::COLOR_DEFAULTS; keep both in sync.
+     */
+    --color-brand-50: oklch(97.50% 0.0127 159.89); /* #F0FAF4 */
+    --color-brand-100: oklch(94.60% 0.0212 159.89); /* #E2F2E8 */
+    --color-brand-200: oklch(89.29% 0.0403 159.89); /* #C6E4D3 */
+    --color-brand-300: oklch(82.05% 0.0658 159.89); /* #A0D2B6 */
+    --color-brand-400: oklch(72.39% 0.0902 159.89); /* #71B892 */
+    --color-brand-500: oklch(63.21% 0.1061 159.89); /* #479D73 */
+    --color-brand-600: oklch(54.52% 0.1061 159.89); /* #29835A */
+    --color-brand-700: #0f6b46; /* client */
+    --color-brand-800: oklch(38.22% 0.086 159.89); /* #015032 */
+    --color-brand-900: oklch(28.57% 0.0641 159.89); /* #01341F */
+    --color-brand-950: oklch(20.00% 0.0451 159.89); /* #001C0F */
+
+    --color-brand-soft-50: oklch(97.50% 0.0154 156.2); /* #EFFAF2 */
+    --color-brand-soft-100: oklch(94.62% 0.0257 156.2); /* #E0F3E6 */
+    --color-brand-soft-200: oklch(89.34% 0.0488 156.2); /* #C3E6CF */
+    --color-brand-soft-300: oklch(82.14% 0.0795 156.2); /* #9AD5AF */
+    --color-brand-soft-400: oklch(72.54% 0.1091 156.2); /* #68BB8A */
+    --color-brand-soft-500: #38a169; /* client */
+    --color-brand-soft-600: oklch(54.11% 0.1283 156.2); /* #09844E */
+    --color-brand-soft-700: oklch(45.84% 0.1099 156.2); /* #02693D */
+    --color-brand-soft-800: oklch(37.57% 0.0902 156.2); /* #014F2C */
+    --color-brand-soft-900: oklch(28.27% 0.0677 156.2); /* #01331B */
+    --color-brand-soft-950: oklch(20.00% 0.0482 156.2); /* #001C0C */
+
+    --color-neutral-50: oklch(97.50% 0.0042 260.91); /* #F5F7FA */
+    --color-neutral-100: oklch(93.84% 0.007 260.91); /* #E8EBEF */
+    --color-neutral-200: oklch(87.14% 0.0132 260.91); /* #D0D5DE */
+    --color-neutral-300: oklch(78.00% 0.0216 260.91); /* #B0B8C6 */
+    --color-neutral-400: oklch(65.81% 0.0296 260.91); /* #8892A4 */
+    --color-neutral-500: oklch(54.23% 0.0348 260.91); /* #647084 */
+    --color-neutral-600: oklch(43.26% 0.0348 260.91); /* #465164 */
+    --color-neutral-700: #2d3748; /* client */
+    --color-neutral-800: oklch(29.19% 0.0286 260.91); /* #242C3A */
+    --color-neutral-900: oklch(24.32% 0.023 260.91); /* #1A202B */
+    --color-neutral-950: oklch(20.00% 0.0174 260.91); /* #12161E */
+
+    /* Semantic tokens (the only colors components use). */
+    --color-ink: var(--color-neutral-700);
+    --color-ink-muted: var(--color-neutral-500); /* 5.0:1 on white, 4.7:1 on surface */
+    --color-surface: var(--color-neutral-50);
+    --color-dark: oklch(24.32% 0.022 165); /* #16231D: neutral 900 with a green tint */
+    --color-brand: var(--color-brand-700);
+    --color-brand-soft: var(--color-brand-soft-500);
+    /* Text and accents on dark backgrounds (9.7:1 on dark). */
+    --color-highlight: var(--color-brand-soft-300);
+    --color-cta-dark-bg: var(--color-brand-soft);
+    --color-cta-dark-bg-hover: color-mix(in srgb, var(--color-cta-dark-bg) 80%, white);
+    --color-cta-dark-text: var(--color-neutral-950);
+    --color-cta-light-bg: var(--color-brand);
+    --color-cta-light-bg-hover: color-mix(in srgb, var(--color-cta-light-bg) 80%, black);
+    --color-cta-light-text: var(--color-white);
+    /* Photo overlays: a touch deeper than dark. */
+    --color-overlay: color-mix(in srgb, var(--color-dark) 80%, black);
 
     --radius-card: 12px;
 }
@@ -104,9 +154,14 @@
         }
     }
 
+    /* Focus ring: brand on light backgrounds; .on-dark areas switch to highlight. */
     :focus-visible {
-        outline: 2px solid var(--color-ice);
+        outline: 2px solid var(--focus-ring, var(--color-brand));
         outline-offset: 3px;
+    }
+
+    .on-dark {
+        --focus-ring: var(--color-highlight);
     }
 
     [tabindex='-1']:focus {
@@ -124,8 +179,8 @@
 
 /* Without JS the header is always solid; with JS it starts transparent. */
 .site-header {
-    background-color: color-mix(in srgb, var(--color-navy) 92%, transparent);
-    box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--color-navy-dark) 55%, transparent);
+    background-color: color-mix(in srgb, var(--color-dark) 92%, transparent);
+    box-shadow: 0 8px 24px -12px color-mix(in srgb, var(--color-dark) 55%, transparent);
     transition:
         background-color 250ms ease-out,
         box-shadow 250ms ease-out;
@@ -140,7 +195,7 @@
     backdrop-filter: blur(12px);
 }
 
-/* Navbar CTA: white outline while the navbar is transparent, solid accent after
+/* Navbar CTA: white outline while the navbar is transparent, solid dark CTA after
    scrolling past 40px. Without JS the header is solid, so the CTA stays solid. */
 .nav-cta {
     transition-property: background-color, color, box-shadow;
@@ -181,13 +236,13 @@ html:not(.js) .js-only {
     bottom: -2px;
     height: 2px;
     border-radius: 9999px;
-    background-color: var(--color-ice);
+    background-color: var(--color-highlight);
     transform: scaleX(0);
     transform-origin: left;
     transition: transform 200ms ease-out;
 }
 
-/* Active item: text stays white (never orange), 2px ice underline. */
+/* Active item: text stays white, 2px highlight underline. */
 .nav-link.is-active {
     color: var(--color-white);
 }
@@ -218,17 +273,18 @@ html:not(.js) .mega:focus-within .mega-panel,
     }
 }
 
-/* Soft layered shadow (no hard edge). */
+/* Soft layered shadow (no hard edge). Light card inside the dark header: brand focus ring. */
 .mega-card {
+    --focus-ring: var(--color-brand);
     box-shadow:
-        0 1px 2px color-mix(in srgb, var(--color-navy-dark) 6%, transparent),
-        0 8px 16px -4px color-mix(in srgb, var(--color-navy-dark) 8%, transparent),
-        0 24px 48px -12px color-mix(in srgb, var(--color-navy-dark) 18%, transparent);
+        0 1px 2px color-mix(in srgb, var(--color-dark) 6%, transparent),
+        0 8px 16px -4px color-mix(in srgb, var(--color-dark) 8%, transparent),
+        0 24px 48px -12px color-mix(in srgb, var(--color-dark) 18%, transparent);
 }
 
 /* Page dimmer behind the open mega menu (JS only). */
 .mega-backdrop {
-    background-color: color-mix(in srgb, var(--color-navy-dark) 40%, transparent);
+    background-color: color-mix(in srgb, var(--color-dark) 40%, transparent);
     opacity: 0;
     pointer-events: none;
     transition: opacity 200ms ease-out;
@@ -338,7 +394,7 @@ html:not(.js) .mobile-menu:target,
    (~0.66 darkness), which keeps WCAG AA even on a plain white photo. On very wide
    screens the gradient is wider than the screen and its faint end is cut off. */
 .hero-overlay-left {
-    --scrim: var(--color-navy-dark);
+    --scrim: var(--color-overlay);
     --text-end: calc(max(24px, (100% - 1280px) / 2 + 24px) + 560px);
     background-image: linear-gradient(
         90deg,
@@ -360,7 +416,7 @@ html:not(.js) .mobile-menu:target,
    height of the navbar text (~0.8 with the 18% layer) that the inactive language
    (white 60%) and the menu links pass WCAG AA on any photo, even plain white. */
 .hero-overlay-top {
-    --scrim: var(--color-navy-dark);
+    --scrim: var(--color-overlay);
     background-image: linear-gradient(
         180deg,
         color-mix(in srgb, var(--scrim) 82%, transparent) 0%,
@@ -374,7 +430,7 @@ html:not(.js) .mobile-menu:target,
 
 /* Bottom scrim: from the statistics bar up ~35% of the hero, eased (many stops). */
 .hero-overlay-bottom {
-    --scrim: var(--color-navy-dark);
+    --scrim: var(--color-overlay);
     background-image: linear-gradient(
         0deg,
         color-mix(in srgb, var(--scrim) 85%, transparent) 0%,

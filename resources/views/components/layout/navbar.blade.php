@@ -1,6 +1,6 @@
 {{--
     Site navbar. All links are real <a href> elements. Without JS the header is
-    solid navy, the mega menu opens on hover/focus and the mobile menu via :target.
+    solid dark, the mega menu opens on hover/focus and the mobile menu via :target.
 --}}
 @props(['settings', 'services', 'sections'])
 @php
@@ -12,12 +12,12 @@
 @endphp
 <div x-data="navbar" @keydown.escape.window="closeAll()">
     <header
-        class="site-header fixed inset-x-0 top-0 z-50 text-white"
+        class="site-header on-dark fixed inset-x-0 top-0 z-50 text-white"
         :class="{ 'is-solid': scrolled || megaOpen, 'is-scrolled': scrolled }"
     >
         <a
             href="#main"
-            class="sr-only rounded-full bg-white px-4 py-2 font-semibold text-navy focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-10"
+            class="sr-only rounded-full bg-white px-4 py-2 font-semibold text-brand focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-10"
         >{{ $texts['skip_link'] }}</a>
 
         <x-ui.container

@@ -20,7 +20,7 @@ it('renders the home page with title, meta description and headline in the raw H
         ->assertSee('<meta property="og:locale" content="en_US">', false)
         ->assertSee('<link rel="canonical"', false)
         ->assertSee('Keep your products fresh with')
-        ->assertSee('Temperature-Controlled Logistics');
+        ->assertSee('Fresher Tomorrow, Further Together');
 });
 
 it('puts the navbar, mega menu links, final statistics and a single h1 in the HTML', function () {
@@ -160,7 +160,7 @@ it('falls back to the original image when conversions are off (same payload shap
 it('puts the featured services in the mega menu grid and the others in the row below', function () {
     $html = $this->get('/')->getContent();
     $panel = substr($html, (int) strpos($html, 'id="mega-menu-services"'));
-    $divider = strpos($panel, 'border-t border-navy/10');
+    $divider = strpos($panel, 'border-t border-ink/10');
 
     expect(Service::query()->where('is_featured', true)->count())->toBe(4)
         ->and($divider)->toBeGreaterThan(strpos($panel, 'Logistic Partnership'))
@@ -169,7 +169,7 @@ it('puts the featured services in the mega menu grid and the others in the row b
     Service::query()->where('slug', 'omnichannel-integration')->update(['is_featured' => true]);
     FrontendData::flush();
 
-    expect($this->get('/')->getContent())->not->toContain('border-t border-navy/10');
+    expect($this->get('/')->getContent())->not->toContain('border-t border-ink/10');
 });
 
 it('caches only the front page data, never the rendered HTML', function () {
@@ -241,7 +241,7 @@ it('shows the statistic icons chosen in the admin and keeps an empty slot for st
     $html = $this->get('/')->getContent();
     $bar = substr($html, (int) strpos($html, '<dl'));
 
-    expect(substr_count($bar, 'size-5 text-ice'))->toBe(3)
+    expect(substr_count($bar, 'size-5 text-highlight'))->toBe(3)
         ->and(substr_count($bar, '<span class="mb-2 block size-5 lg:shorter:mb-1.5" aria-hidden="true"></span>'))->toBe(1);
 });
 

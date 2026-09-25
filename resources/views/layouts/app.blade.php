@@ -15,6 +15,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="theme-color" content="{{ $seo['themeColor'] }}">
+        <link rel="manifest" href="/site.webmanifest">
 
         <title>{{ $seo['title'] }}</title>
         <meta name="description" content="{{ $seo['description'] }}">
@@ -73,8 +74,10 @@
 
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        {{-- Brand colors from the admin (Pengaturan Situs › Warna); overrides the tokens in app.css. --}}
-        <style>:root{@foreach ($settings['colors'] as $name => $hex)--color-{{ $name }}:{{ $hex }};@endforeach}</style>
+        {{-- Brand colors changed in the admin (Pengaturan Situs › Warna); overrides the tokens in app.css. --}}
+        @if ($settings['colorOverrides'])
+            <style>:root{@foreach ($settings['colorOverrides'] as $name => $hex)--color-{{ $name }}:{{ $hex }};@endforeach}</style>
+        @endif
 
         @if ($jsonLd)
             <script type="application/ld+json">{!! json_encode($jsonLd, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>

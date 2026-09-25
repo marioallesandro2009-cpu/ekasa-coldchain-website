@@ -1,11 +1,11 @@
-{{-- One service link in the mega menu. Hover/focus: surface background, solid ice icon box. --}}
+{{-- One service link in the mega menu. Hover/focus: surface background, solid brand icon box. --}}
 @props(['service'])
 <a
     href="#{{ $service['anchor'] }}"
     class="group flex items-start gap-4 rounded-[10px] p-4 transition-colors duration-150 hover:bg-surface focus-visible:bg-surface"
     @click="closeMega()"
 >
-    <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-ice/10 text-navy transition-colors duration-150 group-hover:bg-ice group-hover:text-white group-focus-visible:bg-ice group-focus-visible:text-white">
+    <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-brand/10 text-brand transition-colors duration-150 group-hover:bg-brand group-hover:text-white group-focus-visible:bg-brand group-focus-visible:text-white">
         <x-ui.icon :name="$service['icon']" class="size-5" />
     </span>
     <span class="min-w-0">

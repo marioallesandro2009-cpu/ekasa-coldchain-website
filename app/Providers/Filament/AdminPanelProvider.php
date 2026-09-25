@@ -10,7 +10,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
-use Filament\Support\Colors\Color;
 use Filament\Widgets\AccountWidget;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -29,9 +28,23 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName(fn (): string => self::brandName())
+            // Brand scale from resources/css/app.css, one step lighter than Filament's
+            // default mapping: Filament draws buttons and links with 600, which is then
+            // exactly the client green #0F6B46 (brand 700 on the site).
             ->colors([
-                'primary' => Color::hex('#0F2A4A'),
-                'info' => Color::hex('#4FB3E8'),
+                'primary' => [
+                    50 => '#F0FAF4',
+                    100 => '#E2F2E8',
+                    200 => '#C6E4D3',
+                    300 => '#A0D2B6',
+                    400 => '#479D73',
+                    500 => '#29835A',
+                    600 => '#0F6B46',
+                    700 => '#015032',
+                    800 => '#01341F',
+                    900 => '#001C0F',
+                    950 => '#001209',
+                ],
             ])
             ->navigationGroups(['Konten Beranda'])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')

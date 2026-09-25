@@ -25,6 +25,7 @@ Route::middleware(SetLocale::class.':'.Locales::default())->group(function (): v
     Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
     Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
     Route::get('/llms.txt', [SeoController::class, 'llms'])->name('llms');
+    Route::get('/site.webmanifest', [SeoController::class, 'manifest'])->name('manifest');
 });
 
 // Preview sheet of the icon stock, only on a local machine.

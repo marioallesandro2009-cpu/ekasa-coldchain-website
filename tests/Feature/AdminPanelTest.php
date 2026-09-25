@@ -166,16 +166,47 @@ it('changes the brand colors with hex codes and outputs them as CSS variables', 
     $this->actingAs(User::factory()->create());
 
     Livewire::test(ManageSiteSettings::class)
-        ->assertSet('data.colors.navy', '#0F2A4A')
-        ->set('data.colors.navy', '#123456')
-        ->set('data.colors.accent', '#e85d04')
+        ->assertSet('data.colors.brand', '#0F6B46')
+        ->set('data.colors.brand', '#123456')
+        ->set('data.colors.brand-soft', '#e85d04')
         ->call('save')
         ->assertHasNoErrors();
 
     $this->get('/')
-        ->assertSee('--color-navy:#123456;', false)
-        ->assertSee('--color-accent:#E85D04;', false)
+        ->assertSee('--color-brand:#123456;', false)
+        ->assertSee('--color-brand-soft:#E85D04;', false)
+        ->assertDontSee('--color-ink:', false)
         ->assertSee('<meta name="theme-color" content="#123456">', false);
+});
+
+it('leaves the colors to app.css while they are the defaults', function () {
+    seedSite();
+
+    $this->get('/')
+        ->assertDontSee('<style>:root{', false)
+        ->assertSee('<meta name="theme-color" content="#0F6B46">', false);
+});
+
+it('keeps the default colors in sync with the tokens in app.css', function () {
+    $css = (string) file_get_contents(resource_path('css/app.css'));
+
+    // Hex of a token: the client value itself, or the "/* #RRGGBB" comment after an oklch() value.
+    $hex = function (string $token) use ($css, &$hex): string {
+        preg_match('/^\s*--color-'.preg_quote($token, '/').':\s*([^;]+);(?:\s*\/\*\s*(#[0-9A-Fa-f]{6}))?/m', $css, $match);
+        expect($match)->not->toBeEmpty();
+
+        if (preg_match('/^var\(--color-([a-z0-9-]+)\)$/', trim($match[1]), $var)) {
+            return $hex($var[1]);
+        }
+
+        return strtoupper(str_starts_with(trim($match[1]), '#') ? trim($match[1]) : $match[2]);
+    };
+
+    foreach (SiteSetting::COLOR_DEFAULTS as $key => $default) {
+        expect($hex($key))->toBe($default, "--color-{$key}");
+    }
+
+    expect($hex('cta-dark-text'))->toBe(ColorContrast::CTA_DARK_TEXT);
 });
 
 it('rejects colors that are not 6-digit hex codes', function (string $value) {
@@ -183,22 +214,22 @@ it('rejects colors that are not 6-digit hex codes', function (string $value) {
     $this->actingAs(User::factory()->create());
 
     Livewire::test(ManageSiteSettings::class)
-        ->set('data.colors.ice', $value)
+        ->set('data.colors.highlight', $value)
         ->call('save')
-        ->assertHasErrors(['data.colors.ice']);
-})->with(['red', '#FFF', '#GGGGGG', '0F2A4A']);
+        ->assertHasErrors(['data.colors.highlight']);
+})->with(['red', '#FFF', '#GGGGGG', '0F6B46']);
 
 it('warns about low text contrast but still saves the colors', function () {
     seedSite();
     $this->actingAs(User::factory()->create());
 
     Livewire::test(ManageSiteSettings::class)
-        ->set('data.colors.accent', '#0A1D33')
+        ->set('data.colors.brand-soft', '#16231D')
         ->call('save')
         ->assertHasNoErrors()
         ->assertNotified('Kontras warna kurang');
 
-    expect(SiteSetting::current()->brandColors()['accent'])->toBe('#0A1D33');
+    expect(SiteSetting::current()->brandColors()['brand-soft'])->toBe('#16231D');
 });
 
 it('passes WCAG AA with the default colors', function () {

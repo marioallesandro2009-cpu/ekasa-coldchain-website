@@ -63,7 +63,7 @@ it('shows the admin content in Indonesian under /id', function () {
         ->assertOk()
         ->assertSee('<title>PT Ekasa Cold Chain | Logistik Rantai Dingin di Indonesia</title>', false)
         ->assertSee('Jaga produk Anda tetap segar dengan')
-        ->assertSee('Logistik Terkendali Suhu')
+        ->assertSee('Segar Hari Esok, Melangkah Bersama')
         ->assertSee('Minta Penawaran')
         ->assertSee('Transportasi Linehaul')
         ->assertSee('Rentang Suhu')

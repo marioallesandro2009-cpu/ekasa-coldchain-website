@@ -1,6 +1,6 @@
 {{--
     Section heading: small eyebrow + title + optional description, fades in once visible.
-    align: left | center; level: heading level (2 by default); tone: light | dark (dark = on navy).
+    align: left | center; level: heading level (2 by default); tone: light | dark (dark = on a dark background).
 --}}
 @props([
     'eyebrow' => null,
@@ -23,8 +23,8 @@
     @if ($eyebrow)
         <p @class([
             'text-sm font-bold tracking-[0.14em] uppercase',
-            'text-ice' => $tone === 'dark',
-            'text-navy' => $tone !== 'dark',
+            'text-highlight' => $tone === 'dark',
+            'text-brand' => $tone !== 'dark',
         ])>{{ $eyebrow }}</p>
     @endif
     <{{ $tag }}

@@ -28,7 +28,7 @@
 @endphp
 <section
     id="home"
-    class="hero relative isolate flex min-h-[max(100svh,640px)] flex-col overflow-hidden bg-navy-dark text-white"
+    class="hero relative isolate flex min-h-[max(100svh,640px)] flex-col overflow-hidden on-dark bg-dark text-white"
     aria-labelledby="hero-title"
     @if ($isSlideshow)
         x-data="hero(@js($config))"
@@ -50,13 +50,13 @@
             >
         @endif
 
-        {{-- Overlays (no blur, the photo stays sharp): an even navy-dark 18% over the whole
+        {{-- Overlays (no blur, the photo stays sharp): an even overlay 18% over the whole
              photo, the left scrim (lg+, see .hero-overlay-left) and the bottom scrim above the
              statistics bar (below). Together they keep the subtext at WCAG AA on any photo. --}}
-        <div class="absolute inset-0 z-10 bg-navy-dark/18"></div>
+        <div class="absolute inset-0 z-10 bg-overlay/18"></div>
         <div class="hero-overlay-left absolute inset-0 z-10 hidden lg:block"></div>
         {{-- Below lg the text spans the full width: an even tint instead of the left scrim. --}}
-        <div class="absolute inset-0 z-10 bg-navy-dark/64 lg:hidden"></div>
+        <div class="absolute inset-0 z-10 bg-overlay/64 lg:hidden"></div>
         <div class="hero-overlay-top absolute inset-x-0 top-0 z-10 h-44"></div>
     </div>
 
@@ -67,7 +67,7 @@
             {{-- 1. Badge --}}
             <div x-data="animatedContent" x-intersect.once="show()" data-animate data-delay="0">
                 <p class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3.5 py-1.5 text-[13px] font-semibold sm:text-sm">
-                    <span class="size-1.5 shrink-0 rounded-full bg-ice" aria-hidden="true"></span>
+                    <span class="size-1.5 shrink-0 rounded-full bg-highlight" aria-hidden="true"></span>
                     <span class="shiny-text">{{ $settings['heroBadge'] }}<span class="shiny-glint" data-text="{{ $settings['heroBadge'] }}" aria-hidden="true"></span></span>
                 </p>
             </div>
@@ -89,7 +89,7 @@
                          (~0.56em per character, measured 0.47-0.52em), so narrow screens do not
                          reserve an empty second line. --}}
                     <span
-                        class="grid text-ice"
+                        class="grid text-highlight"
                         style="font-size: min(1em, calc(100cqi / ({{ $labelChars }} * 0.56)))"
                         aria-hidden="true"
                     >
@@ -114,7 +114,7 @@
 
             {{-- 4. Actions --}}
             <div class="mt-6 flex items-center gap-3 sm:mt-8 sm:gap-4 lg:short:mt-6 lg:shorter:mt-5" x-data="animatedContent" x-intersect.once="show()" data-animate data-delay="0.3">
-                <x-ui.button :href="'#'.\App\Models\PageSection::CONTACT" size="lg" class="shrink-0 shadow-lg shadow-accent/30">
+                <x-ui.button :href="'#'.\App\Models\PageSection::CONTACT" size="lg" class="shrink-0 shadow-lg shadow-cta-dark-bg/30">
                     {{ $settings['ctaLabel'] }}
                 </x-ui.button>
                 <x-ui.button href="#services" variant="secondary" size="lg" icon="arrow-right" class="group min-w-0">
@@ -178,14 +178,14 @@
                             >
                                 <span class="block h-0.5 overflow-hidden rounded-full bg-white/25">
                                     <span
-                                        class="hero-progress block h-full rounded-full bg-white"
+                                        class="hero-progress block h-full rounded-full bg-highlight"
                                         data-progress="{{ $i }}"
                                         @animationend="onProgressEnd({{ $i }})"
                                     ></span>
                                 </span>
                                 <span
                                     class="mt-2.5 hidden truncate text-sm font-semibold transition-colors duration-200 sm:block"
-                                    :class="index === {{ $i }} ? 'text-white' : 'text-white/70 group-hover:text-white/90'"
+                                    :class="index === {{ $i }} ? 'text-highlight' : 'text-white/70 group-hover:text-white/90'"
                                 >{{ $slide['label'] }}</span>
                             </button>
                         @endforeach
@@ -209,7 +209,7 @@
         {{-- Columns sit in the same container as the logo and headline: the first column
              starts at the headline edge, the last one ends at the navbar CTA edge.
              Every column has the same inner padding. --}}
-        <div class="border-t border-white/10 bg-navy-dark/55 backdrop-blur-md">
+        <div class="border-t border-white/10 bg-dark/55 backdrop-blur-md">
             <x-ui.container
                 as="dl"
                 class="grid grid-cols-2 md:grid-cols-[repeat(var(--stat-cols),minmax(0,1fr))]"
@@ -239,7 +239,7 @@
                             style="font-size: clamp(20px, calc(100cqi / ({{ $valueChars }} * 0.62)), 32px)"
                         >
                             @if ($stat['icon'])
-                                <x-ui.icon :name="$stat['icon']" stroke-width="1.5" class="mb-2 block size-5 text-ice lg:shorter:mb-1.5" />
+                                <x-ui.icon :name="$stat['icon']" stroke-width="1.5" class="mb-2 block size-5 text-highlight lg:shorter:mb-1.5" />
                             @elseif ($hasIcons)
                                 <span class="mb-2 block size-5 lg:shorter:mb-1.5" aria-hidden="true"></span>
                             @endif

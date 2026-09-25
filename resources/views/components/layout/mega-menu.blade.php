@@ -13,7 +13,7 @@
     {{ $attributes->class('mega-panel absolute inset-x-0 top-full pt-2') }}
 >
     <x-ui.container>
-        <div class="mega-card grid grid-cols-[minmax(0,1fr)_320px] gap-6 rounded-2xl bg-white p-5 text-ink ring-1 ring-navy/5 xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div class="mega-card grid grid-cols-[minmax(0,1fr)_320px] gap-6 rounded-2xl bg-white p-5 text-ink ring-1 ring-ink/5 xl:grid-cols-[minmax(0,1fr)_360px]">
             <div class="flex flex-col">
                 @if ($featured)
                     <ul class="grid grid-cols-2 content-start gap-1">
@@ -24,7 +24,7 @@
                 @endif
 
                 @if ($others)
-                    <ul @class(['grid gap-1', 'mt-3 border-t border-navy/10 pt-3' => $featured])>
+                    <ul @class(['grid gap-1', 'mt-3 border-t border-ink/10 pt-3' => $featured])>
                         @foreach ($others as $service)
                             <li><x-layout.mega-menu-item :service="$service" /></li>
                         @endforeach
@@ -34,7 +34,7 @@
 
             <a
                 href="#{{ $contactId }}"
-                class="group relative block aspect-[4/3] overflow-hidden rounded-card bg-navy"
+                class="group relative block aspect-[4/3] overflow-hidden rounded-card bg-dark"
                 @click="closeMega()"
             >
                 @if ($image = $megaMenu['image'])
@@ -50,10 +50,10 @@
                         class="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
                     >
                 @endif
-                <span class="absolute inset-0 bg-linear-to-t from-navy-dark/95 via-navy-dark/45 to-navy-dark/0" aria-hidden="true"></span>
+                <span class="absolute inset-0 bg-linear-to-t from-overlay/95 via-overlay/45 to-overlay/0" aria-hidden="true"></span>
                 <span class="absolute inset-x-0 bottom-0 p-5 text-white">
                     <span class="block text-lg leading-snug font-bold">{{ $megaMenu['title'] }}</span>
-                    <span class="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-ice">
+                    <span class="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-highlight">
                         {{ $megaMenu['linkLabel'] }}
                         <x-ui.icon name="arrow-right" class="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
                     </span>

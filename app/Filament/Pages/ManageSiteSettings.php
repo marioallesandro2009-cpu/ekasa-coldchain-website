@@ -155,9 +155,9 @@ class ManageSiteSettings extends Page
                             ]),
                             Grid::make(3)->schema([
                                 self::logoUpload('logo_white', 'Logo putih')
-                                    ->helperText('Tampil di navbar (latar gelap). PNG/SVG transparan, tinggi ideal minimal 72 px.'),
+                                    ->helperText('Versi terang: ikon dan tulisan putih. Tampil di navbar transparan dan latar gelap. PNG/SVG transparan, tinggi ideal minimal 72 px.'),
                                 self::logoUpload('logo_color', 'Logo berwarna')
-                                    ->helperText('Untuk latar terang. PNG/SVG transparan.'),
+                                    ->helperText('Versi standar (berwarna) untuk latar terang. PNG/SVG transparan.'),
                                 ImageUpload::limitDimensions(SpatieMediaLibraryFileUpload::make('favicon'), '512 x 512 px')
                                     ->label('Favicon')
                                     ->collection('favicon')
@@ -234,16 +234,14 @@ class ManageSiteSettings extends Page
                     Tab::make('Warna')
                         ->icon(Heroicon::OutlinedSwatch)
                         ->schema([
-                            Text::make('Ketik kode hex 6 digit (misalnya #0F2A4A) atau pilih lewat kotak warna. Perubahan langsung berlaku di website setelah disimpan. Setelah menyimpan, sistem memeriksa kontras teks dan memberi peringatan jika ada teks yang sulit dibaca (di bawah standar WCAG AA 4,5:1).')
+                            Text::make('Ketik kode hex 6 digit (misalnya #0F6B46) atau pilih lewat kotak warna. Perubahan langsung berlaku di website setelah disimpan. Setelah menyimpan, sistem memeriksa kontras teks dan memberi peringatan jika ada teks yang sulit dibaca (di bawah standar WCAG AA 4,5:1).')
                                 ->color('gray'),
                             Grid::make(3)->schema([
-                                self::color('navy', 'Navy', 'Latar navbar saat di-scroll, section navy, ikon.'),
-                                self::color('navy-dark', 'Navy gelap', 'Latar hero, footer, overlay foto, teks tombol CTA.'),
-                                self::color('navy-light', 'Navy terang', 'Lapisan animasi menu mobile.'),
-                                self::color('ice', 'Ice (biru muda)', 'Label layanan di hero, garis menu aktif, eyebrow di latar navy, fokus keyboard.'),
-                                self::color('accent', 'Accent (CTA)', 'Tombol utama "Get a Quote". Hanya untuk CTA utama.'),
-                                self::color('accent-hover', 'Accent saat hover', 'Tombol utama saat disorot kursor.'),
-                                self::color('surface', 'Latar abu-abu muda', 'Latar section "abu-abu muda" dan kartu mega menu.'),
+                                self::color('brand', 'Hijau brand (primary)', 'Tombol CTA di latar terang, eyebrow dan ikon di latar terang, fokus keyboard di latar terang, admin.'),
+                                self::color('brand-soft', 'Hijau sedang (secondary)', 'Tombol CTA di latar gelap (hero, navbar setelah di-scroll).'),
+                                self::color('highlight', 'Hijau muda (highlight)', 'Teks dan aksen di latar gelap: label layanan di hero, indikator aktif, garis menu aktif, fokus keyboard.'),
+                                self::color('dark', 'Latar gelap', 'Navbar setelah di-scroll, menu mobile, footer, section gelap, dasar overlay foto.'),
+                                self::color('surface', 'Latar abu-abu muda', 'Latar section "abu-abu muda" dan layanan di mega menu saat disorot.'),
                                 self::color('ink', 'Teks utama', 'Warna teks di latar terang.'),
                                 self::color('ink-muted', 'Teks sekunder', 'Deskripsi dan teks kecil di latar terang.'),
                             ]),
@@ -377,7 +375,7 @@ class ManageSiteSettings extends Page
             ->hex()
             ->required()
             ->regex(SiteSetting::HEX_PATTERN)
-            ->validationMessages(['regex' => 'Gunakan kode hex 6 digit, misalnya #0F2A4A.'])
+            ->validationMessages(['regex' => 'Gunakan kode hex 6 digit, misalnya #0F6B46.'])
             ->placeholder(SiteSetting::COLOR_DEFAULTS[$key])
             ->helperText($usage.' Bawaan: '.SiteSetting::COLOR_DEFAULTS[$key]);
     }

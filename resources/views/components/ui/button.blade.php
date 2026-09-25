@@ -1,7 +1,7 @@
 {{--
     Button / link button.
-    variant: primary (accent, main CTA only) | secondary (outline) | ghost
-    tone:    dark (on navy/photos) | light (on white/surface) - affects secondary and ghost
+    variant: primary (main CTA) | secondary (outline) | ghost
+    tone:    dark (on dark/photos) | light (on white/surface)
     size:    md | lg
     Renders <a> when href is given, otherwise <button>.
 --}}
@@ -21,13 +21,15 @@
     ];
 
     $variants = [
-        'primary' => 'bg-accent text-navy-dark hover:bg-accent-hover',
+        'primary' => $tone === 'dark'
+            ? 'bg-cta-dark-bg text-cta-dark-text hover:bg-cta-dark-bg-hover'
+            : 'bg-cta-light-bg text-cta-light-text hover:bg-cta-light-bg-hover',
         'secondary' => $tone === 'dark'
             ? 'border border-white/70 text-white hover:bg-white/10'
-            : 'border border-navy/30 text-navy hover:border-navy hover:bg-navy/5',
+            : 'border border-brand/30 text-brand hover:border-brand hover:bg-brand/5',
         'ghost' => $tone === 'dark'
             ? 'text-white hover:bg-white/10'
-            : 'text-navy hover:bg-navy/5',
+            : 'text-brand hover:bg-brand/5',
     ];
 
     $classes = [$base, $sizes[$size] ?? $sizes['md'], $variants[$variant] ?? $variants['primary']];

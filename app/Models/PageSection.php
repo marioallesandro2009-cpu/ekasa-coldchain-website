@@ -41,7 +41,7 @@ class PageSection extends Model implements HasTranslatableFields
     public const BACKGROUNDS = [
         'white' => 'Putih',
         'surface' => 'Abu-abu muda',
-        'navy' => 'Navy (gelap)',
+        'dark' => 'Gelap',
     ];
 
     protected function casts(): array
