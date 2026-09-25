@@ -56,6 +56,19 @@ final class Translatable
     }
 
     /**
+     * One field per language side by side, without the per-field review buttons
+     * (block contents: the block has one "Versi ID sudah dicek" switch instead).
+     *
+     * @param  Closure(string $locale): Field  $make
+     */
+    public static function pair(Closure $make): Grid
+    {
+        return Grid::make(count(Locales::all()))
+            ->schema(array_map($make, Locales::all()))
+            ->columnSpanFull();
+    }
+
+    /**
      * "Judul" -> "Judul (EN)".
      */
     public static function label(string $label, string $locale): string

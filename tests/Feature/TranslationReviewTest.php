@@ -27,7 +27,7 @@ it('shows a checked Indonesian text on /id, and the English text for a draft', f
     // Seeded texts are checked; the new text keeps its "reviewed" status.
     $this->get('/id')->assertSee('Ruang dingin dan beku');
 
-    $service->update(['translation_status' => ['id' => ['title' => 'reviewed', 'short_description' => 'draft']]]);
+    $service->update(['translation_status' => ['id' => [...$service->translation_status['id'], 'short_description' => 'draft']]]);
 
     $this->get('/id')->assertDontSee('Ruang dingin dan beku')->assertSee('Chilled and frozen rooms');
     expect($service->refresh()->draftTranslations('id'))->toBe(['short_description']);
@@ -80,9 +80,10 @@ it('replaces glossary terms that have a fixed translation', function () {
 });
 
 it('counts empty and unchecked Indonesian texts on the dashboard', function () {
-    coldStorage()->update([
+    $service = coldStorage();
+    $service->update([
         'title' => ['en' => 'Cold Storage', 'id' => ''],
-        'translation_status' => ['id' => ['short_description' => 'draft']],
+        'translation_status' => ['id' => [...$service->translation_status['id'], 'short_description' => 'draft']],
     ]);
     $this->actingAs(User::factory()->create());
 

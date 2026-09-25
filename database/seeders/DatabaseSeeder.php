@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             SiteSettingSeeder::class,
             IconLibrarySeeder::class,
+            ServiceDataSeeder::class,
             PageSectionSeeder::class,
             ServiceSeeder::class,
             HeroSlideSeeder::class,

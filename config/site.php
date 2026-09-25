@@ -34,12 +34,13 @@ return [
     |
     | The first language is the default: it lives at the root (/) and is the
     | fallback for empty translations. The others live under their prefix.
+    | segments: translated first URL segment of a page type (/services/..., /id/layanan/...).
     |
     */
 
     'locales' => [
-        'en' => ['prefix' => '', 'og' => 'en_US', 'native' => 'English'],
-        'id' => ['prefix' => 'id', 'og' => 'id_ID', 'native' => 'Bahasa Indonesia'],
+        'en' => ['prefix' => '', 'og' => 'en_US', 'native' => 'English', 'segments' => ['services' => 'services']],
+        'id' => ['prefix' => 'id', 'og' => 'id_ID', 'native' => 'Bahasa Indonesia', 'segments' => ['services' => 'layanan']],
     ],
 
     // Order in the navbar language switch ("ID | EN").
