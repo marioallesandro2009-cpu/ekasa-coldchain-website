@@ -17,5 +17,8 @@
         "playwright-core": "^1.63.0",
         "tailwindcss": "^4.1.11",
         "vite": "^8.0.0"
+    },
+    "dependencies": {
+        "leaflet": "^1.9.4"
     }
 }

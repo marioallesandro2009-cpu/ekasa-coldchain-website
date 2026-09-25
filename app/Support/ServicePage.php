@@ -14,12 +14,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * View data of a service detail page in one language: the resolved blocks
  * (hidden and empty blocks dropped), SEO values and JSON-LD. Block texts use the
  * Indonesian version only when the block is marked "Versi ID sudah dicek".
- * Blocks without a template yet (the special blocks, Bagian D) are skipped.
+ * The special blocks are resolved by App\Support\ServiceSpecialBlocks.
  */
 final class ServicePage
 {
     /** Block types rendered by resources/views/components/blocks/{type}.blade.php. */
-    public const RENDERED = ['hero_layanan', 'pita_spesifikasi', 'keunggulan', 'teks_gambar', 'cara_kerja', 'industri', 'galeri', 'faq', 'cta_penutup'];
+    public const RENDERED = ['hero_layanan', 'pita_spesifikasi', 'keunggulan', 'teks_gambar', 'cara_kerja', 'industri', 'galeri', 'faq', 'cta_penutup', 'zona_suhu', 'lokasi_gudang', 'katalog_armada', 'skema_sewa', 'diagram_rute', 'alur_end_to_end'];
 
     /** Blocks on a dark band; the others alternate white and light grey. */
     private const DARK = ['pita_spesifikasi', 'cta_penutup'];
@@ -272,7 +272,7 @@ final class ServicePage
                 return [...$heading, 'cta' => $button($text($data['button_label'] ?? null), (string) ($data['target'] ?? 'contact'))];
         }
 
-        return null;
+        return ServiceSpecialBlocks::resolve($type, $data, $heading, $text, $settings, $locale);
     }
 
     /**

@@ -133,7 +133,7 @@ it('skips hidden and empty blocks', function () {
 
     $html = $this->get('/services/cold-storage')->getContent();
     expect($html)->not->toContain('id="keunggulan"')
-        ->not->toContain('data-animated-list')
+        ->not->toContain('id="faq"')
         ->not->toContain('"FAQPage"');
 });
 
