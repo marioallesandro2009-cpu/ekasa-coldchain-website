@@ -48,9 +48,12 @@
             <meta name="twitter:image" content="{{ $seo['image']['url'] }}">
         @endif
 
-        @if ($settings['favicon'])
-            <link rel="icon" href="{{ $settings['favicon']['url'] }}" type="{{ $settings['favicon']['mime'] }}">
-            <link rel="apple-touch-icon" href="{{ $settings['favicon']['url'] }}">
+        @if ($favicon = $settings['favicon'])
+            @if ($favicon['sizes'][32] !== $favicon['url'])
+                <link rel="icon" href="{{ $favicon['sizes'][32] }}" type="image/png" sizes="32x32">
+            @endif
+            <link rel="icon" href="{{ $favicon['url'] }}" type="{{ $favicon['mime'] }}">
+            <link rel="apple-touch-icon" href="{{ $favicon['sizes'][180] }}">
         @else
             <link rel="icon" href="/favicon.ico" sizes="any">
         @endif

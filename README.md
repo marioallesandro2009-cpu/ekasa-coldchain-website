@@ -45,6 +45,7 @@ vendor/bin/pint --test                   # gaya kode
 vendor/bin/phpstan analyse               # analisis statis
 node scripts/browser-check.mjs           # perilaku + screenshot (Chrome headless)
 node scripts/contrast-check.mjs          # kontras subteks hero di semua foto
+node scripts/hero-overlay-check.mjs      # kontras terburuk overlay hero (foto, gambar terang, putih polos)
 ```
 
 ## Konversi WebP
@@ -52,6 +53,18 @@ node scripts/contrast-check.mjs          # kontras subteks hero di semua foto
 `IMAGE_CONVERSIONS=auto|on|off` di `.env` (default `auto` = aktif jika GD/Imagick ada).
 Tanpa konversi, upload tetap berhasil dan situs memakai file original dengan struktur data
 yang sama. Status tampil di halaman admin **Pengaturan Situs**.
+
+## Warna brand dan logo
+
+Palet resmi: #0F6B46 (primary), #38A169 (secondary), #2D3748 (neutral). Token ada di
+`resources/css/app.css` (`@theme`); komponen hanya memakai token semantik. Rincian, tabel
+kontras, dan pemetaan komponen: [docs/warna-brand.md](docs/warna-brand.md). Tujuh token
+bisa diubah di admin (**Pengaturan Situs › Warna**).
+
+Logo dan favicon dari klien (PNG) ada di `database/seeders/images/` (logo warna, logo putih
+untuk latar gelap, favicon 512 px); bisa diganti di **Pengaturan Situs › Umum**. Favicon
+32/180/192 px dibuat otomatis dari favicon yang diunggah. File SVG logo masih diminta ke
+klien, lihat [docs/image-credits.md](docs/image-credits.md).
 
 ## Foto seeder
 
@@ -87,6 +100,6 @@ Lalu:
 php artisan migrate --force --seed
 php artisan storage:link
 php artisan filament:assets
-php artisan media-library:regenerate   # buat semua versi WebP
+php artisan media-library:regenerate   # buat semua versi WebP dan ukuran favicon
 php artisan optimize
 ```

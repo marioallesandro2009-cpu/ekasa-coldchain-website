@@ -93,7 +93,10 @@ class SeoController extends Controller
             'display' => 'browser',
             'theme_color' => $settings['colors']['brand'],
             'background_color' => $settings['colors']['brand'],
-            'icons' => $favicon ? [['src' => $favicon['url'], 'type' => $favicon['mime'], 'sizes' => 'any']] : [],
+            'icons' => $favicon ? array_values(array_filter([
+                $favicon['sizes'][192] !== $favicon['url'] ? ['src' => $favicon['sizes'][192], 'type' => 'image/png', 'sizes' => '192x192'] : null,
+                ['src' => $favicon['url'], 'type' => $favicon['mime'], 'sizes' => $favicon['width'] > 0 ? "{$favicon['width']}x{$favicon['height']}" : 'any'],
+            ])) : [],
         ], 200, ['Content-Type' => 'application/manifest+json'], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 

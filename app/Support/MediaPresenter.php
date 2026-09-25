@@ -91,7 +91,7 @@ final class MediaPresenter
 
         return [
             'url' => $media->getUrl(),
-            'webp' => $media->hasGeneratedConversion($webpConversion) ? $media->getUrl($webpConversion) : null,
+            'webp' => self::hasConversion($media, $webpConversion) ? $media->getUrl($webpConversion) : null,
             'width' => $width,
             'height' => $height,
         ];
@@ -104,7 +104,7 @@ final class MediaPresenter
     {
         [$width, $height] = self::originalDimensions($media);
 
-        if (! $media->hasGeneratedConversion($conversion)) {
+        if (! self::hasConversion($media, $conversion)) {
             return ['url' => $media->getUrl(), 'width' => $width, 'height' => $height];
         }
 
@@ -113,6 +113,41 @@ final class MediaPresenter
         $scaledHeight = $width > 0 ? (int) round($height * $scaledWidth / $width) : 0;
 
         return ['url' => $media->getUrl($conversion), 'width' => $scaledWidth, 'height' => $scaledHeight];
+    }
+
+    /** Favicon sizes: browser tab (32), iOS home screen (180), web app manifest (192). */
+    public const FAVICON_SIZES = [32, 180, 192];
+
+    /**
+     * Favicon payload: the original file plus one URL per size in FAVICON_SIZES
+     * (the original when that size was not generated, e.g. for an SVG or ICO).
+     *
+     * @return array{url: string, mime: string, width: int, height: int, sizes: array<int, string>}|null
+     */
+    public static function favicon(?Media $media): ?array
+    {
+        if (! $media) {
+            return null;
+        }
+
+        [$width, $height] = self::originalDimensions($media);
+        $sizes = [];
+
+        foreach (self::FAVICON_SIZES as $size) {
+            $sizes[$size] = self::hasConversion($media, "favicon_{$size}") ? $media->getUrl("favicon_{$size}") : $media->getUrl();
+        }
+
+        return ['url' => $media->getUrl(), 'mime' => (string) $media->mime_type, 'width' => $width, 'height' => $height, 'sizes' => $sizes];
+    }
+
+    /**
+     * A conversion file exists and is still registered: after switching conversions
+     * off (IMAGE_CONVERSIONS=off) older media still list their generated WebP files,
+     * but getUrl() would throw for a conversion that is no longer registered.
+     */
+    private static function hasConversion(Media $media, string $conversion): bool
+    {
+        return ImageConversions::enabled() && $media->hasGeneratedConversion($conversion);
     }
 
     /**

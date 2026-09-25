@@ -6,10 +6,12 @@ use App\Models\Concerns\FlushesFrontendCache;
 use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\RegistersWebpConversions;
 use App\Models\Contracts\HasTranslatableFields;
+use App\Support\ImageConversions;
 use App\Support\Locales;
 use App\Support\MediaPresenter;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -180,6 +182,17 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
         if ($media?->mime_type !== 'image/svg+xml') {
             $this->addWebpConversion('logo_webp', 600, ['logo_white', 'logo_color']);
         }
+
+        // Favicon sizes (see MediaPresenter::favicon); SVG and ICO uploads are used as they are.
+        if (ImageConversions::enabled() && in_array($media?->mime_type, ['image/png', 'image/webp'], true)) {
+            foreach (MediaPresenter::FAVICON_SIZES as $size) {
+                $this->addMediaConversion("favicon_{$size}")
+                    ->performOnCollections('favicon')
+                    ->nonQueued()
+                    ->format('png')
+                    ->fit(Fit::Contain, $size, $size);
+            }
+        }
     }
 
     /**
@@ -201,7 +214,7 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
             'colorOverrides' => array_diff_assoc($this->brandColors(), self::COLOR_DEFAULTS),
             'logoWhite' => MediaPresenter::logo($this->getFirstMedia('logo_white'), 'logo_webp'),
             'logoColor' => MediaPresenter::logo($this->getFirstMedia('logo_color'), 'logo_webp'),
-            'favicon' => $favicon ? ['url' => $favicon->getUrl(), 'mime' => $favicon->mime_type] : null,
+            'favicon' => MediaPresenter::favicon($favicon),
             'whatsappUrl' => self::whatsappUrl($this->whatsapp_number),
             'email' => $this->email,
             'phone' => $this->phone,

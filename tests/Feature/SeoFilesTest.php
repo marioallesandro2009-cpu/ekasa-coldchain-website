@@ -94,7 +94,13 @@ it('serves a web app manifest with the brand green and the favicon', function ()
         ->and($manifest['name'])->toBe('PT Ekasa Cold Chain')
         ->and($manifest['theme_color'])->toBe('#0F6B46')
         ->and($manifest['background_color'])->toBe('#0F6B46')
-        ->and($manifest['icons'][0]['src'])->toContain('favicon');
+        ->and($manifest['icons'][0])->toMatchArray(['type' => 'image/png', 'sizes' => '192x192'])
+        ->and($manifest['icons'][0]['src'])->toContain('favicon_192')
+        ->and($manifest['icons'][1]['sizes'])->toBe('512x512');
 
-    $this->get('/')->assertSee('<link rel="manifest" href="/site.webmanifest">', false);
+    $this->get('/')
+        ->assertSee('<link rel="manifest" href="/site.webmanifest">', false)
+        ->assertSee('favicon_32.png" type="image/png" sizes="32x32"', false)
+        ->assertSee('<link rel="apple-touch-icon" href="', false)
+        ->assertSee('favicon_180.png', false);
 });
