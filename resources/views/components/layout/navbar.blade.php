@@ -27,7 +27,7 @@
             <x-layout.logo
                 :logo="$settings['logoWhite']"
                 :name="$settings['companyName']"
-                :height="36"
+                :height="48"
                 class="justify-self-start"
             />
 

@@ -213,13 +213,24 @@
     background-color: color-mix(in srgb, var(--color-white) 10%, transparent);
 }
 
-/* 80px -> 68px once scrolled (desktop). */
+/* 80px -> 68px once scrolled (desktop). Logo: 40px in the 64px mobile bar, 48px in
+   the 80px bar, 44px in the 68px bar (about 60-65% of the bar height each time). */
 .nav-bar {
+    --logo-h: 40px;
+    transition: height 250ms ease-out;
+}
+
+.nav-bar img {
     transition: height 250ms ease-out;
 }
 
 @media (width >= 64rem) {
+    .nav-bar {
+        --logo-h: 48px;
+    }
+
     .nav-bar.is-compact {
+        --logo-h: 44px;
         height: 68px;
     }
 }

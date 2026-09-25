@@ -19,7 +19,7 @@
 
     <div class="mm-layer mm-panel absolute inset-0 on-dark flex flex-col bg-dark text-white">
         <x-ui.container class="flex h-16 shrink-0 items-center justify-between">
-            <x-layout.logo :logo="$settings['logoWhite']" :name="$settings['companyName']" :height="32" :max-width="180" @click="closeMobile(false)" />
+            <x-layout.logo :logo="$settings['logoWhite']" :name="$settings['companyName']" :height="40" :max-width="180" @click="closeMobile(false)" />
             <a
                 href="#"
                 class="-mr-2 grid size-12 place-items-center rounded-full text-white transition-colors hover:bg-white/10"
