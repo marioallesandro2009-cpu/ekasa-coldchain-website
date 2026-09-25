@@ -32,8 +32,9 @@ it('links the language switch to the same page in the other language', function 
         ->toMatch('#href="/"\s+hreflang="en"\s+lang="en"\s+aria-label="Read in English"#')
         ->toMatch('#<span aria-current="true"[^>]*>\s*<span aria-hidden="true">ID</span>#');
 
-    // Desktop navbar and mobile menu.
-    expect(substr_count($en, 'data-lang-link'))->toBe(2);
+    // Desktop navbar and mobile menu; always the page top, without a #anchor.
+    expect(substr_count($en, 'href="/id"'))->toBe(2)
+        ->and($en)->not->toContain('href="/id#');
 });
 
 it('keeps admin, robots.txt, sitemap.xml and llms.txt without a language prefix', function () {

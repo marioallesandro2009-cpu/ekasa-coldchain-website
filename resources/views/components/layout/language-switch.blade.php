@@ -1,7 +1,7 @@
 {{--
-    Language switch: plain links to the same page in the other language (works
-    without JS; with JS the current #anchor is kept, see app.js). The active
-    language is not a link.
+    Language switch: plain links to the same page in the other language. They
+    always open the top of the page (no #anchor, so no jump or scroll after
+    switching). The active language is not a link.
 --}}
 @props(['label', 'size' => 'sm'])
 @php
@@ -34,7 +34,6 @@
                 hreflang="{{ $locale }}"
                 lang="{{ $locale }}"
                 aria-label="{{ __('Read in this language', [], $locale) }}"
-                data-lang-link
                 @class([
                     'rounded text-white/60 transition-colors duration-200 hover:text-white',
                     'inline-grid min-h-11 min-w-11 place-items-center' => $size === 'lg',

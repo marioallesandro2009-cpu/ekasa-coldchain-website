@@ -20,12 +20,6 @@ Alpine.data('blurText', blurText);
 Alpine.data('countUp', countUp);
 Alpine.data('animatedContent', animatedContent);
 
-// Language links keep the current section (#anchor); without JS they open the page top.
-document.addEventListener('click', (event) => {
-    const link = event.target.closest?.('a[data-lang-link]');
-    if (link && location.hash) link.hash = location.hash;
-});
-
 // Links to sections that do not exist yet (e.g. a service anchor) go to #services.
 document.addEventListener('click', (event) => {
     const link = event.target.closest?.('a[href^="#"]');
