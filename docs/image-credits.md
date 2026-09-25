@@ -2,7 +2,7 @@
 
 ## Foto seeder (`database/seeders/images/`)
 
-Foto beranda di bawah ini disediakan pemilik proyek. Empat foto untuk halaman layanan
+Foto beranda di bawah ini disediakan pemilik proyek. Lima foto untuk layanan
 (Tahap 3) diunduh dari Pexels; lihat bagian berikutnya. Metadata file asli (`_original/`) sudah kosong: tidak ada EXIF (kamera, fotografer,
 hak cipta) maupun XMP, hanya profil warna sRGB. Karena itu sumber dan lisensinya tidak
 bisa ditelusuri dari file dan **harus dikonfirmasi pemilik proyek sebelum situs
@@ -32,6 +32,7 @@ foto). Menggantikan foto dari klien yang tidak cocok.
 | service-cold-storage-hero.jpg | Foto potret (hero butuh lanskap) | [#36126305](https://www.pexels.com/photo/industrial-storage-warehouse-interior-view-36126305/) lorong rak gudang | Adrien Olichon |
 | service-linehaul-hero.jpg | Barisan mobil pikap (bukan truk linehaul) | [#10594292](https://www.pexels.com/photo/asphalt-road-between-fields-10594292/) jalan raya dengan truk di kejauhan | BREAKS OUT |
 | service-partnership-hero.jpg | Foto potret (hero butuh lanskap) | [#4487361](https://www.pexels.com/photo/warehouse-workers-carrying-boxes-4487361/) dua pekerja membawa kardus | Tiger Lily |
+| service-hyperlocal-card.jpg | Kurir berkaos merah (nuansa hangat, tidak senada dengan kartu lain) | [#6169135](https://www.pexels.com/photo/delivery-man-going-out-from-a-van-6169135/) kurir naik ke van putih polos di jalan perumahan | Tima Miroshnichenko |
 
 **Kartu Linehaul memakai foto armada Ekasa**, bukan file tersendiri:
 `service-linehaul-card.jpg` (trailer besar) dihapus. Kartu 4:3 menampilkan
@@ -49,7 +50,7 @@ yang sudut/rasionya lebih pas** begitu tersedia dari klien.
 | location-cakung.jpg, location-pulo-gadung.jpg, location-tanjung-priok.jpg | Gedung gudang, silo, loading dock | **Foto ilustrasi generik, BUKAN foto gudang Ekasa yang sebenarnya.** Perlu diganti foto asli lokasi Ekasa sebelum situs dipublikasikan. |
 | service-linehaul-detail.jpg | Trailer besar di dock | **Foto sementara.** Truknya trailer besar, beda dengan armada Ekasa (truk boks menengah). Sebaiknya diganti foto truk boks menengah. |
 | fleet-fe74-long-side.png, fleet-fe71-long-side.jpg | Truk boks Ekasa FE 74 LONG dan FE71 LONG, tampak samping | Dari klien, isinya tidak diedit. FE71 (JPEG, jadi nama barunya `.jpg`) ikut dikompres ulang q82: 107 kB -> 96 kB, tanpa artefak yang terlihat (`docs/screenshots/foto-pengganti/fe71-kompresi-zoom.png`). FE74 (PNG) tidak diproses skrip. |
-| service-cold-storage-card.jpg, service-hyperlocal-*.jpg, service-linehaul-detail.jpg, service-partnership-card.jpg, service-partnership-detail.jpg | Sesuai nama layanan | Sumber belum diketahui. |
+| service-cold-storage-card.jpg, service-hyperlocal-hero.jpg, service-hyperlocal-detail.jpg, service-linehaul-detail.jpg, service-partnership-card.jpg, service-partnership-detail.jpg | Sesuai nama layanan | Sumber belum diketahui. |
 
 ## Logo dan favicon (placeholder)
 
