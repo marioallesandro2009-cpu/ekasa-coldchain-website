@@ -9,6 +9,9 @@
 | Logo dan favicon | Logo PT Ekasa Cold Chain dari klien (PNG raster; versi warna, versi putih turunan, favicon), warnanya disesuaikan ke palet brand | Milik klien. **Minta file vektor (SVG) ke klien**; lihat `docs/image-credits.md` |
 | Foto seeder | Disediakan pemilik proyek | **PERLU DICEK**, lihat `docs/image-credits.md` |
 | Laravel, Filament, Livewire, Alpine.js, Tailwind CSS, Spatie Media Library | Paket open source | MIT |
+| Peta di panel lokasi | Leaflet 1.9.4 (npm, self-hosted, dimuat saat panel dibuka) | BSD-2-Clause |
+| Ubin peta di panel lokasi | OpenStreetMap (`tile.openstreetmap.org`) | Data © kontributor OpenStreetMap, ODbL; atribusi tampil di peta. Untuk lalu lintas tinggi, pertimbangkan penyedia ubin sendiri (kebijakan pemakaian ubin OSM) |
+| Peta titik heksagonal (blok lokasi) | Dibuat dalam kode; garis pantai Teluk Jakarta disederhanakan sebagai ilustrasi | Milik klien |
 
 Desain mengambil referensi dari coldspace.id (referensi desain saja); tidak ada logo,
 foto, teks, atau aset lain dari situs itu yang dipakai.
