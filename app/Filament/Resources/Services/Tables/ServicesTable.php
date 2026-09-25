@@ -5,13 +5,14 @@ namespace App\Filament\Resources\Services\Tables;
 use App\Filament\Resources\Services\Schemas\ServiceForm;
 use App\Filament\Support\Translatable;
 use App\Support\FrontendData;
-use App\Support\ServiceIcons;
+use App\Support\IconLibrary;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 
 class ServicesTable
 {
@@ -31,9 +32,7 @@ class ServicesTable
                 ...Translatable::statusColumns(ServiceForm::LABELS),
                 TextColumn::make('icon')
                     ->label('Ikon')
-                    ->formatStateUsing(fn (?string $state): string => ServiceIcons::options()[$state] ?? (string) $state)
-                    ->badge()
-                    ->color('gray'),
+                    ->formatStateUsing(fn (?string $state): HtmlString => new HtmlString($state ? IconLibrary::optionHtml($state, $state) : '')),
                 TextColumn::make('anchor')
                     ->label('Anchor')
                     ->prefix('#')

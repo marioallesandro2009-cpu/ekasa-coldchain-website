@@ -6,7 +6,8 @@
  * currentColor 1.75 with round caps and joins. The icon seeder copies them into
  * the admin icon library; interface icons (arrows, menu, close...) are not here.
  *
- * key => [label [en, id], category]
+ * key => [label [en, id], category]. Keys under 'review' are drawn but wait for
+ * the client's approval: the library adds them switched off (not selectable).
  */
 return [
     'categories' => [
@@ -54,5 +55,38 @@ return [
         'email' => [['Email', 'Email'], 'contact'],
         'chat-bubble' => [['Chat bubble', 'Gelembung chat'], 'contact'],
         'opening-hours' => [['Opening hours', 'Jam operasional'], 'contact'],
+
+        // Batch 2
+        'network' => [['Network', 'Jaringan'], 'systems'],
+        'forklift' => [['Forklift', 'Forklift'], 'warehouse'],
+        'pallet' => [['Pallet with boxes', 'Palet berisi kardus'], 'warehouse'],
+        'barcode-scan' => [['Barcode scan', 'Pindai barcode'], 'warehouse'],
+        'clipboard-check' => [['Checklist', 'Daftar periksa'], 'warehouse'],
+        'cross-dock' => [['Cross-docking', 'Bongkar muat silang'], 'warehouse'],
+        'calendar-check' => [['Confirmed schedule', 'Jadwal terkonfirmasi'], 'time'],
+        'stopwatch' => [['Stopwatch', 'Stopwatch'], 'time'],
+        'monitor-pulse' => [['Live monitoring', 'Pemantauan langsung'], 'time'],
+        'bell' => [['Alert', 'Peringatan'], 'time'],
+        'lock' => [['Lock', 'Gembok'], 'security'],
+        'cctv' => [['CCTV camera', 'Kamera CCTV'], 'security'],
+        'droplet' => [['Hygiene', 'Higienis'], 'security'],
+        'fish' => [['Seafood', 'Hasil laut'], 'industry'],
+        'leaf' => [['Fresh produce', 'Produk segar'], 'industry'],
+        'milk-carton' => [['Dairy', 'Produk susu'], 'industry'],
+        'ice-cream' => [['Ice cream', 'Es krim'], 'industry'],
+        'capsule' => [['Pharmaceuticals', 'Farmasi'], 'industry'],
+        'iot-sensor' => [['IoT sensor', 'Sensor IoT'], 'systems'],
+        'cloud-sync' => [['Cloud sync', 'Sinkronisasi cloud'], 'systems'],
+        'gauge' => [['Dashboard gauge', 'Indikator dasbor'], 'systems'],
+        'plug' => [['Integration', 'Integrasi'], 'systems'],
+    ],
+
+    // Batch 2 awaiting approval ("network" is already the Omnichannel default).
+    'review' => [
+        'forklift', 'pallet', 'barcode-scan', 'clipboard-check', 'cross-dock',
+        'calendar-check', 'stopwatch', 'monitor-pulse', 'bell',
+        'lock', 'cctv', 'droplet',
+        'fish', 'leaf', 'milk-carton', 'ice-cream', 'capsule',
+        'iot-sensor', 'cloud-sync', 'gauge', 'plug',
     ],
 ];

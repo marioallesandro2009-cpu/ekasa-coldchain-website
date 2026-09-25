@@ -63,8 +63,26 @@ bisa diubah di admin (**Pengaturan Situs › Warna**).
 
 Logo dan favicon dari klien (PNG) ada di `database/seeders/images/` (logo warna, logo putih
 untuk latar gelap, favicon 512 px); bisa diganti di **Pengaturan Situs › Umum**. Favicon
-32/180/192 px dibuat otomatis dari favicon yang diunggah. File SVG logo masih diminta ke
+32/180/192 px dibuat otomatis dari favicon yang diunggah. `public/favicon.ico` (16/32/48 px)
+juga dibuat ulang setiap kali favicon PNG/WebP/JPEG atau ICO diunggah (favicon SVG tidak bisa
+dikonversi oleh GD; file .ico lama tetap dipakai). Membuat ulang secara manual:
+`php artisan site:favicon-ico`. Logo navbar 48 px (navbar 80 px), 44 px setelah scroll (68 px),
+40 px di mobile. File SVG logo masih diminta ke
 klien, lihat [docs/image-credits.md](docs/image-credits.md).
+
+## Pustaka Ikon
+
+Ikon layanan dan statistik diambil dari **Konten Beranda › Pustaka Ikon**. Isinya ikon
+orisinal Ekasa (`resources/icons/ekasa/`, daftar di `manifest.php`, disalin ke database oleh
+`IconLibrarySeeder`) ditambah ikon SVG yang diunggah admin. SVG unggahan dibersihkan: hanya
+bentuk garis (path, circle, rect, line, polyline, polygon, ellipse) yang disimpan, warnanya
+menjadi `currentColor`, dan viewBox harus `0 0 24 24`. Ikon nonaktif tidak muncul di pilihan,
+tetapi tetap tampil di konten yang sudah memakainya; ikon yang sedang dipakai tidak bisa
+dinonaktifkan atau dihapus. Ikon di daftar `review` pada manifest (batch 2) masuk dalam
+keadaan nonaktif sampai disetujui.
+
+Ikon batch 2 digambar oleh `node scripts/draw-icons-batch2.mjs`; lembar pratinjau:
+`node scripts/icon-review-sheet.mjs <out.png> "<judul>" key1,key2`.
 
 ## Foto seeder
 

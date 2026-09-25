@@ -3,7 +3,7 @@
 | Aset | Sumber | Lisensi / status |
 |---|---|---|
 | Kode situs dan panel admin | Dibuat untuk PT Ekasa Cold Chain | Milik klien |
-| Ikon konten Ekasa (`resources/icons/ekasa/`) | Karya orisinal proyek ini, digambar langsung dalam kode (bukan salinan atau modifikasi set ikon lain) | Milik klien |
+| Ikon konten Ekasa (`resources/icons/ekasa/`) | Karya orisinal proyek ini, digambar langsung dalam kode (bukan salinan atau modifikasi set ikon lain): 31 ikon batch 1, 22 ikon batch 2 (termasuk network) | Milik klien. Ikon SVG yang diunggah admin di Pustaka Ikon: tanggung jawab pengunggah |
 | Ikon antarmuka (`resources/svg/lucide/`: panah, chevron, menu, tutup, chat) | Lucide (`lucide-static` 1.47.0) | ISC. Ikon layanan dan statistik memakai ikon Ekasa |
 | Font Plus Jakarta Sans (400-800) | Fontsource (`@fontsource/plus-jakarta-sans` 5.3.0), self-hosted | SIL Open Font License 1.1 |
 | Logo dan favicon | Logo PT Ekasa Cold Chain dari klien (PNG raster; versi warna, versi putih turunan, favicon), warnanya disesuaikan ke palet brand | Milik klien. **Minta file vektor (SVG) ke klien**; lihat `docs/image-credits.md` |

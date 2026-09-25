@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\Services\Schemas;
 
 use App\Filament\Support\Translatable;
+use App\Support\IconLibrary;
 use App\Support\ServiceIcons;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -49,11 +50,14 @@ class ServiceForm
                             ->unique(ignoreRecord: true),
                         Select::make('icon')
                             ->label('Ikon')
-                            ->options(ServiceIcons::options())
+                            ->options(fn (): array => IconLibrary::htmlOptions())
+                            ->allowHtml()
                             ->searchable()
+                            ->getSearchResultsUsing(fn (?string $search): array => IconLibrary::htmlOptions($search))
+                            ->getOptionLabelUsing(fn (?string $value): string => $value ? IconLibrary::optionHtml($value) : '')
                             ->required()
                             ->default(ServiceIcons::DEFAULT)
-                            ->helperText('Ikon orisinal Ekasa. Pratinjau semua ikon: halaman /dev/icons di komputer lokal.'),
+                            ->helperText('Dari Konten Beranda › Pustaka Ikon (hanya ikon aktif).'),
                         TextInput::make('anchor')
                             ->label('Anchor tujuan')
                             ->prefix('#')

@@ -19,14 +19,15 @@
         .dark { background: #16231d; color: #fff; }
         .name { grid-column: 1 / -1; padding: 8px 10px; background: #fff; border-top: 1px solid #d0d5de; }
         .name code { color: #647084; }
+        .review { color: #b45309; font-weight: 600; }
         .s16 svg { width: 16px; height: 16px; display: block; }
         .s24 svg { width: 24px; height: 24px; display: block; }
         .s48 svg { width: 48px; height: 48px; display: block; }
     </style>
 </head>
 <body>
-    <h1>Pustaka ikon Ekasa · batch 1</h1>
-    <p>{{ count($manifest['icons']) }} ikon orisinal · 16, 24, 48 px · latar putih dan gelap</p>
+    <h1>Pustaka ikon Ekasa</h1>
+    <p>{{ count($manifest['icons']) }} ikon orisinal · 16, 24, 48 px · latar putih dan gelap · <span class="review">menunggu persetujuan</span>: {{ count($manifest['review'] ?? []) }} ikon batch 2</p>
     @foreach ($manifest['categories'] as $category => $categoryLabel)
         @php($keys = array_keys(array_filter($manifest['icons'], fn (array $icon): bool => $icon[1] === $category)))
         @if ($keys)
@@ -41,7 +42,7 @@
                                 <span class="s48">{!! $svg($key) !!}</span>
                             </div>
                         @endforeach
-                        <div class="name"><strong>{{ $manifest['icons'][$key][0][1] }}</strong> · {{ $manifest['icons'][$key][0][0] }}<br><code>{{ $key }}</code></div>
+                        <div class="name">@if (in_array($key, $manifest['review'] ?? [], true))<span class="review">menunggu persetujuan</span><br>@endif<strong>{{ $manifest['icons'][$key][0][1] }}</strong> · {{ $manifest['icons'][$key][0][0] }}<br><code>{{ $key }}</code></div>
                     </div>
                 @endforeach
             </div>

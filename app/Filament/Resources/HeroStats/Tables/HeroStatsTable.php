@@ -6,7 +6,7 @@ use App\Filament\Resources\HeroStats\Schemas\HeroStatForm;
 use App\Filament\Support\Translatable;
 use App\Models\HeroStat;
 use App\Support\FrontendData;
-use App\Support\ServiceIcons;
+use App\Support\IconLibrary;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -14,6 +14,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\HtmlString;
 
 class HeroStatsTable
 {
@@ -38,10 +39,8 @@ class HeroStatsTable
                 Translatable::column('label', 'Label'),
                 TextColumn::make('icon')
                     ->label('Ikon')
-                    ->formatStateUsing(fn (?string $state): string => ServiceIcons::options()[$state] ?? (string) $state)
-                    ->placeholder('—')
-                    ->badge()
-                    ->color('gray'),
+                    ->formatStateUsing(fn (?string $state): HtmlString => new HtmlString($state ? IconLibrary::optionHtml($state, $state) : ''))
+                    ->placeholder('—'),
                 IconColumn::make('use_count_up')
                     ->label('Count Up')
                     ->boolean(),

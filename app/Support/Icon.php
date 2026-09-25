@@ -5,8 +5,10 @@ namespace App\Support;
 use InvalidArgumentException;
 
 /**
- * Inline SVG icons: the original Ekasa content icons (resources/icons/ekasa, stroke
- * 1.75) first, then the Lucide interface icons (resources/svg/lucide, ISC, stroke 2).
+ * Inline SVG icons: the admin icon library first (App\Support\IconLibrary: the
+ * Ekasa stock and uploaded icons), then the files: the original Ekasa content icons
+ * (resources/icons/ekasa, stroke 1.75) and the Lucide interface icons
+ * (resources/svg/lucide, ISC, stroke 2).
  */
 final class Icon
 {
@@ -42,10 +44,22 @@ final class Icon
     }
 
     /**
+     * Forget the parsed icons (after the library changed).
+     */
+    public static function flush(): void
+    {
+        self::$cache = [];
+    }
+
+    /**
      * @return array{inner: string, strokeWidth: string}
      */
     private static function read(string $name): array
     {
+        if ($icon = IconLibrary::find($name)) {
+            return $icon;
+        }
+
         foreach ([resource_path("icons/ekasa/{$name}.svg"), resource_path("svg/lucide/{$name}.svg")] as $path) {
             if (! is_file($path)) {
                 continue;
