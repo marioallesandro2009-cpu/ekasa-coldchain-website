@@ -6,6 +6,8 @@
  *
  * - The original is moved to database/seeders/images/_original/ (git-ignored)
  *   and is always the source, so the script can be run again safely.
+ * - Replacing a photo: put the new file here AND delete its copy in _original/,
+ *   otherwise the old original is used again and the new photo is overwritten.
  * - Output: JPG, quality 82, at most 2400 px wide. A hero photo that is still
  *   500 kB (500,000 bytes) or more is made narrower in 100 px steps, not below
  *   1600 px (very detailed photos, such as aerial snow, need ~1700 px at q82).
@@ -53,7 +55,8 @@ for (const name of readdirSync(DIR).filter((file) => /\.jpe?g$/i.test(file))) {
     if (!existsSync(original)) renameSync(target, original);
 
     const source = await decode(readFileSync(original));
-    const isHero = name.startsWith('hero-');
+    // Home hero slides (hero-*.jpg) and service page heroes (*-hero.jpg).
+    const isHero = /^hero-|-hero\.jpe?g$/i.test(name);
     let width = Math.min(MAX_WIDTH, source.width);
     let output;
 

@@ -2,8 +2,8 @@
 
 ## Foto seeder (`database/seeders/images/`)
 
-Semua foto disediakan oleh pemilik proyek; tidak ada foto yang diunduh dari internet.
-Metadata file asli (`_original/`) sudah kosong: tidak ada EXIF (kamera, fotografer,
+Foto beranda di bawah ini disediakan pemilik proyek. Empat foto untuk halaman layanan
+(Tahap 3) diunduh dari Pexels; lihat bagian berikutnya. Metadata file asli (`_original/`) sudah kosong: tidak ada EXIF (kamera, fotografer,
 hak cipta) maupun XMP, hanya profil warna sRGB. Karena itu sumber dan lisensinya tidak
 bisa ditelusuri dari file dan **harus dikonfirmasi pemilik proyek sebelum situs
 dipublikasikan**.
@@ -15,6 +15,41 @@ dipublikasikan**.
 | hero-hyperlocal.jpg | 7008 x 4672 | 6.866 KB | Slide hero 3 | **PERLU DICEK** (sumber tidak diketahui) |
 | hero-partnership.jpg | 4608 x 3456 | 3.064 KB | Slide hero 4 | **PERLU DICEK** (sumber tidak diketahui) |
 | menu-services.jpg | 6240 x 4160 | 5.336 KB | Kartu mega menu | **PERLU DICEK** (sumber tidak diketahui) |
+
+### Foto untuk Tahap 3 (belum dipakai seeder, belum di-commit)
+
+Nama file diperbaiki dari ekstensi ganda (misalnya `location-cakung.jpg.jpg`), dan
+isi tiap file sudah dicek cocok dengan namanya. Semua JPG sudah diperkecil dengan
+`scripts/optimize-seed-images.mjs` (file asli di `_original/`, tidak ter-commit).
+
+**Diunduh dari Pexels** (Pexels License: boleh dipakai komersial, tanpa wajib
+atribusi; dilarang menjual ulang foto apa adanya atau menyiratkan dukungan orang di
+foto). Menggantikan foto dari klien yang tidak cocok.
+
+| File | Menggantikan | Foto Pexels | Fotografer |
+|---|---|---|---|
+| service-cold-storage-detail.jpg | Peti kayu dan traktor (bukan cold storage) | [#5953713](https://www.pexels.com/photo/a-worker-in-a-storage-room-5953713/) ruang dingin putih | Anna Shvets |
+| service-cold-storage-hero.jpg | Foto potret (hero butuh lanskap) | [#36126305](https://www.pexels.com/photo/industrial-storage-warehouse-interior-view-36126305/) lorong rak gudang | Adrien Olichon |
+| service-linehaul-hero.jpg | Barisan mobil pikap (bukan truk linehaul) | [#10594292](https://www.pexels.com/photo/asphalt-road-between-fields-10594292/) jalan raya dengan truk di kejauhan | BREAKS OUT |
+| service-partnership-hero.jpg | Foto potret (hero butuh lanskap) | [#4487361](https://www.pexels.com/photo/warehouse-workers-carrying-boxes-4487361/) dua pekerja membawa kardus | Tiger Lily |
+
+**Kartu Linehaul memakai foto armada Ekasa**, bukan file tersendiri:
+`service-linehaul-card.jpg` (trailer besar) dihapus. Kartu 4:3 menampilkan
+`fleet-fe71-long-side.jpg` dengan crop tampilan (object-fit: cover, titik fokus
+horizontal sekitar 70%): tulisan EKASA COLD CHAIN, strip merah, dan roda belakang
+utuh, kabin terpotong. File aslinya tidak diedit. FE74 tidak dipakai karena unit
+pendinginnya berlogo pabrikan lain. Pratinjau crop:
+`docs/screenshots/foto-pengganti/armada-crop-4x3.png`. **Ganti dengan foto armada asli
+yang sudut/rasionya lebih pas** begitu tersedia dari klien.
+
+**Disediakan pemilik proyek** (sumber dan lisensi **PERLU DICEK**):
+
+| File | Isi | Catatan |
+|---|---|---|
+| location-cakung.jpg, location-pulo-gadung.jpg, location-tanjung-priok.jpg | Gedung gudang, silo, loading dock | **Foto ilustrasi generik, BUKAN foto gudang Ekasa yang sebenarnya.** Perlu diganti foto asli lokasi Ekasa sebelum situs dipublikasikan. |
+| service-linehaul-detail.jpg | Trailer besar di dock | **Foto sementara.** Truknya trailer besar, beda dengan armada Ekasa (truk boks menengah). Sebaiknya diganti foto truk boks menengah. |
+| fleet-fe74-long-side.png, fleet-fe71-long-side.jpg | Truk boks Ekasa FE 74 LONG dan FE71 LONG, tampak samping | Dari klien, isinya tidak diedit. FE71 (JPEG, jadi nama barunya `.jpg`) ikut dikompres ulang q82: 107 kB -> 96 kB, tanpa artefak yang terlihat (`docs/screenshots/foto-pengganti/fe71-kompresi-zoom.png`). FE74 (PNG) tidak diproses skrip. |
+| service-cold-storage-card.jpg, service-hyperlocal-*.jpg, service-linehaul-detail.jpg, service-partnership-card.jpg, service-partnership-detail.jpg | Sesuai nama layanan | Sumber belum diketahui. |
 
 ## Logo dan favicon (placeholder)
 
