@@ -1,11 +1,14 @@
 import intersect from '@alpinejs/intersect';
 import Alpine from 'alpinejs';
 import animatedContent from './alpine/animatedContent';
+import animatedList from './alpine/animatedList';
 import blurText from './alpine/blurText';
 import countUp from './alpine/countUp';
 import hero from './alpine/hero';
 import navbar from './alpine/navbar';
 import rotatingText from './alpine/rotatingText';
+import splitText from './alpine/splitText';
+import spotlightCard from './alpine/spotlightCard';
 import heroParallax from './parallax';
 
 // Emit the fonts so the layout can preload them with Vite::asset().
@@ -19,6 +22,9 @@ Alpine.data('rotatingText', rotatingText);
 Alpine.data('blurText', blurText);
 Alpine.data('countUp', countUp);
 Alpine.data('animatedContent', animatedContent);
+Alpine.data('splitText', splitText);
+Alpine.data('animatedList', animatedList);
+Alpine.data('spotlightCard', spotlightCard);
 
 // Links to sections that do not exist yet (e.g. a service anchor) go to #services.
 document.addEventListener('click', (event) => {

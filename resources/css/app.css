@@ -644,6 +644,98 @@ html:not(.js) .mobile-menu:target,
     transition-delay: var(--delay, 0s);
 }
 
+/*
+ * Split text (section titles): hidden only while JS splits the words (after the
+ * fonts load), then each word rises 40px and fades in, 45ms apart, once 10% of
+ * the title is visible. Without JS or with reduced motion the title is untouched.
+ */
+.js-anim [data-split-text]:not([data-split]) {
+    opacity: 0;
+}
+
+.split-word {
+    display: inline-block;
+}
+
+.js-anim [data-split-text]:not(.is-in) .split-word {
+    opacity: 0;
+    transform: translateY(40px);
+}
+
+.js-anim [data-split-text].is-in .split-word {
+    /* cubic-bezier(0.215, 0.61, 0.355, 1): ease-out cubic, close to GSAP power3.out. */
+    transition:
+        opacity 0.5s cubic-bezier(0.215, 0.61, 0.355, 1),
+        transform 0.5s cubic-bezier(0.215, 0.61, 0.355, 1);
+    transition-delay: calc(var(--i, 0) * 45ms);
+}
+
+/*
+ * Animated list (location cards, FAQ): each direct child scales from 0.7 and
+ * fades in over 0.2s when it enters the viewport; children entering together are
+ * 70ms apart. Hidden only once JS marks the document.
+ */
+.js-anim [data-animated-list] > :not(.is-in) {
+    opacity: 0;
+    transform: scale(0.7);
+}
+
+.js-anim [data-animated-list] > .is-in {
+    transition:
+        opacity 0.2s ease-out,
+        transform 0.2s ease-out;
+    transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+/*
+ * Spotlight card: a soft light follows the pointer (--mouse-x/--mouse-y, set by JS),
+ * and the card lifts 4px with a larger shadow on hover. Only on devices that can
+ * hover and without reduced motion; elsewhere the card is static.
+ * --spotlight-color: white 14% on dark cards (default), brand 10% on light cards.
+ */
+.spotlight-card {
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+    --spotlight-color: color-mix(in srgb, var(--color-white) 14%, transparent);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.spotlight-card.is-light {
+    --spotlight-color: color-mix(in srgb, var(--color-brand) 10%, transparent);
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .spotlight-card {
+        transition:
+            transform 200ms ease-out,
+            box-shadow 200ms ease-out;
+    }
+
+    .spotlight-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--spotlight-color), transparent 80%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+    }
+
+    .spotlight-card:hover,
+    .spotlight-card:focus-within {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 40px -16px color-mix(in srgb, var(--color-dark) 45%, transparent);
+    }
+
+    .spotlight-card:hover::before,
+    .spotlight-card:focus-within::before {
+        opacity: 1;
+    }
+}
+
 /* Reduced motion: show the final state everywhere. */
 @media (prefers-reduced-motion: reduce) {
     .blur-word,

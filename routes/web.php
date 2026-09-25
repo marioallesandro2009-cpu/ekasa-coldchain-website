@@ -28,7 +28,8 @@ Route::middleware(SetLocale::class.':'.Locales::default())->group(function (): v
     Route::get('/site.webmanifest', [SeoController::class, 'manifest'])->name('manifest');
 });
 
-// Preview sheet of the icon stock, only on a local machine.
+// Preview sheets (icon stock, animation components), only on a local machine.
 if (app()->environment('local')) {
     Route::view('/dev/icons', 'dev.icons')->name('dev.icons');
+    Route::view('/dev/components', 'dev.components')->name('dev.components');
 }
