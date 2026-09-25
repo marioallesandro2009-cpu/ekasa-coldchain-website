@@ -135,7 +135,8 @@ it('lists every language version in the sitemap and llms.txt', function () {
     $locs = array_map('strval', $xml->xpath('//s:url/s:loc'));
     $links = array_map(fn ($link) => (string) $link['hreflang'].' '.$link['href'], $xml->xpath('//s:url[1]/x:link'));
 
-    expect($locs)->toBe([$base.'/', $base.'/id'])
+    // Home first; the service pages are covered in ServicePageTest.
+    expect(array_slice($locs, 0, 2))->toBe([$base.'/', $base.'/id'])
         ->and($links)->toBe(['en '.$base.'/', 'id '.$base.'/id', 'x-default '.$base.'/'])
         ->and($this->get('/llms.txt')->getContent())
         ->toContain('- English: '.$base.'/')

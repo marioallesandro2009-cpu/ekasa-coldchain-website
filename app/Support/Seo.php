@@ -50,6 +50,38 @@ final class Seo
     }
 
     /**
+     * A service detail page: its own title/description (else "<service> | <company>"
+     * and the intro), canonical and hreflang from the slug in each language, the
+     * hero photo as share image and preload.
+     *
+     * @param  array{service: array<string, mixed>, paths: array<string, string>}  $page
+     * @param  array<string, mixed>  $settings
+     * @return array<string, mixed>
+     */
+    public static function service(array $page, array $settings): array
+    {
+        $service = $page['service'];
+        $locale = Locales::current();
+        $hero = $service['heroImage'];
+        $alternates = array_map(fn (string $path): string => self::baseUrl().$path, $page['paths']);
+        $description = $service['seoDescription'] ?? $service['intro'] ?? $service['description'] ?? $settings['seo']['description'];
+
+        return [
+            'title' => (string) ($service['seoTitle'] ?? $service['title'].' | '.$settings['companyName']),
+            'description' => Str::limit(trim(strip_tags((string) $description)), 300, ''),
+            'canonical' => $alternates[$locale],
+            'alternates' => $alternates,
+            'ogLocale' => Locales::ogLocale($locale),
+            'ogAlternates' => array_values(array_map(Locales::ogLocale(...), array_diff(Locales::all(), [$locale]))),
+            'siteName' => (string) $settings['companyName'],
+            'image' => $hero['large'] ?? $settings['seo']['image'],
+            'imageAlt' => (string) ($hero['alt'] ?? $service['title']),
+            'preload' => $hero,
+            'themeColor' => (string) $settings['colors']['brand'],
+        ];
+    }
+
+    /**
      * @param  array{url: string, width: int, height: int}  $logo
      * @return array{url: string, width: int, height: int}
      */

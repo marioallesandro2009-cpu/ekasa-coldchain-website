@@ -73,6 +73,26 @@ final class FrontendData
         foreach (Locales::all() as $locale) {
             Cache::forget(self::key($locale));
         }
+
+        // Other cached pages (service detail pages) carry this version in their key.
+        Cache::forever(self::VERSION_KEY, (int) Cache::get(self::VERSION_KEY, 0) + 1);
+    }
+
+    private const VERSION_KEY = 'frontend.version';
+
+    /**
+     * Cache other public page data (e.g. a service page) until admin data changes.
+     *
+     * @template T
+     *
+     * @param  \Closure(): T  $build
+     * @return T
+     */
+    public static function remember(string $key, \Closure $build): mixed
+    {
+        $version = (int) Cache::get(self::VERSION_KEY, 0);
+
+        return Cache::rememberForever(config('site.cache_key').".{$key}.v{$version}", $build);
     }
 
     private static function key(?string $locale = null): string

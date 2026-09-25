@@ -37,7 +37,9 @@ it('puts the navbar, mega menu links, final statistics and a single h1 in the HT
         ->not->toContain('id="careers"');
 
     expect($html)
-        ->toContain('href="#cold-storage"')
+        // Published services link to their detail page; drafts to their home anchor.
+        ->toContain('href="/services/cold-storage"')
+        ->toContain('href="#omnichannel-integration"')
         ->toContain('600+')
         ->toContain('-25°C to 6°C')
         ->not->toContain('Contact Us')

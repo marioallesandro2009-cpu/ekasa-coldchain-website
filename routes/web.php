@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SeoController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Middleware\SetLocale;
 use App\Support\Locales;
 use Illuminate\Support\Facades\Route;
@@ -14,8 +15,12 @@ foreach (Locales::all() as $locale) {
     Route::middleware(SetLocale::class.':'.$locale)
         ->prefix($prefix)
         ->name($prefix === '' ? '' : $prefix.'.')
-        ->group(function (): void {
+        ->group(function () use ($locale): void {
             Route::get('/', HomeController::class)->name('home');
+            // Service detail page: /services/{slug}, /id/layanan/{slug}.
+            Route::get('/'.config("site.locales.{$locale}.segments.services", 'services').'/{slug}', ServiceController::class)
+                ->where('slug', '[a-z0-9-]+')
+                ->name('services.show');
         });
 }
 

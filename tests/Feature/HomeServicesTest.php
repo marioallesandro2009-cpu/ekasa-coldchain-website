@@ -39,9 +39,9 @@ it('uses the fleet side view cropped around its focus point for the Linehaul car
     $this->get('/')->assertSee('style="object-position: 70% 50%"', false);
 });
 
-it('keeps at most three key points and links to #contact while there is no detail page', function () {
+it('keeps at most three key points and links to #contact while the detail page is a draft', function () {
     Service::query()->where('slug', 'cold-storage')->firstOrFail()
-        ->update(['key_points' => ['en' => "One\nTwo\nThree\nFour"]]);
+        ->update(['key_points' => ['en' => "One\nTwo\nThree\nFour"], 'detail_status' => Service::DRAFT]);
 
     $cold = collect(FrontendData::services('en'))->firstWhere('title', 'Cold Storage');
 

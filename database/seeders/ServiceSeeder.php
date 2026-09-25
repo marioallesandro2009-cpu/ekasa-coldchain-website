@@ -247,8 +247,8 @@ class ServiceSeeder extends Seeder
                         ServiceBlocks::make('hero_layanan', ['show_key_points' => true]),
                         ServiceBlocks::make('pita_spesifikasi', ['items' => [
                             ['prefix' => '', 'value' => 600, 'suffix' => '+', 'count_up' => true, 'label' => $t('Delivery points', 'Titik antar')],
-                            ['prefix' => '', 'value' => 3, 'suffix' => 'h', 'count_up' => true, 'label' => $t('Average delivery time', 'Rata-rata waktu antar')],
-                            ['prefix' => '', 'value' => 16, 'suffix' => 'h', 'count_up' => true, 'label' => $t('Hub opening hours', 'Jam buka hub')],
+                            ['prefix' => '', 'value' => 3, 'suffix' => '', 'count_up' => true, 'label' => $t('Hours on average to deliver', 'Jam rata-rata waktu antar')],
+                            ['prefix' => '', 'value' => 16, 'suffix' => '', 'count_up' => true, 'label' => $t('Hub opening hours a day', 'Jam buka hub per hari')],
                         ]]),
                         $this->textImage('right',
                             $t('At the door', 'Sampai di pintu'),

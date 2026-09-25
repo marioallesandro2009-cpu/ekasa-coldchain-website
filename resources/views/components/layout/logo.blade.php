@@ -11,7 +11,7 @@
         $height = (int) round($width / $ratio);
     }
 @endphp
-<a href="#home" {{ $attributes->class('inline-flex shrink-0 items-center rounded-md') }}>
+<a href="{{ \App\Support\Links::section('home') }}" {{ $attributes->class('inline-flex shrink-0 items-center rounded-md') }}>
     @if ($logo)
         <picture>
             @if ($logo['webp'])

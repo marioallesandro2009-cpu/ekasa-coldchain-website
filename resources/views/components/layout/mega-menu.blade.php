@@ -33,7 +33,7 @@
             </div>
 
             <a
-                href="#{{ $contactId }}"
+                href="{{ \App\Support\Links::section($contactId) }}"
                 class="group relative block aspect-[4/3] overflow-hidden rounded-card bg-dark"
                 @click="closeMega()"
             >

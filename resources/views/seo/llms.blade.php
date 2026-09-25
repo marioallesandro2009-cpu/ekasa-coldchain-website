@@ -7,7 +7,7 @@
 ## Services
 
 @foreach ($services as $service)
-- [{!! $service['title'] !!}]({!! $baseUrl !!}/#{!! $service['anchor'] !!}){!! $service['description'] ? ': '.$service['description'] : '' !!}
+- [{!! $service['title'] !!}]({!! $baseUrl !!}{!! $service['url'] ?? '/#'.$service['anchor'] !!}){!! $service['description'] ? ': '.$service['description'] : '' !!}
 @endforeach
 
 ## Languages

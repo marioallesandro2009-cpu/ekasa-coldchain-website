@@ -1,7 +1,7 @@
 {{-- One service link in the mega menu. Hover/focus: surface background, solid brand icon box. --}}
 @props(['service'])
 <a
-    href="#{{ $service['anchor'] }}"
+    href="{{ \App\Support\Links::service($service) }}"
     class="group flex items-start gap-4 rounded-[10px] p-4 transition-colors duration-150 hover:bg-surface focus-visible:bg-surface"
     @click="closeMega()"
 >

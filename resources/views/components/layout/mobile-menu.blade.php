@@ -48,7 +48,7 @@
                                     @foreach ($services as $service)
                                         <li>
                                             <a
-                                                href="#{{ $service['anchor'] }}"
+                                                href="{{ \App\Support\Links::service($service) }}"
                                                 class="flex min-h-14 items-center gap-4 rounded-card px-2 py-2.5 transition-colors active:bg-white/10"
                                                 @click="closeMobile(false)"
                                             >
@@ -68,7 +68,7 @@
                             </details>
                         @else
                             <a
-                                href="#{{ $item['id'] }}"
+                                href="{{ \App\Support\Links::section($item['id']) }}"
                                 class="flex min-h-14 items-center gap-3 py-3 text-xl font-semibold text-white/90"
                                 :aria-current="active === '{{ $item['id'] }}' ? 'location' : null"
                                 @click="closeMobile(false)"
@@ -86,7 +86,7 @@
             class="mm-item shrink-0 space-y-3 border-t border-white/10 pt-5 pb-[max(20px,env(safe-area-inset-bottom))]"
             style="--i: {{ count($items) }}"
         >
-            <x-ui.button :href="'#'.$contactId" size="lg" class="w-full" @click="closeMobile(false)">
+            <x-ui.button :href="\App\Support\Links::section($contactId)" size="lg" class="w-full" @click="closeMobile(false)">
                 {{ $settings['ctaLabel'] }}
             </x-ui.button>
             @if ($settings['whatsappUrl'])

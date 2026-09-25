@@ -58,6 +58,20 @@ class SeoController extends Controller
             }
         }
 
+        // Published service pages: their own slug in each language, their own lastmod
+        // (shared data such as FAQ or fleet changes are not tracked per page).
+        foreach (Service::query()->active()->where('detail_status', Service::PUBLISHED)->ordered()->get() as $service) {
+            $alternates = [];
+
+            foreach (Locales::all() as $locale) {
+                $alternates[$locale] = Seo::baseUrl().$service->detailPath($locale);
+            }
+
+            foreach ($alternates as $url) {
+                $urls[] = ['loc' => $url, 'lastmod' => ($service->updated_at ?? now())->toAtomString(), 'priority' => '0.8', 'alternates' => $alternates];
+            }
+        }
+
         $xml = view('seo.sitemap', ['urls' => $urls, 'defaultLocale' => Locales::default()])->render();
 
         return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);

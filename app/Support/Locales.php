@@ -103,6 +103,27 @@ final class Locales
     }
 
     /**
+     * Register the URL of the current page in every language, for pages whose path
+     * differs per language (/services/cold-storage, /id/layanan/penyimpanan-dingin).
+     *
+     * @param  array<string, string>  $paths  locale => path
+     */
+    public static function setPagePaths(array $paths): void
+    {
+        request()->attributes->set('locale_paths', $paths);
+    }
+
+    /**
+     * Path of the current page in a language (language switch).
+     */
+    public static function pathFor(Request $request, string $locale): string
+    {
+        $paths = (array) $request->attributes->get('locale_paths', []);
+
+        return $paths[$locale] ?? self::path($locale, self::pagePath($request));
+    }
+
+    /**
      * Current page without its language prefix: "/id" -> "/", "/id/about" -> "/about".
      */
     public static function pagePath(Request $request): string

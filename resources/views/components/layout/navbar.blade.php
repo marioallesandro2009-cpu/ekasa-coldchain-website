@@ -44,7 +44,7 @@
                                 @click.outside="closeMega()"
                             >
                                 <a
-                                    href="#{{ $item['id'] }}"
+                                    href="{{ \App\Support\Links::section($item['id']) }}"
                                     class="nav-link relative inline-flex h-10 items-center gap-1 rounded-md px-3 text-[15px] font-medium text-white/85 transition-colors duration-200 hover:text-white"
                                     :class="{ 'is-active': active === '{{ $item['id'] }}' }"
                                     data-spy="{{ $item['id'] }}"
@@ -75,7 +75,7 @@
                         @else
                             <li>
                                 <a
-                                    href="#{{ $item['id'] }}"
+                                    href="{{ \App\Support\Links::section($item['id']) }}"
                                     class="nav-link relative inline-flex h-10 items-center rounded-md px-3 text-[15px] font-medium text-white/85 transition-colors duration-200 hover:text-white"
                                     :class="{ 'is-active': active === '{{ $item['id'] }}' }"
                                     :aria-current="active === '{{ $item['id'] }}' ? 'location' : null"
@@ -91,7 +91,7 @@
                 <x-layout.language-switch :label="$texts['language']" class="hidden lg:flex" />
 
                 <div class="hidden lg:block">
-                    <x-ui.button :href="'#'.$contactId" class="nav-cta">
+                    <x-ui.button :href="\App\Support\Links::section($contactId)" class="nav-cta">
                         {{ $settings['ctaLabel'] }}
                     </x-ui.button>
                 </div>

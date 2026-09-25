@@ -8,7 +8,6 @@
     use App\Support\Locales;
 
     $current = Locales::current();
-    $page = Locales::pagePath(request());
 @endphp
 <div
     role="group"
@@ -30,7 +29,7 @@
             </span>
         @else
             <a
-                href="{{ Locales::path($locale, $page) }}"
+                href="{{ Locales::pathFor(request(), $locale) }}"
                 hreflang="{{ $locale }}"
                 lang="{{ $locale }}"
                 aria-label="{{ __('Read in this language', [], $locale) }}"

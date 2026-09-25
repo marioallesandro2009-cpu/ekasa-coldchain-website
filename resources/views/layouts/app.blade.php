@@ -19,7 +19,7 @@
 
         <title>{{ $seo['title'] }}</title>
         <meta name="description" content="{{ $seo['description'] }}">
-        <meta name="robots" content="index, follow, max-image-preview:large">
+        <meta name="robots" content="{{ ($seo['noindex'] ?? false) ? 'noindex, nofollow' : 'index, follow, max-image-preview:large' }}">
         <link rel="canonical" href="{{ $seo['canonical'] }}">
         @foreach ($seo['alternates'] as $hreflang => $url)
             <link rel="alternate" hreflang="{{ $hreflang }}" href="{{ $url }}">
