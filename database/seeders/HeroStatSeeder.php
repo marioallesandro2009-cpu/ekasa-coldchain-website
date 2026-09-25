@@ -17,7 +17,7 @@ class HeroStatSeeder extends Seeder
             ['label' => ['Delivery Points', 'Titik Pengiriman'], 'icon' => 'map-pin', 'value' => 600, 'suffix' => '+', 'use_count_up' => true],
             ['label' => ['Warehouses', 'Gudang'], 'icon' => 'warehouse', 'value' => 15, 'suffix' => '+', 'use_count_up' => true],
             ['label' => ['Temperature Range', 'Rentang Suhu'], 'icon' => 'thermometer-snowflake', 'text_value' => ['-25°C to 6°C', '-25°C hingga 6°C'], 'use_count_up' => false],
-            ['label' => ['Trusted Brands', 'Klien Terpercaya'], 'icon' => 'handshake', 'value' => 100, 'suffix' => '+', 'use_count_up' => true],
+            ['label' => ['Trusted Brands', 'Klien Terpercaya'], 'icon' => 'badge', 'value' => 100, 'suffix' => '+', 'use_count_up' => true],
         ];
 
         foreach ($stats as $index => $stat) {

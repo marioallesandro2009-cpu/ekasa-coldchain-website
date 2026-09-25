@@ -239,7 +239,7 @@
                             style="font-size: clamp(20px, calc(100cqi / ({{ $valueChars }} * 0.62)), 32px)"
                         >
                             @if ($stat['icon'])
-                                <x-ui.icon :name="$stat['icon']" stroke-width="1.5" class="mb-2 block size-5 text-highlight lg:shorter:mb-1.5" />
+                                <x-ui.icon :name="$stat['icon']" class="mb-2 block size-5 text-highlight lg:shorter:mb-1.5" />
                             @elseif ($hasIcons)
                                 <span class="mb-2 block size-5 lg:shorter:mb-1.5" aria-hidden="true"></span>
                             @endif

@@ -63,4 +63,4 @@ seeder, storage, dan media library.
 
 ## Ikon
 
-- Lucide (`lucide-static` 1.47.0), lisensi ISC. SVG disimpan di `resources/svg/lucide/`.
+- Lucide (`lucide-static` 1.47.0), lisensi ISC, hanya untuk ikon antarmuka (panah, chevron, menu, tutup, chat). SVG disimpan di `resources/svg/lucide/`. Ikon layanan dan statistik adalah ikon Ekasa orisinal (`resources/icons/ekasa/`).

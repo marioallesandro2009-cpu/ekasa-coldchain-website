@@ -31,7 +31,7 @@ class ServicesTable
                 ...Translatable::statusColumns(ServiceForm::LABELS),
                 TextColumn::make('icon')
                     ->label('Ikon')
-                    ->formatStateUsing(fn (?string $state): string => ServiceIcons::OPTIONS[$state] ?? (string) $state)
+                    ->formatStateUsing(fn (?string $state): string => ServiceIcons::options()[$state] ?? (string) $state)
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('anchor')

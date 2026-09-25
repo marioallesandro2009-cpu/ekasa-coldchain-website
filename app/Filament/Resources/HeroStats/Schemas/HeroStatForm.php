@@ -29,11 +29,11 @@ class HeroStatForm
                             ->required(Translatable::isRequired($locale))
                             ->maxLength(60)),
                         Select::make('icon')
-                            ->label('Ikon (Lucide)')
-                            ->options(ServiceIcons::OPTIONS)
+                            ->label('Ikon')
+                            ->options(ServiceIcons::options())
                             ->searchable()
                             ->placeholder('Tanpa ikon')
-                            ->helperText('Tampil di atas angka. Pratinjau: lucide.dev/icons'),
+                            ->helperText('Tampil di atas angka. Ikon orisinal Ekasa.'),
                         TextInput::make('prefix')
                             ->label('Prefiks')
                             ->maxLength(16)

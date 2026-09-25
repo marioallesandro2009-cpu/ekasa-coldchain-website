@@ -14,10 +14,10 @@ class ServiceSeeder extends Seeder
         // temperature range of Cold Storage).
         $services = [
             ['cold-storage', ['Cold Storage', 'Cold Storage'], ['Chilled and frozen rooms from -25°C to 6°C', 'Ruang chiller dan frozen, -25°C hingga 6°C'], 'snowflake'],
-            ['linehaul-transport', ['Linehaul Transport', 'Transportasi Linehaul'], ['Refrigerated and dry trucks between cities', 'Truk berpendingin dan non-pendingin antarkota'], 'truck'],
+            ['linehaul-transport', ['Linehaul Transport', 'Transportasi Linehaul'], ['Refrigerated and dry trucks between cities', 'Truk berpendingin dan non-pendingin antarkota'], 'reefer-truck'],
             ['hyperlocal-fulfilment', ['Hyperlocal Fulfilment', 'Hyperlocal Fulfilment'], ['Quick drop-offs from hubs inside the city', 'Antar cepat dari hub di dalam kota'], 'map-pin'],
-            ['logistic-partnership', ['Logistic Partnership', 'Kemitraan Logistik'], ['One team for storage, transport and delivery', 'Satu tim untuk gudang, transportasi, dan pengiriman'], 'handshake'],
-            ['omnichannel-integration', ['Omnichannel Integration', 'Integrasi Omnichannel'], ['Orders from every sales channel in one flow', 'Pesanan dari semua kanal penjualan dalam satu alur'], 'network'],
+            ['logistic-partnership', ['Logistic Partnership', 'Kemitraan Logistik'], ['One team for storage, transport and delivery', 'Satu tim untuk gudang, transportasi, dan pengiriman'], 'chain-link'],
+            ['omnichannel-integration', ['Omnichannel Integration', 'Integrasi Omnichannel'], ['Orders from every sales channel in one flow', 'Pesanan dari semua kanal penjualan dalam satu alur'], 'route'],
         ];
 
         foreach ($services as $index => [$slug, $title, $description, $icon]) {

@@ -61,7 +61,7 @@ class HeroStat extends Model implements HasTranslatableFields
             'suffix' => $this->suffix,
             'textValue' => $this->translate('text_value'),
             'label' => $this->translate('label'),
-            'icon' => $this->icon && array_key_exists($this->icon, ServiceIcons::OPTIONS) ? $this->icon : null,
+            'icon' => ServiceIcons::has($this->icon) ? $this->icon : null,
             // Count up needs a numeric value; otherwise the static text is shown.
             'useCountUp' => $this->use_count_up && $value !== null,
         ];

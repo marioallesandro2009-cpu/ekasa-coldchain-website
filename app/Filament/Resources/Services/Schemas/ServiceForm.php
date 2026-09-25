@@ -48,12 +48,12 @@ class ServiceForm
                             ->alphaDash()
                             ->unique(ignoreRecord: true),
                         Select::make('icon')
-                            ->label('Ikon (Lucide)')
-                            ->options(ServiceIcons::OPTIONS)
+                            ->label('Ikon')
+                            ->options(ServiceIcons::options())
                             ->searchable()
                             ->required()
                             ->default(ServiceIcons::DEFAULT)
-                            ->helperText('Pratinjau ikon: lucide.dev/icons'),
+                            ->helperText('Ikon orisinal Ekasa. Pratinjau semua ikon: halaman /dev/icons di komputer lokal.'),
                         TextInput::make('anchor')
                             ->label('Anchor tujuan')
                             ->prefix('#')

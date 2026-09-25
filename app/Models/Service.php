@@ -56,7 +56,7 @@ class Service extends Model implements HasTranslatableFields
             'id' => $this->id,
             'title' => $this->translate('title'),
             'description' => $this->translate('short_description'),
-            'icon' => $this->icon && array_key_exists($this->icon, ServiceIcons::OPTIONS) ? $this->icon : ServiceIcons::DEFAULT,
+            'icon' => ServiceIcons::has($this->icon) ? $this->icon : ServiceIcons::DEFAULT,
             'anchor' => ltrim((string) ($this->anchor ?: $this->slug), '#'),
             'featured' => $this->is_featured,
         ];

@@ -42,6 +42,7 @@ return [
         'office-building' => [['Office building', 'Gedung kantor'], 'company'],
         'team' => [['Team', 'Tim'], 'company'],
         'handshake' => [['Handshake', 'Jabat tangan'], 'company'],
+        'chain-link' => [['Linked partnership', 'Kemitraan terhubung'], 'company'],
         'shield-check' => [['Shield with check', 'Perisai tercentang'], 'company'],
         'badge' => [['Badge', 'Lencana'], 'company'],
         'star' => [['Star', 'Bintang'], 'company'],

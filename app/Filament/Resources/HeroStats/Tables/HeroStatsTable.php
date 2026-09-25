@@ -38,7 +38,7 @@ class HeroStatsTable
                 Translatable::column('label', 'Label'),
                 TextColumn::make('icon')
                     ->label('Ikon')
-                    ->formatStateUsing(fn (?string $state): string => ServiceIcons::OPTIONS[$state] ?? (string) $state)
+                    ->formatStateUsing(fn (?string $state): string => ServiceIcons::options()[$state] ?? (string) $state)
                     ->placeholder('—')
                     ->badge()
                     ->color('gray'),
