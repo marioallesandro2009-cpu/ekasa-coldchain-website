@@ -163,7 +163,7 @@ class ManageSiteSettings extends Page
                                     ->collection('favicon')
                                     ->acceptedFileTypes(SiteSetting::FAVICON_MIMES)
                                     ->maxSize(1024)
-                                    ->helperText('PNG persegi 512 x 512 px, SVG, atau ICO. Maks. 1 MB.'),
+                                    ->helperText('PNG persegi 512 x 512 px, SVG, atau ICO. Maks. 1 MB. PNG dan ICO juga memperbarui favicon.ico (16/32/48 px).'),
                             ]),
                         ]),
                     Tab::make('Hero')

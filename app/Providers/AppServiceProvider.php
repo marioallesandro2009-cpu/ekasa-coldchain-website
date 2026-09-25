@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\SiteSetting;
+use App\Support\FaviconIco;
 use App\Support\FrontendData;
 use App\Support\MediaPresenter;
 use Carbon\CarbonImmutable;
@@ -38,13 +40,17 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Keep the front page cache in sync with uploaded media.
+     * Keep the front page cache (and public/favicon.ico) in sync with uploaded media.
      */
     protected function configureMedia(): void
     {
         Event::listen(MediaHasBeenAddedEvent::class, function (MediaHasBeenAddedEvent $event): void {
             MediaPresenter::storeDimensions($event->media);
             FrontendData::flush();
+
+            if ($event->media->collection_name === 'favicon' && $event->media->model_type === (new SiteSetting)->getMorphClass()) {
+                FaviconIco::writeFromMedia($event->media);
+            }
         });
 
         Event::listen(ConversionHasBeenCompletedEvent::class, fn () => FrontendData::flush());
