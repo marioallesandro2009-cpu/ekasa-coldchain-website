@@ -4,8 +4,10 @@
     key points, the next three as 16:9 cards stacked beside it, more in a row below;
     one column on phones, the large card taller), and the supporting (Pendukung)
     services as ribbons below. DOM order = admin order; the grid only places them.
-    Cards (sections.service-card): spotlightCard, each fading in once with
-    animatedContent, one link to the detail page (or #contact while it is a draft).
+    A teaser, not the full picture (REDESIGN MATANG, Bagian 2): cards are
+    sections.service-card-index in "compact" mode (number + title + photo, no
+    description/key points), same asymmetric proportions as before, with a
+    "View all services" link to the full /services index below the grid.
 --}}
 @props(['section', 'services', 'texts'])
 @php
@@ -45,14 +47,20 @@
             };
         @endphp
         <ul class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 lg:grid-cols-12" role="list">
-            <x-sections.service-card :service="$lead" size="large" :texts="$texts" :class="$leadClass" />
+            <x-sections.service-card-index :service="$lead" :number="1" size="large" :texts="$texts" compact :class="$leadClass" />
             @foreach ($side as $i => $service)
-                <x-sections.service-card :service="$service" :texts="$texts" :delay="0.1 + $i * 0.08" class="lg:col-span-5" />
+                <x-sections.service-card-index :service="$service" :number="$i + 2" :texts="$texts" compact :delay="0.1 + $i * 0.08" class="lg:col-span-5" />
             @endforeach
             @foreach ($more as $i => $service)
-                <x-sections.service-card :service="$service" :texts="$texts" :delay="$i * 0.08" class="lg:col-span-4" />
+                <x-sections.service-card-index :service="$service" :number="$i + 5" :texts="$texts" compact :delay="$i * 0.08" class="lg:col-span-4" />
             @endforeach
         </ul>
+
+        <div class="mt-6 text-center sm:mt-8">
+            <x-ui.button :href="\App\Models\Service::indexPath()" tone="light" icon="arrow-right" class="group">
+                {{ __('View all services') }}
+            </x-ui.button>
+        </div>
     @endif
     @if ($supporting)
         <ul class="mt-6 space-y-4" role="list">

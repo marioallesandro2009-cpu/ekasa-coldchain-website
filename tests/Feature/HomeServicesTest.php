@@ -12,10 +12,15 @@ it('shows the main services as cards and the supporting ones as ribbons', functi
     $html = $this->get('/')->assertOk()->getContent();
     $section = substr($html, (int) strpos($html, 'id="services"'));
 
+    // Teaser (Bagian 2): compact cards (number + title + photo only, no key
+    // points or "Learn more" text) plus a link to the full /services index.
     expect(substr_count($section, '<article'))->toBe(4)
         ->and($section)->toContain('Cold Storage')
-        ->toContain('Three temperature zones')
-        ->toContain('Learn more')
+        ->not->toContain('Three temperature zones')
+        ->not->toContain('Learn more')
+        ->toContain('>01<')
+        ->toContain('View all services')
+        ->toContain('href="/services"')
         ->toContain('Also available')
         ->toContain('Omnichannel Integration')
         ->toContain('x-data="splitText" data-split-text="h2"')
@@ -25,8 +30,8 @@ it('shows the main services as cards and the supporting ones as ribbons', functi
 it('shows the Indonesian texts on /id', function () {
     $this->get('/id')->assertOk()
         ->assertSee('Layanan Kami')
-        ->assertSee('Tiga zona suhu')
-        ->assertSee('Selengkapnya')
+        ->assertDontSee('Tiga zona suhu')
+        ->assertSee('Lihat semua layanan')
         ->assertSee('Juga tersedia');
 });
 
@@ -65,15 +70,16 @@ it('lays the main services out as a bento grid: the first large, three beside it
 
 it('makes the first main service in the admin order the large card', function () {
     $section = fn (): string => substr($html = $this->get('/')->getContent(), (int) strpos($html, 'id="services"'));
+    // The large card's wrapper class ("lg:col-span-7") sits right before its title
+    // in the markup; the next "lg:col-span-5" starts the first side card.
+    $largeSlice = fn (string $html): string => substr($html, (int) strpos($html, 'lg:col-span-7'), (int) strpos($html, 'lg:col-span-5') - (int) strpos($html, 'lg:col-span-7'));
 
-    // Only the large card lists the key points.
-    expect($section())->toContain('Three temperature zones')->not->toContain('Refrigerated box trucks');
+    expect($largeSlice($section()))->toContain('Cold Storage')->not->toContain('Linehaul Transport');
 
     // Through the model, like the admin (a query update would skip the cache flush).
     Service::query()->where('slug', 'linehaul-transport')->firstOrFail()->update(['sort_order' => 0]);
 
     $html = $section();
     expect(strpos($html, 'Linehaul Transport'))->toBeLessThan(strpos($html, 'Cold Storage'))
-        ->and($html)->toContain('Refrigerated box trucks')
-        ->not->toContain('Three temperature zones');
+        ->and($largeSlice($html))->toContain('Linehaul Transport')->not->toContain('Cold Storage');
 });

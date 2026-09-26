@@ -3,11 +3,14 @@
     dark-gradient text treatment as the home page card (sections.service-card),
     but with the three "vehicle configurator" motifs from Bagian 1: a giant
     transparent ordinal number overlapping the photo, a slow always-on Ken Burns
-    zoom, and a notched corner (clip-path) instead of a rounded one. Kept as a
-    separate component so the home page teaser (sections.service-card) is not
-    touched by this redesign.
+    zoom, and a notched corner (clip-path) instead of a rounded one.
+
+    compact (Bagian 2, home page teaser): number + title + photo only — no
+    description, key points or "Learn more" text (the card is still one big
+    link). Same component on both pages keeps the visual system (number,
+    Ken Burns, notch) identical between the teaser and the full index.
 --}}
-@props(['service', 'number', 'size' => 'small', 'texts', 'delay' => 0])
+@props(['service', 'number', 'size' => 'small', 'texts', 'delay' => 0, 'compact' => false])
 @php
     $large = $size === 'large';
     $image = $service['image'];
@@ -70,10 +73,10 @@
                     <a href="{{ $href }}" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">{{ $service['title'] }}</a>
                 </h2>
             </div>
-            @if ($service['description'])
+            @if ($service['description'] && ! $compact)
                 <p @class(['text-white/85', 'mt-3 text-lg' => $large, 'mt-1.5 truncate text-sm' => ! $large])>{{ $service['description'] }}</p>
             @endif
-            @if ($large && $service['keyPoints'])
+            @if ($large && $service['keyPoints'] && ! $compact)
                 <ul class="mt-4 space-y-2 text-[15px]" role="list">
                     @foreach ($service['keyPoints'] as $point)
                         <li class="flex items-start gap-2.5">
@@ -83,7 +86,7 @@
                     @endforeach
                 </ul>
             @endif
-            @if ($large)
+            @if ($large && ! $compact)
                 <span class="mt-6 inline-flex items-center gap-1.5 font-semibold text-highlight" aria-hidden="true">
                     {{ $texts['service_card_link'] }}
                     <x-ui.icon name="arrow-right" class="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />

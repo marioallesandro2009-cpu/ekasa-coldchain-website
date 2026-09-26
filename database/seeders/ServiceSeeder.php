@@ -193,6 +193,8 @@ class ServiceSeeder extends Seeder
                     'card_fleet_vehicle_id' => FleetVehicle::query()->where('model', 'FE 71 Long')->value('id'),
                     'card_focus_x' => 70,
                     'card_focus_y' => 50,
+                    // Bright white truck box: same reason as cold-storage above.
+                    'card_photo_light' => true,
                     'blocks' => [
                         ServiceBlocks::make('hero_layanan', ['show_key_points' => true]),
                         ServiceBlocks::make('pita_spesifikasi', ['items' => [
