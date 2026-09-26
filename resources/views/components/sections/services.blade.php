@@ -1,10 +1,11 @@
 {{--
-    Home page services (#services): heading (splitText) from "Section Beranda", a grid of
-    the main (Utama) services as cards (4:3 photo, icon, name, description, up to three
-    key points, link), and the supporting (Pendukung) services as ribbons below.
-    Cards: spotlightCard, each fading in once with animatedContent. The whole card is
-    one link (stretched over the card) to the detail page, or to #contact while the
-    detail page is not published.
+    Home page services (#services): heading (splitText) from "Section Beranda", the main
+    (Utama) services as a bento grid (the first in admin order as a large 4:5 card with
+    key points, the next three as 16:9 cards stacked beside it, more in a row below;
+    one column on phones, the large card taller), and the supporting (Pendukung)
+    services as ribbons below. DOM order = admin order; the grid only places them.
+    Cards (sections.service-card): spotlightCard, each fading in once with
+    animatedContent, one link to the detail page (or #contact while it is a draft).
 --}}
 @props(['section', 'services', 'texts'])
 @php
@@ -30,65 +31,29 @@
     />
 
     @if ($featured)
-        <ul @class([
-            'mt-10 grid gap-6 sm:mt-12 md:grid-cols-2',
-            'xl:grid-cols-3' => count($featured) > 4,
-        ]) role="list">
-            @foreach ($featured as $i => $service)
-                <li x-data="animatedContent" x-intersect.once="show()" data-animate data-delay="{{ ($i % 2) * 0.1 + intdiv($i, 2) * 0.05 }}">
-                    <article
-                        x-data="spotlightCard"
-                        class="spotlight-card is-light group relative flex h-full flex-col overflow-hidden rounded-card border border-ink/10 bg-white text-ink has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-brand"
-                    >
-                        <div class="relative aspect-[4/3] overflow-hidden bg-surface">
-                            @if ($image = $service['image'])
-                                <img
-                                    src="{{ $image['small']['url'] }}"
-                                    srcset="{{ \App\Support\MediaPresenter::srcset($image) }}"
-                                    sizes="(min-width: 1280px) 616px, (min-width: 768px) 50vw, 100vw"
-                                    width="{{ $image['large']['width'] }}"
-                                    height="{{ $image['large']['height'] }}"
-                                    alt=""
-                                    loading="lazy"
-                                    decoding="async"
-                                    style="object-position: {{ $image['focus'] }}"
-                                    class="absolute inset-0 size-full object-cover"
-                                >
-                            @endif
-                        </div>
-                        <div class="flex flex-1 flex-col p-6 sm:p-7">
-                            <div class="flex items-center gap-3">
-                                <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-brand/10 text-brand">
-                                    <x-ui.icon :name="$service['icon']" class="size-5" />
-                                </span>
-                                <h3 class="text-xl leading-snug font-bold">
-                                    <a href="{{ $service['url'] ?? $contact }}" class="focus-visible:outline-none after:absolute after:inset-0 after:content-['']">{{ $service['title'] }}</a>
-                                </h3>
-                            </div>
-                            @if ($service['description'])
-                                <p class="mt-3 text-ink-muted">{{ $service['description'] }}</p>
-                            @endif
-                            @if ($service['keyPoints'])
-                                <ul class="mt-4 space-y-2 text-[15px]" role="list">
-                                    @foreach ($service['keyPoints'] as $point)
-                                        <li class="flex items-start gap-2.5">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 size-4.5 shrink-0 text-brand" aria-hidden="true" focusable="false"><path d="M5 12.5 9.5 17 19 7.5"/></svg>
-                                            <span>{{ $point }}</span>
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @endif
-                            <span class="mt-auto inline-flex items-center gap-1.5 pt-6 font-semibold text-brand" aria-hidden="true">
-                                {{ $texts['service_card_link'] }}
-                                <x-ui.icon name="arrow-right" class="size-4 transition-transform duration-200 group-hover:translate-x-0.5" />
-                            </span>
-                        </div>
-                    </article>
-                </li>
+        @php
+            // Bento: the first main service (admin order) as the large card, the next
+            // three stacked beside it, any further ones in a row below.
+            $lead = $featured[0];
+            $side = array_slice($featured, 1, 3);
+            $more = array_slice($featured, 4);
+            $leadClass = match (count($side)) {
+                0 => 'lg:col-span-12',
+                1 => 'lg:col-span-7',
+                2 => 'lg:col-span-7 lg:row-span-2',
+                default => 'lg:col-span-7 lg:row-span-3',
+            };
+        @endphp
+        <ul class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 lg:grid-cols-12" role="list">
+            <x-sections.service-card :service="$lead" size="large" :texts="$texts" :class="$leadClass" />
+            @foreach ($side as $i => $service)
+                <x-sections.service-card :service="$service" :texts="$texts" :delay="0.1 + $i * 0.08" class="lg:col-span-5" />
+            @endforeach
+            @foreach ($more as $i => $service)
+                <x-sections.service-card :service="$service" :texts="$texts" :delay="$i * 0.08" class="lg:col-span-4" />
             @endforeach
         </ul>
     @endif
-
     @if ($supporting)
         <ul class="mt-6 space-y-4" role="list">
             @foreach ($supporting as $service)

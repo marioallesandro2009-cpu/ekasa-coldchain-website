@@ -51,10 +51,29 @@ it('keeps at most three key points and links to #contact while the detail page i
     $this->get('/')->assertSee('href="#contact" class="focus-visible:outline-none', false);
 });
 
-it('switches to three columns when there are more than four main services', function () {
-    expect($this->get('/')->getContent())->not->toContain('xl:grid-cols-3');
+it('lays the main services out as a bento grid: the first large, three beside it, more below', function () {
+    $html = $this->get('/')->getContent();
+
+    expect($html)->toContain('lg:col-span-7 lg:row-span-3')
+        ->and(substr_count($html, 'lg:col-span-5'))->toBe(3)
+        ->and($html)->not->toContain('lg:col-span-4');
 
     Service::query()->create(['title' => ['en' => 'Cross Docking'], 'slug' => 'cross-docking', 'icon' => 'box', 'is_featured' => true, 'is_active' => true]);
 
-    expect($this->get('/')->getContent())->toContain('xl:grid-cols-3');
+    expect($this->get('/')->getContent())->toContain('lg:col-span-4');
+});
+
+it('makes the first main service in the admin order the large card', function () {
+    $section = fn (): string => substr($html = $this->get('/')->getContent(), (int) strpos($html, 'id="services"'));
+
+    // Only the large card lists the key points.
+    expect($section())->toContain('Three temperature zones')->not->toContain('Refrigerated box trucks');
+
+    // Through the model, like the admin (a query update would skip the cache flush).
+    Service::query()->where('slug', 'linehaul-transport')->firstOrFail()->update(['sort_order' => 0]);
+
+    $html = $section();
+    expect(strpos($html, 'Linehaul Transport'))->toBeLessThan(strpos($html, 'Cold Storage'))
+        ->and($html)->toContain('Refrigerated box trucks')
+        ->not->toContain('Three temperature zones');
 });
