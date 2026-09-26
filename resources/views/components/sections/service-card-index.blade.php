@@ -38,7 +38,7 @@
                 loading="lazy"
                 decoding="async"
                 style="object-position: {{ $image['focus'] }}"
-                class="ken-burns absolute inset-0 -z-20 size-full object-cover motion-reduce:transition-none"
+                class="ken-burns absolute inset-0 -z-20 size-full object-cover"
             >
         @endif
 

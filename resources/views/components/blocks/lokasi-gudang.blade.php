@@ -105,7 +105,7 @@
                     <div>
                         <div class="relative aspect-[4/3] bg-surface">
                             <template x-if="current.photo">
-                                <img :src="current.photo.src" :srcset="current.photo.srcset" sizes="448px" alt="" class="absolute inset-0 size-full object-cover">
+                                <img :src="current.photo.src" :srcset="current.photo.srcset" sizes="448px" width="448" height="336" alt="" class="absolute inset-0 size-full object-cover">
                             </template>
                             <button
                                 type="button"
