@@ -2,6 +2,7 @@
 
 namespace App\Support;
 
+use App\Models\PageSection;
 use Illuminate\Support\Str;
 
 /**
@@ -45,6 +46,40 @@ final class Seo
             'imageAlt' => (string) ($firstSlide['alt'] ?? $settings['companyName']),
             'preload' => $firstSlide,
             // Browser UI color on phones: the brand green.
+            'themeColor' => (string) $settings['colors']['brand'],
+        ];
+    }
+
+    /**
+     * The services index page (/services, /id/layanan): copy from the "Section
+     * Beranda" services entry (the same one the home page teaser uses), so there
+     * is no separate admin field to keep in sync.
+     *
+     * @param  array{settings: array<string, mixed>, sections: list<array<string, mixed>>}  $data
+     * @param  array<string, string>  $paths  locale => path, from Service::indexPath()
+     * @return array<string, mixed>
+     */
+    public static function servicesIndex(array $data, array $paths): array
+    {
+        $settings = $data['settings'];
+        $locale = Locales::current();
+        $section = collect($data['sections'])->firstWhere('id', PageSection::SERVICES);
+        $alternates = array_map(fn (string $path): string => self::baseUrl().$path, $paths);
+        $title = (string) ($section['navLabel'] ?? __('Services'));
+        $description = $section['description'] ?? $settings['seo']['description'];
+        $image = $settings['seo']['image'] ?? ($settings['logoColor'] ? self::logoSize($settings['logoColor']) : null);
+
+        return [
+            'title' => $title.' | '.$settings['companyName'],
+            'description' => Str::limit(trim(strip_tags((string) $description)), 300, ''),
+            'canonical' => $alternates[$locale],
+            'alternates' => $alternates,
+            'ogLocale' => Locales::ogLocale($locale),
+            'ogAlternates' => array_values(array_map(Locales::ogLocale(...), array_diff(Locales::all(), [$locale]))),
+            'siteName' => (string) $settings['companyName'],
+            'image' => $image,
+            'imageAlt' => (string) $settings['companyName'],
+            'preload' => null,
             'themeColor' => (string) $settings['colors']['brand'],
         ];
     }

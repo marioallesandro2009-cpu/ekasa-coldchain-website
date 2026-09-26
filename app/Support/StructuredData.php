@@ -58,6 +58,52 @@ final class StructuredData
     }
 
     /**
+     * The services index page: Organization, WebPage, breadcrumb (Home > Services)
+     * and the same ItemList of services as the home page.
+     *
+     * @param  array{settings: array<string, mixed>, services: list<array<string, mixed>>, sections: list<array<string, mixed>>}  $data
+     * @param  array<string, mixed>  $seo
+     * @return array<string, mixed>
+     */
+    public static function servicesIndex(array $data, array $seo): array
+    {
+        $settings = $data['settings'];
+        $base = Seo::baseUrl();
+        $locale = Locales::current();
+        $url = (string) $seo['canonical'];
+        $orgId = $base.'/#organization';
+        $homeUrl = Locales::url($locale);
+
+        $graph = [
+            self::organization($settings, $orgId, $base),
+            [
+                '@type' => 'WebPage',
+                '@id' => $url.'#webpage',
+                'url' => $url,
+                'name' => $seo['title'],
+                'description' => $seo['description'],
+                'inLanguage' => $locale,
+                'isPartOf' => ['@id' => $base.'/#website'],
+                'breadcrumb' => ['@id' => $url.'#breadcrumb'],
+            ],
+            [
+                '@type' => 'BreadcrumbList',
+                '@id' => $url.'#breadcrumb',
+                'itemListElement' => [
+                    ['@type' => 'ListItem', 'position' => 1, 'name' => __('Home'), 'item' => $homeUrl],
+                    ['@type' => 'ListItem', 'position' => 2, 'name' => __('Services'), 'item' => $url],
+                ],
+            ],
+        ];
+
+        if ($data['services'] !== []) {
+            $graph[] = self::services($data, $orgId, $url);
+        }
+
+        return self::withoutEmpty(['@context' => 'https://schema.org', '@graph' => $graph]);
+    }
+
+    /**
      * Service detail page: Organization, WebPage, the Service, the breadcrumb
      * (Home > Services > service) and, when the page has FAQ blocks, an FAQPage.
      *

@@ -40,6 +40,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property int|null $card_fleet_vehicle_id
  * @property int $card_focus_x
  * @property int $card_focus_y
+ * @property bool $card_photo_light
  * @property string|null $icon
  * @property string|null $anchor
  * @property bool $is_featured
@@ -49,7 +50,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property array<string, array<string, string>>|null $translation_status
  * @property-read FleetVehicle|null $cardFleetVehicle
  */
-#[Fillable(['title', 'slug', 'slugs', 'short_description', 'intro', 'key_points', 'seo_title', 'seo_description', 'detail_status', 'blocks', 'card_fleet_vehicle_id', 'card_focus_x', 'card_focus_y', 'icon', 'anchor', 'is_featured', 'sort_order', 'is_active', 'is_sample', 'translation_status'])]
+#[Fillable(['title', 'slug', 'slugs', 'short_description', 'intro', 'key_points', 'seo_title', 'seo_description', 'detail_status', 'blocks', 'card_fleet_vehicle_id', 'card_focus_x', 'card_focus_y', 'card_photo_light', 'icon', 'anchor', 'is_featured', 'sort_order', 'is_active', 'is_sample', 'translation_status'])]
 class Service extends Model implements HasMedia, HasTranslatableFields
 {
     use FlushesFrontendCache, HasSampleFlag, HasTranslations, InteractsWithMedia, RegistersWebpConversions, Sortable;
@@ -71,6 +72,7 @@ class Service extends Model implements HasMedia, HasTranslatableFields
             'blocks' => 'array',
             'card_focus_x' => 'integer',
             'card_focus_y' => 'integer',
+            'card_photo_light' => 'boolean',
             'is_active' => 'boolean',
             'is_featured' => 'boolean',
             'sort_order' => 'integer',
@@ -155,6 +157,17 @@ class Service extends Model implements HasMedia, HasTranslatableFields
     }
 
     /**
+     * Path of the services index page in a language: /services, /id/layanan.
+     */
+    public static function indexPath(?string $locale = null): string
+    {
+        $locale ??= Locales::current();
+        $segment = (string) config("site.locales.{$locale}.segments.services", 'services');
+
+        return Locales::path($locale, "/{$segment}");
+    }
+
+    /**
      * Card photo (4:3): the service's card photo, or the side view of a fleet truck
      * cropped on screen around the focus point (the file itself is never edited).
      *
@@ -190,6 +203,9 @@ class Service extends Model implements HasMedia, HasTranslatableFields
             'featured' => $this->is_featured,
             'keyPoints' => $this->keyPoints(),
             'image' => $this->cardImage(),
+            // Whether the card photo is bright/busy: the /services index card's
+            // giant ordinal number needs dark ink there instead of pale white.
+            'photoLight' => $this->card_photo_light,
             // Detail page link once it is published (and the page route exists).
             'url' => $this->isPublished() && Route::has('services.show') ? $this->detailPath() : null,
         ];

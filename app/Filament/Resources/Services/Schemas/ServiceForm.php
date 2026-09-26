@@ -206,6 +206,9 @@ class ServiceForm
                             TextInput::make('card_focus_x')->label('Titik fokus horizontal')->numeric()->minValue(0)->maxValue(100)->suffix('%')->default(50),
                             TextInput::make('card_focus_y')->label('Titik fokus vertikal')->numeric()->minValue(0)->maxValue(100)->suffix('%')->default(50),
                         ]),
+                        Toggle::make('card_photo_light')
+                            ->label('Foto ini terang/ramai')
+                            ->helperText('Aktifkan kalau foto kartu ini cukup terang atau ramai (misal gudang berpenerangan terang). Di halaman Our Services, nomor urut besar yang menumpuk di foto akan otomatis dibuat lebih gelap dan lebih pekat supaya tetap terlihat — kalau tetap tidak aktif, nomor tetap putih pudar seperti biasa (cocok untuk foto gelap/seragam).'),
                     ]),
                 ]),
             Section::make('Galeri')->schema([

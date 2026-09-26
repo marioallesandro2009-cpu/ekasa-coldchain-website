@@ -30,6 +30,15 @@
                         @endforeach
                     </ul>
                 @endif
+
+                <a
+                    href="{{ \App\Models\Service::indexPath() }}"
+                    class="mt-3 inline-flex items-center gap-1.5 self-start rounded-md px-2 py-1.5 text-sm font-semibold text-brand hover:underline"
+                    @click="closeMega()"
+                >
+                    {{ __('View all services') }}
+                    <x-ui.icon name="arrow-right" class="size-4" />
+                </a>
             </div>
 
             <a

@@ -64,6 +64,16 @@
                                             </a>
                                         </li>
                                     @endforeach
+                                    <li>
+                                        <a
+                                            href="{{ \App\Models\Service::indexPath() }}"
+                                            class="flex min-h-14 items-center gap-2 rounded-card px-2 py-2.5 font-semibold text-highlight"
+                                            @click="closeMobile(false)"
+                                        >
+                                            {{ __('View all services') }}
+                                            <x-ui.icon name="arrow-right" class="size-4" />
+                                        </a>
+                                    </li>
                                 </ul>
                             </details>
                         @else

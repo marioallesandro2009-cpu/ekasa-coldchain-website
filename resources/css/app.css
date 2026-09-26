@@ -872,6 +872,61 @@ html:not(.js) .mobile-menu:target,
     font-size: 11px;
 }
 
+/* ---------------------------------------------------------------------------
+ * Services index (/services, /id/layanan): hexagonal dot field, the 01->04
+ * connector, notched cards and their ambient Ken Burns photo.
+ * ------------------------------------------------------------------------- */
+
+/* Two staggered dot layers = a honeycomb lattice, not a plain square grid. The
+   faintness (3-5%) is baked into the dot colour itself (not the element's own
+   opacity, which would also fade every child — the actual page content). */
+.hex-dot-field {
+    --hex-dot: color-mix(in srgb, var(--color-ink) 4.5%, transparent);
+    background-image:
+        radial-gradient(circle, var(--hex-dot) 1px, transparent 1.2px),
+        radial-gradient(circle, var(--hex-dot) 1px, transparent 1.2px);
+    background-size:
+        28px 48px,
+        28px 48px;
+    background-position:
+        0 0,
+        14px 24px;
+}
+
+/* Card corner notch (clip-path): a manifest/label feel instead of a rounded
+   SaaS card. One corner only, so it still reads as "a card" at a glance. */
+.card-notch {
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 28px), calc(100% - 28px) 100%, 0 100%);
+}
+
+/* Ambient Ken Burns: always running (not just on hover), very slow. Runs only
+   once JS marks the document, so a slow browser never paints a mid-zoom frame
+   as the "resting" state without JS. */
+@keyframes ken-burns {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(1.045);
+    }
+}
+
+.js-anim .ken-burns {
+    animation: ken-burns 26s ease-in-out infinite alternate;
+}
+
+/* Connector dots and lines between the index cards: absolutely positioned by
+   the caller (top/left as a percentage of the connector's own box), so the
+   same markup works for the desktop bento branch and the mobile single line. */
+.connector-dot {
+    box-shadow: 0 0 0 4px var(--color-surface, #fff);
+}
+
+.connector-line {
+    border-color: color-mix(in srgb, var(--color-brand) 35%, transparent);
+}
+
 /* Reduced motion: show the final state everywhere. */
 @media (prefers-reduced-motion: reduce) {
     .blur-word,
@@ -907,5 +962,10 @@ html:not(.js) .mobile-menu:target,
     .loc-pulse {
         animation: none;
         opacity: 0;
+    }
+
+    .ken-burns {
+        animation: none !important;
+        transform: none !important;
     }
 }

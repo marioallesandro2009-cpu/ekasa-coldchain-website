@@ -4,7 +4,6 @@
 --}}
 @props(['block', 'service', 'settings', 'first' => false])
 @php
-    use App\Support\Links;
     use App\Support\Locales;
 
     $image = $block['image'];
@@ -34,7 +33,7 @@
             <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-white/75">
                 <li><a href="{{ $home }}" class="rounded hover:text-white">{{ __('Home') }}</a></li>
                 <li aria-hidden="true">/</li>
-                <li><a href="{{ Links::section(\App\Models\PageSection::SERVICES) }}" class="rounded hover:text-white">{{ __('Services') }}</a></li>
+                <li><a href="{{ \App\Models\Service::indexPath() }}" class="rounded hover:text-white">{{ __('Services') }}</a></li>
                 <li aria-hidden="true">/</li>
                 <li aria-current="page" class="text-white">{{ $service['title'] }}</li>
             </ol>

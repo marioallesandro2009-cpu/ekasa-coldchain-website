@@ -58,6 +58,18 @@ class SeoController extends Controller
             }
         }
 
+        // Services index (/services, /id/layanan): the segment differs per language,
+        // so it cannot use Locales::alternates() like the pages above.
+        $indexAlternates = [];
+
+        foreach (Locales::all() as $locale) {
+            $indexAlternates[$locale] = Seo::baseUrl().Service::indexPath($locale);
+        }
+
+        foreach ($indexAlternates as $url) {
+            $urls[] = ['loc' => $url, 'lastmod' => $lastModified->toAtomString(), 'priority' => '0.9', 'alternates' => $indexAlternates];
+        }
+
         // Published service pages: their own slug in each language, their own lastmod
         // (shared data such as FAQ or fleet changes are not tracked per page).
         foreach (Service::query()->active()->where('detail_status', Service::PUBLISHED)->ordered()->get() as $service) {

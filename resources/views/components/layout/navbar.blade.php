@@ -2,7 +2,10 @@
     Site navbar. All links are real <a href> elements. Without JS the header is
     solid dark, the mega menu opens on hover/focus and the mobile menu via :target.
 --}}
-@props(['settings', 'services', 'sections'])
+{{-- solid: force the dark bar from the first frame — for pages whose top section
+     is not a dark hero photo (e.g. the services index), where a transparent bar
+     with white text would be unreadable before the visitor scrolls. --}}
+@props(['settings', 'services', 'sections', 'solid' => false])
 @php
     // Navbar items: active sections marked "show in navbar" (admin "Section Beranda").
     $items = array_values(array_filter($sections, fn (array $section): bool => $section['showInNav']));
@@ -10,10 +13,10 @@
     $texts = $settings['texts'];
     $hasMega = count($services) > 0;
 @endphp
-<div x-data="navbar" @keydown.escape.window="closeAll()">
+<div x-data="navbar({ forceSolid: @js($solid) })" @keydown.escape.window="closeAll()">
     <header
-        class="site-header on-dark fixed inset-x-0 top-0 z-50 text-white"
-        :class="{ 'is-solid': scrolled || megaOpen, 'is-scrolled': scrolled }"
+        @class(['site-header on-dark fixed inset-x-0 top-0 z-50 text-white', 'is-solid' => $solid])
+        :class="{ 'is-solid': scrolled || megaOpen || forceSolid, 'is-scrolled': scrolled }"
     >
         <a
             href="#main"
@@ -44,7 +47,7 @@
                                 @click.outside="closeMega()"
                             >
                                 <a
-                                    href="{{ \App\Support\Links::section($item['id']) }}"
+                                    href="{{ \App\Models\Service::indexPath() }}"
                                     class="nav-link relative inline-flex h-10 items-center gap-1 rounded-md px-3 text-[15px] font-medium text-white/85 transition-colors duration-200 hover:text-white"
                                     :class="{ 'is-active': active === '{{ $item['id'] }}' }"
                                     data-spy="{{ $item['id'] }}"

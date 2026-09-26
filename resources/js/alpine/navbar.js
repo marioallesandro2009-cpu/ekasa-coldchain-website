@@ -7,8 +7,9 @@ const MOBILE_CLOSE_MS = 280;
 /**
  * Navbar: scroll state, scrollspy, Services mega menu, mobile menu.
  */
-export default () => ({
+export default ({ forceSolid = false } = {}) => ({
     scrolled: false,
+    forceSolid,
     active: '',
     megaOpen: false,
     megaSource: null,

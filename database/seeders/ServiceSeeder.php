@@ -127,6 +127,9 @@ class ServiceSeeder extends Seeder
                     'key_points' => $t("Three temperature zones\nLogged 24/7\nFrom a single pallet", "Tiga zona suhu\nTercatat 24/7\nMulai dari satu palet"),
                     'seo_description' => $t('Frozen and chilled warehousing in Jabodetabek from -25 °C, logged 24/7, from a single pallet.', 'Gudang frozen dan chiller di Jabodetabek mulai -25 °C, suhu tercatat 24/7, mulai dari satu palet.'),
                     'detail_status' => Service::PUBLISHED,
+                    // The card photo (a bright, busy warehouse interior) needs the
+                    // /services index card's giant number to be dark, not white.
+                    'card_photo_light' => true,
                     'blocks' => [
                         ServiceBlocks::make('hero_layanan', ['show_key_points' => true]),
                         ServiceBlocks::make('pita_spesifikasi', ['items' => [
