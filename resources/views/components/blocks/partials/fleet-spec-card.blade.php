@@ -9,18 +9,22 @@
     <span class="inline-flex rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand">{{ $item['typeLabel'] }}</span>
     <h3 class="mt-2 text-lg font-extrabold tracking-tight text-ink">{{ $item['name'] }}</h3>
     @if ($item['specs'])
+        {{-- Each row is a <dl> child div holding exactly one dt + one dd (the only
+             nesting the definition-list content model allows); the bar lives inside
+             the dd itself rather than as a sibling div, since dl > div > div(dt, dd)
+             or dl > div > (dt, dd, div) both fail the dt/dd-only-children rule. --}}
         <dl class="mt-3 space-y-2.5">
             @foreach ($item['specs'] as $spec)
-                <div>
-                    <div class="flex items-baseline justify-between gap-3 text-sm">
-                        <dt class="text-ink-muted">{{ $spec['label'] }}</dt>
-                        <dd class="font-bold tabular-nums text-ink">{{ $spec['value'] }}</dd>
-                    </div>
-                    @if ($spec['bar'] !== null)
-                        <div class="mt-1 h-1.5 overflow-hidden rounded-full bg-ink/10" aria-hidden="true">
-                            <div class="spec-bar h-full rounded-full bg-brand" style="width: {{ $spec['bar'] }}%"></div>
-                        </div>
-                    @endif
+                <div class="flex items-start justify-between gap-3 text-sm">
+                    <dt class="pt-0.5 text-ink-muted">{{ $spec['label'] }}</dt>
+                    <dd class="flex flex-1 flex-col items-end font-bold tabular-nums text-ink">
+                        <span>{{ $spec['value'] }}</span>
+                        @if ($spec['bar'] !== null)
+                            <div class="mt-1 h-1.5 w-full max-w-24 overflow-hidden rounded-full bg-ink/10" aria-hidden="true">
+                                <div class="spec-bar h-full rounded-full bg-brand" style="width: {{ $spec['bar'] }}%"></div>
+                            </div>
+                        @endif
+                    </dd>
                 </div>
             @endforeach
         </dl>
