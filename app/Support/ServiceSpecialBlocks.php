@@ -211,7 +211,15 @@ final class ServiceSpecialBlocks
             }
         }
 
-        return [...$heading, 'items' => $items, 'map' => ['width' => $width, 'height' => $height, 'land' => implode(' ', $land), 'places' => $places]];
+        return [
+            ...$heading,
+            // The admin's own kind filter (not a new field): styles the "hub" radar
+            // ring motif only where a block is filtered to hubs specifically (see
+            // lokasi-gudang.blade.php), not on every location marker site-wide.
+            'kindFilter' => $kind,
+            'items' => $items,
+            'map' => ['width' => $width, 'height' => $height, 'land' => implode(' ', $land), 'places' => $places],
+        ];
     }
 
     /**

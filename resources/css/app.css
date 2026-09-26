@@ -786,6 +786,30 @@ html:not(.js) .mobile-menu:target,
     stroke-dashoffset: 1;
 }
 
+/* Linehaul motif: a short dash keeps moving along the drawn line, pathLength=1
+   so the same dash size reads consistently whatever the route's real length.
+   Hidden until the line has drawn in, so it never plays over an empty path. */
+.route-flow {
+    stroke-dasharray: 0.04 0.12;
+    stroke-dashoffset: 0;
+    opacity: 0;
+}
+
+.js-anim [data-draw].is-in .route-flow {
+    animation: route-flow 3s linear calc(0.6s + var(--i, 0) * 120ms) infinite;
+    opacity: 1;
+}
+
+@keyframes route-flow {
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: -0.32;
+    }
+}
+
 .route-stop {
     transition: opacity 0.3s ease-out;
     transition-delay: calc(0.8s + var(--i, 0) * 120ms);
@@ -859,6 +883,25 @@ html:not(.js) .mobile-menu:target,
     70%,
     100% {
         transform: scale(2.4);
+        opacity: 0;
+    }
+}
+
+/* Hyperlocal motif: a slower, wider "radar reach" ring, layered behind the
+   existing marker pulse — only on hub markers (lokasi_gudang filtered to
+   kind=hub), not every location marker site-wide. */
+.hub-radar {
+    animation: hub-radar 3.2s ease-out infinite;
+}
+
+@keyframes hub-radar {
+    0% {
+        transform: scale(1);
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: scale(4.5);
         opacity: 0;
     }
 }
@@ -959,9 +1002,15 @@ html:not(.js) .mobile-menu:target,
         transition: none !important;
     }
 
-    .loc-pulse {
+    .loc-pulse,
+    .hub-radar {
         animation: none;
         opacity: 0;
+    }
+
+    .route-flow {
+        animation: none !important;
+        opacity: 0 !important;
     }
 
     .ken-burns {

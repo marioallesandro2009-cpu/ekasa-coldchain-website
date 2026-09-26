@@ -9,6 +9,13 @@
     left/right edges; a thumbnail strip (name below each) sits under the panel.
     Grid: one card per truck, with a Semua/Reefer/Dry filter when both types exist.
     Without JS: every truck listed one after another, no navigation.
+
+    Special block "bigger stage" (REDESIGN MATANG, Bagian D): forced dark
+    background and bigger padding, no named per-service motif here (only
+    zona_suhu, diagram_rute and alur_end_to_end have one). The Showcase photo
+    already carries its own dark scrim regardless of section background, so
+    only the Grid layout's card background (bg-white/bg-surface, which assumed
+    a light section) needed a dark-aware class.
 --}}
 @props(['block', 'service', 'settings', 'first' => false])
 @php
@@ -16,8 +23,8 @@
     $count = count($items);
     $announce = collect($items)->values()->map(fn (array $item, int $i): string => __('Truck :current of :total: :name', ['current' => $i + 1, 'total' => $count, 'name' => $item['name']]))->all();
 @endphp
-<x-ui.section :id="$block['id']" :variant="$block['variant']" aria-labelledby="{{ $block['id'] }}-title" x-ignore data-alpine-defer>
-    <x-ui.section-heading split :id="$block['id'].'-title'" :eyebrow="$block['eyebrow']" :title="$block['title'] ?? $service['title']" :description="$block['description']" />
+<x-ui.section :id="$block['id']" variant="dark" class="py-20! lg:py-28!" aria-labelledby="{{ $block['id'] }}-title" x-ignore data-alpine-defer>
+    <x-ui.section-heading split align="center" tone="dark" :id="$block['id'].'-title'" :eyebrow="$block['eyebrow']" :title="$block['title'] ?? $service['title']" :description="$block['description']" />
 
     @if ($block['layout'] === 'showcase')
         <div
@@ -76,8 +83,12 @@
                                     @endif
                                 </div>
 
-                                {{-- Spec card: floating over the photo on desktop only. --}}
-                                <x-blocks.partials.fleet-spec-card :item="$item" class="hidden lg:absolute lg:top-6 lg:right-6 lg:block lg:w-72" />
+                                {{-- Spec card: floating over the photo on desktop only. right-20 (not
+                                     right-6): the "next" arrow is vertically centred on the whole panel
+                                     at lg:right-3/size-12 (spans panel-right 12-60px) — right-6 put the
+                                     card's edge at 24px, squarely inside that span, so the arrow rendered
+                                     half-hidden behind the card. right-20 (80px) clears it with margin. --}}
+                                <x-blocks.partials.fleet-spec-card :item="$item" class="hidden lg:absolute lg:top-6 lg:right-20 lg:block lg:w-72" />
 
                                 {{-- Arrows live inside each slide's own image box (not the outer wrapper),
                                      so they stay centred on the photo whatever the mobile spec card below
@@ -125,7 +136,7 @@
                                     <img src="{{ $image['small']['url'] }}" alt="" width="{{ $image['small']['width'] }}" height="{{ $image['small']['height'] }}" loading="lazy" class="size-full object-cover" style="object-position: {{ $item['focus'] }}">
                                 @endif
                             </span>
-                            <span class="mt-1.5 block truncate text-sm font-semibold" :class="index === {{ $i }} ? 'text-brand' : 'text-ink-muted'">{{ $item['name'] }}</span>
+                            <span class="mt-1.5 block truncate text-sm font-semibold" :class="index === {{ $i }} ? 'text-brand' : 'text-white/60'">{{ $item['name'] }}</span>
                         </button>
                     @endforeach
                 </div>
@@ -136,13 +147,13 @@
             @if (count($block['types']) > 1)
                 <div class="js-only mb-6 flex gap-2" role="group" aria-label="{{ __('Filter') }}">
                     @foreach (['all' => __('All'), 'reefer' => __('Refrigerated'), 'dry' => __('Dry')] as $value => $label)
-                        <button type="button" @click="type = '{{ $value }}'" x-bind:aria-pressed="(type === '{{ $value }}').toString()" class="rounded-full border px-4 py-1.5 text-sm font-semibold transition" :class="type === '{{ $value }}' ? 'border-brand bg-brand text-white' : 'border-ink/15 hover:border-brand'">{{ $label }}</button>
+                        <button type="button" @click="type = '{{ $value }}'" x-bind:aria-pressed="(type === '{{ $value }}').toString()" class="rounded-full border px-4 py-1.5 text-sm font-semibold transition" :class="type === '{{ $value }}' ? 'border-brand bg-brand text-white' : 'border-white/20 hover:border-brand'">{{ $label }}</button>
                     @endforeach
                 </div>
             @endif
             <ul class="grid gap-6 md:grid-cols-2 xl:grid-cols-3" role="list">
                 @foreach ($items as $item)
-                    <li x-show="type === 'all' || type === '{{ $item['type'] }}'" @class(['overflow-hidden rounded-card border border-ink/10', 'bg-white' => $block['variant'] === 'surface', 'bg-surface' => $block['variant'] !== 'surface'])>
+                    <li x-show="type === 'all' || type === '{{ $item['type'] }}'" class="overflow-hidden rounded-card border border-white/15 bg-white/5">
                         <div class="studio-panel aspect-[16/9]">
                             @if ($image = $item['image'])
                                 <img src="{{ $image['small']['url'] }}" srcset="{{ \App\Support\MediaPresenter::srcset($image) }}" sizes="(min-width: 1280px) 400px, (min-width: 768px) 50vw, 100vw" width="{{ $image['large']['width'] }}" height="{{ $image['large']['height'] }}" alt="{{ $item['name'] }}" loading="lazy" class="size-full object-cover" style="object-position: {{ $item['focus'] }}">
@@ -153,7 +164,7 @@
                             <h3 class="mt-1 text-xl font-bold">{{ $item['name'] }}</h3>
                             <dl class="mt-4 space-y-1.5 text-sm">
                                 @foreach ($item['specs'] as $spec)
-                                    <div class="flex justify-between gap-4"><dt class="text-ink-muted">{{ $spec['label'] }}</dt><dd class="font-semibold tabular-nums">{{ $spec['value'] }}</dd></div>
+                                    <div class="flex justify-between gap-4"><dt class="text-white/60">{{ $spec['label'] }}</dt><dd class="font-semibold tabular-nums">{{ $spec['value'] }}</dd></div>
                                 @endforeach
                             </dl>
                             <a href="{{ $item['ask']['href'] }}" @if ($item['ask']['external']) target="_blank" rel="noopener" @endif class="mt-5 inline-flex items-center gap-1.5 font-semibold text-brand hover:underline">{{ $item['ask']['label'] }}<span class="sr-only">: {{ $item['name'] }}</span><x-ui.icon name="arrow-right" class="size-4" /></a>

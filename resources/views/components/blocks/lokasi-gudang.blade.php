@@ -46,6 +46,12 @@
                             @click.prevent="open({{ $item['id'] }}, $event)"
                         >
                             <span class="relative grid size-7 place-items-center">
+                                {{-- Hyperlocal motif: a wider "radar reach" ring behind the usual pulse,
+                                     only when this block is filtered to hubs specifically (kindFilter),
+                                     not on every location marker site-wide. --}}
+                                @if (($block['kindFilter'] ?? null) === 'hub')
+                                    <span class="hub-radar absolute inset-0 rounded-full bg-highlight/70" aria-hidden="true"></span>
+                                @endif
                                 <span class="loc-pulse absolute inset-0 bg-highlight [clip-path:polygon(25%_5%,75%_5%,100%_50%,75%_95%,25%_95%,0_50%)]" aria-hidden="true"></span>
                                 <span class="relative size-5 bg-brand-soft ring-white transition-transform duration-200 [clip-path:polygon(25%_5%,75%_5%,100%_50%,75%_95%,25%_95%,0_50%)] group-hover:scale-125" aria-hidden="true"></span>
                             </span>

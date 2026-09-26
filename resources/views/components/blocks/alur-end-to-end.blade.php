@@ -1,16 +1,23 @@
 {{--
     End-to-end flow: steps in a row joined by a line that fills from left to right once
     visible (stacked on phones, the line fills top to bottom).
+
+    Special block "bigger stage" (REDESIGN MATANG, Bagian D): forced dark
+    background and bigger padding — same reasoning as zona-suhu.blade.php (the
+    admin's variant does not flip hardcoded child colours, so ink-neutral
+    classes below are rewritten for dark directly). Logistic Partnership
+    motif: the connector fills with a repeating chain-link pattern instead of
+    a solid bar, echoing this service's own chain-link icon.
 --}}
 @props(['block', 'service', 'settings', 'first' => false])
 @php($count = count($block['steps']))
-<x-ui.section :id="$block['id']" :variant="$block['variant']" aria-labelledby="{{ $block['id'] }}-title" x-ignore data-alpine-defer>
-    <x-ui.section-heading split :id="$block['id'].'-title'" :eyebrow="$block['eyebrow']" :title="$block['title'] ?? $service['title']" :description="$block['description']" />
+<x-ui.section :id="$block['id']" variant="dark" class="py-20! lg:py-28!" aria-labelledby="{{ $block['id'] }}-title" x-ignore data-alpine-defer>
+    <x-ui.section-heading split align="center" tone="dark" :id="$block['id'].'-title'" :eyebrow="$block['eyebrow']" :title="$block['title'] ?? $service['title']" :description="$block['description']" />
 
     <div class="relative mt-10 sm:mt-12" style="--steps: {{ $count }}" x-data="animatedContent" x-intersect.once="show()" data-draw>
         {{-- Connector: behind the icons, from the first icon to the last. --}}
-        <div class="absolute top-7 bottom-7 left-7 w-1 -translate-x-1/2 rounded-full bg-ink/10 lg:top-7 lg:right-[calc(50%/var(--steps))] lg:bottom-auto lg:left-[calc(50%/var(--steps))] lg:h-1 lg:w-auto lg:translate-x-0 lg:-translate-y-1/2" aria-hidden="true">
-            <div class="flow-fill size-full rounded-full bg-brand-soft"></div>
+        <div class="absolute top-7 bottom-7 left-7 w-1 -translate-x-1/2 rounded-full bg-white/10 lg:top-7 lg:right-[calc(50%/var(--steps))] lg:bottom-auto lg:left-[calc(50%/var(--steps))] lg:h-1 lg:w-auto lg:translate-x-0 lg:-translate-y-1/2" aria-hidden="true">
+            <div class="flow-fill size-full rounded-full bg-[repeating-linear-gradient(to_bottom,var(--color-brand-soft)_0px,var(--color-brand-soft)_10px,transparent_10px,transparent_16px)] lg:bg-[repeating-linear-gradient(to_right,var(--color-brand-soft)_0px,var(--color-brand-soft)_10px,transparent_10px,transparent_16px)]"></div>
         </div>
         <ol class="relative grid gap-8 lg:grid-cols-[repeat(var(--steps),minmax(0,1fr))] lg:gap-6" role="list">
             @foreach ($block['steps'] as $i => $step)
@@ -25,7 +32,7 @@
                     <div class="pt-2 lg:pt-4">
                         <h3 class="font-bold"><span class="sr-only">{{ $i + 1 }}. </span>{{ $step['title'] }}</h3>
                         @if ($step['text'])
-                            <p class="mt-1 text-sm text-ink-muted lg:mx-auto lg:max-w-[22ch]">{{ $step['text'] }}</p>
+                            <p class="mt-1 text-sm text-white/70 lg:mx-auto lg:max-w-[22ch]">{{ $step['text'] }}</p>
                         @endif
                     </div>
                 </li>
