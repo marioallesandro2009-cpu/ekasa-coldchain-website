@@ -28,10 +28,22 @@ export default ({ count, announce }) => ({
 
     prev() {
         this.go(this.index - 1);
+        this.focusNav('prev');
     },
 
     next() {
         this.go(this.index + 1);
+        this.focusNav('next');
+    },
+
+    /**
+     * The prev/next buttons live inside each slide (so they stay centred on that
+     * slide's own photo) and become inert once their slide is no longer active,
+     * which blurs whatever was focused there. Move focus to the same-side button
+     * in the now-active slide, so repeated clicks/keys do not lose focus context.
+     */
+    focusNav(side) {
+        this.$nextTick(() => this.$el.querySelector(`[id$="-truck-${this.index}"] [data-nav="${side}"]`)?.focus());
     },
 
     onTabKey(event) {

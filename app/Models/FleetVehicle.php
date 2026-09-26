@@ -52,6 +52,20 @@ class FleetVehicle extends Model implements HasMedia, HasTranslatableFields
     /** Side views narrower than this look soft on large screens: the admin warns. */
     public const MIN_SIDE_WIDTH = 1600;
 
+    /**
+     * The fleet showcase's dominant image box is 75:35 (15:7), filled with
+     * object-cover: the crop trims height off the top/bottom (or width off the
+     * sides for a very wide photo). A normal landscape truck photo (like the
+     * client's 16:9 side views) has enough empty studio margin above/below the
+     * truck to absorb that crop safely; only a photo well outside this range
+     * risks the crop cutting into the vehicle itself.
+     */
+    public const SHOWCASE_RATIO = 15 / 7;
+
+    public const SHOWCASE_MIN_RATIO = 1.4;
+
+    public const SHOWCASE_MAX_RATIO = 3.0;
+
     protected function casts(): array
     {
         return [
@@ -106,6 +120,32 @@ class FleetVehicle extends Model implements HasMedia, HasTranslatableFields
         $width = $this->getFirstMedia('side')?->getCustomProperty('width');
 
         return is_numeric($width) ? (int) $width : null;
+    }
+
+    public function sideHeight(): ?int
+    {
+        $height = $this->getFirstMedia('side')?->getCustomProperty('height');
+
+        return is_numeric($height) ? (int) $height : null;
+    }
+
+    /**
+     * Whether the uploaded side view is far enough from a normal landscape truck
+     * photo that displaying it in the 75:35 showcase box (object-cover) risks
+     * cropping into the vehicle rather than just the empty studio margin.
+     */
+    public function sideRatioRisksCroppingVehicle(): bool
+    {
+        $width = $this->sideWidth();
+        $height = $this->sideHeight();
+
+        if (! $width || ! $height) {
+            return false;
+        }
+
+        $ratio = $width / $height;
+
+        return $ratio < self::SHOWCASE_MIN_RATIO || $ratio > self::SHOWCASE_MAX_RATIO;
     }
 
     public function name(): string

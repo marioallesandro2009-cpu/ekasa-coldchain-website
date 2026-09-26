@@ -63,13 +63,17 @@ class FleetVehicleForm
                             ->description(fn (?FleetVehicle $record): string => 'Lebar gambar saat ini '.$record?->sideWidth().' px. Di layar besar gambar akan tampak kurang tajam; unggah versi minimal '.FleetVehicle::MIN_SIDE_WIDTH.' px jika ada.')
                             ->warning()
                             ->visible(fn (?FleetVehicle $record): bool => ($width = $record?->sideWidth()) !== null && $width < FleetVehicle::MIN_SIDE_WIDTH),
-                        ImageUpload::limitDimensions(SpatieMediaLibraryFileUpload::make('side'), '2400 x 1350 px')
+                        Callout::make('Bentuk gambar berisiko memotong truk')
+                            ->description(fn (?FleetVehicle $record): string => 'Gambar ini '.$record?->sideWidth().'×'.$record?->sideHeight().' px, jauh dari bentuk foto truk tampak samping biasa. Di bidang showcase (75:35), bagian yang terpotong otomatis bisa mengenai badan truk, bukan cuma latar kosong. Sebaiknya unggah foto landscape biasa (mendekati 3:2 sampai 2:1), atau periksa hasilnya di halaman layanan dan sesuaikan titik fokus/perbesaran di bawah.')
+                            ->warning()
+                            ->visible(fn (?FleetVehicle $record): bool => $record?->sideRatioRisksCroppingVehicle() ?? false),
+                        ImageUpload::limitDimensions(SpatieMediaLibraryFileUpload::make('side'), '2400 x 1120 px')
                             ->label('Gambar tampak samping')
                             ->collection('side')
                             ->image()
                             ->acceptedFileTypes(SiteSetting::LOGO_MIMES)
                             ->maxSize(5120)
-                            ->helperText('Latar abu-abu polos, truk menghadap kiri. Minimal '.FleetVehicle::MIN_SIDE_WIDTH.' px lebarnya. File tidak diubah; potongan tampilan diatur di bawah.'),
+                            ->helperText('Latar abu-abu polos, truk menghadap kiri. Ideal sekitar 2400 × 1120 px (rasio 75:35, dipakai penuh di bidang showcase). Foto landscape biasa seperti 16:9 (contoh: FE 71, FE 74) juga aman dipakai — bagian yang terpotong otomatis hanya latar kosong di atas/bawah truk, selama badan truk tidak terlalu mepet ke tepi foto. Minimal '.FleetVehicle::MIN_SIDE_WIDTH.' px lebarnya. File tidak diubah; potongan tampilan diatur di bawah.'),
                         Grid::make(3)->schema([
                             TextInput::make('focus_x')->label('Titik fokus horizontal')->numeric()->minValue(0)->maxValue(100)->suffix('%')->default(50),
                             TextInput::make('focus_y')->label('Titik fokus vertikal')->numeric()->minValue(0)->maxValue(100)->suffix('%')->default(50),
