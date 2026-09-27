@@ -1,9 +1,12 @@
 {{--
     Services index (/services, /id/layanan): every active, published service as a
     bento grid — unbounded (unlike the home teaser and navbar mega menu, which cap
-    to Service::MAX_FEATURED; see ServiceIndexController). At lg+ the whole page
-    (navbar + intro + grid) fits one viewport (no scroll); on phones it scrolls
-    normally. Background: a very faint hexagonal dot field (echoes the Ekasa logo
+    to Service::MAX_FEATURED; see ServiceIndexController). Natural height, normal
+    scroll at every breakpoint (an earlier version forced the navbar+intro+grid
+    into exactly one lg+ viewport via lg:h-svh + overflow-hidden — on a shorter
+    browser window that silently clipped whichever card didn't fit, with no way
+    to reach it; removed, see the comment above the grid wrapper below).
+    Background: a very faint hexagonal dot field (echoes the Ekasa logo
     hexagon and the lokasi_gudang hex map) plus a dashed connector with a dot per
     card for the first 4 ("4 pillars, one connected system" — a fixed design
     motif, not meant to track an arbitrary count), plain dashed line (no dots)
@@ -37,11 +40,13 @@
     <x-layout.navbar :settings="$settings" :services="$services" :featured-services="$featuredServices" :sections="$sections" solid />
 
     <main id="main">
-        {{-- The "fits in one viewport, no scroll" treatment (lg:h-svh + overflow-hidden)
-             only makes sense for the original 4-or-fewer bento shape — once a "more" row
-             exists (5th+ featured service), forcing a fixed viewport height would clip it
-             instead of scaling, so it drops to normal scrolling flow like the ribbon below. --}}
-        <div @class(['hex-dot-field relative isolate lg:flex lg:flex-col lg:pt-20', 'lg:h-svh lg:overflow-hidden' => ! $more])>
+        {{-- No forced viewport height here (an earlier version fit the navbar+intro+grid
+             into exactly one screen via lg:h-svh + overflow-hidden) — on shorter browser
+             windows that clipped whichever card didn't fit, hiding it entirely with no way
+             to reach it. Natural height + normal scroll, same as the home page teaser's
+             identical grid below, which never had this problem: every card is always fully
+             visible, however many the admin adds. --}}
+        <div class="hex-dot-field relative isolate lg:flex lg:flex-col lg:pt-20">
             <section class="container-site relative flex-none pt-24 pb-6 lg:pt-8 lg:pb-6">
                 <nav aria-label="{{ __('Breadcrumb') }}">
                     <ol class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-ink-muted">
@@ -81,11 +86,14 @@
                 @endif
 
                 @if ($lead)
-                    <div class="relative h-full">
+                    <div class="relative">
                         {{-- One dot per card for the first {{ \App\Models\Service::MAX_FEATURED }}
                              only ("4 pillars" is a fixed motif, not a per-card counter) — sized
                              to this bento block's own height, so it stays accurate regardless of
-                             what the "more" row below adds to the section's total height. --}}
+                             what the "more" row below adds to the section's total height. The
+                             absolutely-positioned box below measures against this div's actual
+                             rendered height (content-driven, no h-full/1fr needed) same as the
+                             home page teaser's identical grid. --}}
                         @if ($total > 1)
                             <div class="pointer-events-none absolute inset-y-0 left-4 lg:left-[58.3333%]" aria-hidden="true">
                                 @for ($i = 0; $i < $dotCount; $i++)
@@ -94,7 +102,7 @@
                             </div>
                         @endif
 
-                        <ul class="grid h-full gap-4 sm:gap-5 lg:grid-cols-12 lg:[grid-auto-rows:1fr]" role="list">
+                        <ul class="grid gap-4 sm:gap-5 lg:grid-cols-12" role="list">
                             <x-sections.service-card-index :service="$lead" :number="1" size="large" :texts="$texts" :class="$leadClass" />
                             @foreach ($side as $i => $service)
                                 <x-sections.service-card-index :service="$service" :number="$i + 2" :texts="$texts" :delay="0.1 + $i * 0.08" class="lg:col-span-5" />
