@@ -14,7 +14,7 @@
 @php
     $large = $size === 'large';
     $image = $service['image'];
-    $href = $service['url'] ?? '#'.\App\Models\PageSection::CONTACT;
+    $href = \App\Support\Links::service($service);
     $ordinal = str_pad((string) $number, 2, '0', STR_PAD_LEFT);
 @endphp
 <li {{ $attributes->class(['min-w-0']) }} x-data="animatedContent" x-intersect.once="show()" data-animate data-delay="{{ $delay }}">

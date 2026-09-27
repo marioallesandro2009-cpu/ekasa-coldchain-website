@@ -7,8 +7,13 @@
      with white text would be unreadable before the visitor scrolls. --}}
 @props(['settings', 'services', 'featuredServices', 'sections', 'solid' => false])
 @php
-    // Navbar items: active sections marked "show in navbar" (admin "Section Beranda").
-    $items = array_values(array_filter($sections, fn (array $section): bool => $section['showInNav']));
+    // Navbar items: a fixed "Home" link (not an admin section — it has no anchor
+    // of its own, just the site root) followed by active sections marked "show in
+    // navbar" (admin "Section Beranda").
+    $items = [
+        ['id' => 'home', 'navLabel' => __('Home'), 'showInNav' => true, 'mega' => false],
+        ...array_values(array_filter($sections, fn (array $section): bool => $section['showInNav'])),
+    ];
     $contactId = \App\Models\PageSection::CONTACT;
     $texts = $settings['texts'];
     $hasMega = count($services) > 0;
