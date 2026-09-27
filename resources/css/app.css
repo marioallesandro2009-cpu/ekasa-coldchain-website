@@ -788,7 +788,13 @@ html:not(.js) .mobile-menu:target,
 
 /* Linehaul motif: a short dash keeps moving along the drawn line, pathLength=1
    so the same dash size reads consistently whatever the route's real length.
-   Hidden until the line has drawn in, so it never plays over an empty path. */
+   Delay matches .route-line's own (1.1s transition + stagger) exactly, so the
+   flow only appears once that line has actually finished drawing in — not
+   the ~0.5s early start a shorter delay produced. animation-fill-mode:
+   backwards holds the 0% keyframe's opacity:0 for the whole delay (instead of
+   the element's own opacity, which the .is-in rule can't set until the
+   animation itself starts), so no static dash flashes over the undrawn path
+   during that wait. */
 .route-flow {
     stroke-dasharray: 0.04 0.12;
     stroke-dashoffset: 0;
@@ -796,13 +802,17 @@ html:not(.js) .mobile-menu:target,
 }
 
 .js-anim [data-draw].is-in .route-flow {
-    animation: route-flow 3s linear calc(0.6s + var(--i, 0) * 120ms) infinite;
-    opacity: 1;
+    animation: route-flow 3s linear calc(1.1s + var(--i, 0) * 120ms) infinite backwards;
 }
 
 @keyframes route-flow {
-    from {
+    0% {
+        opacity: 0;
         stroke-dashoffset: 0;
+    }
+
+    0.01% {
+        opacity: 1;
     }
 
     to {
