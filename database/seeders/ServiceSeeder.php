@@ -127,8 +127,12 @@ class ServiceSeeder extends Seeder
                     'key_points' => $t("Three temperature zones\nLogged 24/7\nFrom a single pallet", "Tiga zona suhu\nTercatat 24/7\nMulai dari satu palet"),
                     'seo_description' => $t('Frozen and chilled warehousing in Jabodetabek from -25 °C, logged 24/7, from a single pallet.', 'Gudang frozen dan chiller di Jabodetabek mulai -25 °C, suhu tercatat 24/7, mulai dari satu palet.'),
                     'detail_status' => Service::PUBLISHED,
-                    // The card photo (a bright, busy warehouse interior) needs the
-                    // /services index card's giant number to be dark, not white.
+                    // The card photo (service-cold-storage-card) is a well-lit daytime
+                    // warehouse shot, and the giant number sits over its brightest, busiest
+                    // corner (orange racking + boxes) — needs dark ink, not pale white.
+                    // Confirmed by rendering both values and inspecting the actual photo;
+                    // a prior pass flipped this to `false` based on a mischaracterization
+                    // of the image as "dark, moody", which is why "01" kept going invisible.
                     'card_photo_light' => true,
                     'blocks' => [
                         ServiceBlocks::make('hero_layanan', ['show_key_points' => true]),

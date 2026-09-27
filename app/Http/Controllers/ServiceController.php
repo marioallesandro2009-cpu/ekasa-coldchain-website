@@ -45,6 +45,7 @@ class ServiceController extends Controller
         return view('services.show', [
             'settings' => $settings,
             'services' => $data['services'],
+            'featuredServices' => $data['featuredServices'],
             'sections' => $data['sections'],
             'page' => $page,
             'preview' => $preview,

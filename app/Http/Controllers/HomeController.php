@@ -16,6 +16,7 @@ class HomeController extends Controller
         return view('home', [
             'settings' => $data['settings'],
             'services' => $data['services'],
+            'featuredServices' => $data['featuredServices'],
             'heroSlides' => $data['heroSlides'],
             'heroStats' => $data['heroStats'],
             'trustLogos' => $data['trustLogos'],

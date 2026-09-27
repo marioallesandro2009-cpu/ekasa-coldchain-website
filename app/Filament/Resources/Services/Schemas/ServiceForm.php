@@ -107,12 +107,12 @@ class ServiceForm
                             }
                         })),
                     ToggleButtons::make('is_featured')
-                        ->label('Jenis')
+                        ->label('Tampilkan sebagai Unggulan di Beranda & Menu')
                         ->boolean('Utama', 'Pendukung')
                         ->default(true)
                         ->inline()
                         ->grouped()
-                        ->helperText('Utama: kartu besar di beranda dan grid mega menu. Pendukung: pita di bawahnya.'),
+                        ->helperText('Utama: kartu besar di beranda dan grid mega menu (maks. '.Service::MAX_FEATURED.', diambil dari Urutan Tampil terkecil kalau lebih dari itu ditandai Utama). Pendukung: pita di bawahnya. Halaman /services sendiri selalu menampilkan semua layanan aktif, tanpa batas.'),
                     Select::make('icon')
                         ->label('Ikon')
                         ->options(fn (): array => IconLibrary::htmlOptions())

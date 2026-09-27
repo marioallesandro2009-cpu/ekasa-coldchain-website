@@ -1,5 +1,5 @@
 <x-layouts::app :seo="$seo" :settings="$settings" :json-ld="$jsonLd">
-    <x-layout.navbar :settings="$settings" :services="$services" :sections="$sections" />
+    <x-layout.navbar :settings="$settings" :services="$services" :featured-services="$featuredServices" :sections="$sections" />
 
     <main id="main">
         <x-sections.hero :settings="$settings" :slides="$heroSlides" :stats="$heroStats" :trust-logos="$trustLogos" />
@@ -9,7 +9,7 @@
              data-alpine-defer, see app.js), not during page load. --}}
         @foreach ($sections as $section)
             @if ($section['id'] === \App\Models\PageSection::SERVICES)
-                <x-sections.services :section="$section" :services="$services" :texts="$settings['texts']" />
+                <x-sections.services :section="$section" :featured-services="$featuredServices" :texts="$settings['texts']" />
                 @continue
             @endif
             <x-ui.section :id="$section['id']" :variant="$section['background']" class="flex min-h-screen items-center" aria-labelledby="{{ $section['id'] }}-title" x-ignore data-alpine-defer>

@@ -1,12 +1,14 @@
 {{--
     Services mega menu panel. Plain links in the HTML; shown on hover/focus
     without JS (CSS) and controlled by the navbar component with JS.
+    Same rule as the home page teaser (sections.services): only the shared, capped
+    featuredServices (see FrontendData::build()) in a 2x2 grid — no "other services"
+    rows here at all, so home and navbar can never disagree. Everything else is only
+    ever reached via "View all services".
 --}}
-@props(['services', 'megaMenu', 'contactId'])
+@props(['featuredServices', 'megaMenu', 'contactId'])
 @php
-    // Main services (is_featured) in a 2x2 grid; the others in full-width rows below a divider.
-    $featured = array_values(array_filter($services, fn (array $service): bool => $service['featured']));
-    $others = array_values(array_filter($services, fn (array $service): bool => ! $service['featured']));
+    $featured = $featuredServices;
 @endphp
 <div
     id="mega-menu-services"
@@ -18,14 +20,6 @@
                 @if ($featured)
                     <ul class="grid grid-cols-2 content-start gap-1">
                         @foreach ($featured as $service)
-                            <li><x-layout.mega-menu-item :service="$service" /></li>
-                        @endforeach
-                    </ul>
-                @endif
-
-                @if ($others)
-                    <ul @class(['grid gap-1', 'mt-3 border-t border-ink/10 pt-3' => $featured])>
-                        @foreach ($others as $service)
                             <li><x-layout.mega-menu-item :service="$service" /></li>
                         @endforeach
                     </ul>

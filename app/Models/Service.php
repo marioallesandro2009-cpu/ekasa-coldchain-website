@@ -12,6 +12,7 @@ use App\Support\Locales;
 use App\Support\MediaPresenter;
 use App\Support\ServiceIcons;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,13 @@ class Service extends Model implements HasMedia, HasTranslatableFields
     public const STATUSES = [self::DRAFT => 'Draf (halaman detail belum tampil)', self::PUBLISHED => 'Terbit'];
 
     public const MAX_KEY_POINTS = 3;
+
+    /**
+     * How many is_featured services show on the home page teaser and the navbar
+     * mega menu (by sort_order). The /services index itself is unbounded — see
+     * FrontendData::build()'s featuredServices vs services.
+     */
+    public const MAX_FEATURED = 4;
 
     protected function casts(): array
     {
@@ -131,6 +139,14 @@ class Service extends Model implements HasMedia, HasTranslatableFields
     public function isPublished(): bool
     {
         return $this->detail_status === self::PUBLISHED;
+    }
+
+    /**
+     * @param  Builder<static>  $query
+     */
+    public function scopeFeatured(Builder $query): void
+    {
+        $query->where('is_featured', true);
     }
 
     /**

@@ -11,6 +11,7 @@ use App\Support\IconLibrary;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
@@ -46,7 +47,22 @@ class ServicesTable
                     ->prefix('#')
                     ->toggleable(isToggledHiddenByDefault: true),
                 ToggleColumn::make('is_featured')
-                    ->label('Utama'),
+                    ->label('Unggulan')
+                    ->afterStateUpdated(function (Service $record, ?bool $state): void {
+                        if (! $state) {
+                            return;
+                        }
+
+                        $count = Service::query()->active()->featured()->count();
+
+                        if ($count > Service::MAX_FEATURED) {
+                            Notification::make()
+                                ->warning()
+                                ->title('Lebih dari '.Service::MAX_FEATURED.' layanan ditandai Unggulan')
+                                ->body('Hanya '.Service::MAX_FEATURED.' teratas berdasarkan Urutan Tampil yang akan muncul di Beranda dan Menu — sisanya tetap tampil di halaman /services.')
+                                ->send();
+                        }
+                    }),
                 ToggleColumn::make('is_active')
                     ->label('Aktif'),
             ])

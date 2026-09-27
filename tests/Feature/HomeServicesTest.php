@@ -8,12 +8,14 @@ use App\Support\FrontendData;
  */
 beforeEach(fn () => seedSite(serviceImages: true));
 
-it('shows the main services as cards and the supporting ones as ribbons', function () {
+it('shows only the featured services as cards, no supporting ribbon', function () {
     $html = $this->get('/')->assertOk()->getContent();
     $section = substr($html, (int) strpos($html, 'id="services"'));
 
-    // Teaser (Bagian 2): compact cards (number + title + photo only, no key
-    // points or "Learn more" text) plus a link to the full /services index.
+    // Teaser (TAHAP 3, Bagian 2): compact cards (number + title + photo only, no
+    // key points or "Learn more" text) plus a link to the full /services index.
+    // A pure teaser — no supporting/Pendukung ribbon here at all (unlike the full
+    // /services index); Omnichannel (not featured) is only ever reached from there.
     expect(substr_count($section, '<article'))->toBe(4)
         ->and($section)->toContain('Cold Storage')
         ->not->toContain('Three temperature zones')
@@ -21,8 +23,8 @@ it('shows the main services as cards and the supporting ones as ribbons', functi
         ->toContain('>01<')
         ->toContain('View all services')
         ->toContain('href="/services"')
-        ->toContain('Also available')
-        ->toContain('Omnichannel Integration')
+        ->not->toContain('Also available')
+        ->not->toContain('Omnichannel Integration')
         ->toContain('x-data="splitText" data-split-text="h2"')
         ->toContain('x-data="spotlightCard"');
 });
@@ -32,7 +34,7 @@ it('shows the Indonesian texts on /id', function () {
         ->assertSee('Layanan Kami')
         ->assertDontSee('Tiga zona suhu')
         ->assertSee('Lihat semua layanan')
-        ->assertSee('Juga tersedia');
+        ->assertDontSee('Juga tersedia');
 });
 
 it('uses the fleet side view cropped around its focus point for the Linehaul card', function () {
@@ -56,16 +58,26 @@ it('keeps at most three key points and links to #contact while the detail page i
     $this->get('/')->assertSee('href="#contact" class="focus-visible:outline-none', false);
 });
 
-it('lays the main services out as a bento grid: the first large, three beside it, more below', function () {
+it('lays the main services out as a bento grid: the first large, three beside it', function () {
     $html = $this->get('/')->getContent();
 
     expect($html)->toContain('lg:col-span-7 lg:row-span-3')
         ->and(substr_count($html, 'lg:col-span-5'))->toBe(3)
         ->and($html)->not->toContain('lg:col-span-4');
+});
 
+it('never grows past 4 cards on the home teaser: a 5th featured service is capped away, not added below', function () {
     Service::query()->create(['title' => ['en' => 'Cross Docking'], 'slug' => 'cross-docking', 'icon' => 'box', 'is_featured' => true, 'is_active' => true]);
 
-    expect($this->get('/')->getContent())->toContain('lg:col-span-4');
+    $html = $this->get('/')->getContent();
+    $section = substr($html, (int) strpos($html, 'id="services"'));
+
+    // Unlike /services (unbounded), the home teaser stays at the shared,
+    // capped featuredServices — the 5th featured service never gets a
+    // "more" row here, it only ever shows up on the full index.
+    expect(substr_count($section, '<article'))->toBe(4)
+        ->and($section)->not->toContain('lg:col-span-4')
+        ->not->toContain('Cross Docking');
 });
 
 it('makes the first main service in the admin order the large card', function () {

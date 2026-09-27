@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Cache;
 final class FrontendData
 {
     /**
-     * @return array{settings: array<string, mixed>, services: list<array<string, mixed>>, heroSlides: list<array<string, mixed>>, heroStats: list<array<string, mixed>>, sections: list<array<string, mixed>>, trustLogos: list<array<string, mixed>>}
+     * @return array{settings: array<string, mixed>, services: list<array<string, mixed>>, featuredServices: list<array<string, mixed>>, heroSlides: list<array<string, mixed>>, heroStats: list<array<string, mixed>>, sections: list<array<string, mixed>>, trustLogos: list<array<string, mixed>>}
      */
     public static function all(?string $locale = null): array
     {
@@ -29,7 +29,7 @@ final class FrontendData
     /**
      * The data in one language (texts use that language, falling back to English).
      *
-     * @return array{settings: array<string, mixed>, services: list<array<string, mixed>>, heroSlides: list<array<string, mixed>>, heroStats: list<array<string, mixed>>, sections: list<array<string, mixed>>, trustLogos: list<array<string, mixed>>}
+     * @return array{settings: array<string, mixed>, services: list<array<string, mixed>>, featuredServices: list<array<string, mixed>>, heroSlides: list<array<string, mixed>>, heroStats: list<array<string, mixed>>, sections: list<array<string, mixed>>, trustLogos: list<array<string, mixed>>}
      */
     private static function build(string $locale): array
     {
@@ -40,6 +40,11 @@ final class FrontendData
             return [
                 'settings' => SiteSetting::current()->toFrontend(),
                 'services' => array_values(Service::query()->active()->ordered()->with(['media', 'cardFleetVehicle.media'])->get()->map->toFrontend()->all()),
+                // Single source for "featured, capped": the home teaser and the navbar
+                // mega menu both consume this exact list instead of each filtering
+                // $services on their own, so they can never disagree. /services itself
+                // stays unbounded (uses the full 'services' list above).
+                'featuredServices' => array_values(Service::query()->active()->featured()->ordered()->with(['media', 'cardFleetVehicle.media'])->take(Service::MAX_FEATURED)->get()->map->toFrontend()->all()),
                 'heroSlides' => array_values(HeroSlide::query()->active()->ordered()->with('media')->get()
                     ->map->toFrontend()->filter()->all()),
                 'heroStats' => array_values(HeroStat::query()->active()->ordered()->get()->map->toFrontend()->all()),

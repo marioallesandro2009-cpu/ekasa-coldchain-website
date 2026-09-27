@@ -1,7 +1,7 @@
 {{-- Service detail page: the blocks from the admin (Builder), in their order.
      Below the first screen, the blocks' Alpine components start near the viewport. --}}
 <x-layouts::app :seo="$seo" :settings="$settings" :json-ld="$jsonLd">
-    <x-layout.navbar :settings="$settings" :services="$services" :sections="$sections" />
+    <x-layout.navbar :settings="$settings" :services="$services" :featured-services="$featuredServices" :sections="$sections" />
 
     @if ($preview)
         <p class="fixed inset-x-0 bottom-0 z-40 bg-highlight px-4 py-2 text-center text-sm font-semibold text-dark" role="status">

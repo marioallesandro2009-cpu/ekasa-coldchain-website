@@ -5,7 +5,7 @@
 {{-- solid: force the dark bar from the first frame — for pages whose top section
      is not a dark hero photo (e.g. the services index), where a transparent bar
      with white text would be unreadable before the visitor scrolls. --}}
-@props(['settings', 'services', 'sections', 'solid' => false])
+@props(['settings', 'services', 'featuredServices', 'sections', 'solid' => false])
 @php
     // Navbar items: active sections marked "show in navbar" (admin "Section Beranda").
     $items = array_values(array_filter($sections, fn (array $section): bool => $section['showInNav']));
@@ -69,7 +69,7 @@
                                 </a>
 
                                 <x-layout.mega-menu
-                                    :services="$services"
+                                    :featured-services="$featuredServices"
                                     :mega-menu="$settings['megaMenu']"
                                     :contact-id="$contactId"
                                     x-bind:class="{ 'is-open': megaOpen }"

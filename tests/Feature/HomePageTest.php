@@ -159,19 +159,33 @@ it('falls back to the original image when conversions are off (same payload shap
         ->and($image['large']['width'])->toBeGreaterThan(0);
 });
 
-it('puts the featured services in the mega menu grid and the others in the row below', function () {
-    $html = $this->get('/')->getContent();
-    $panel = substr($html, (int) strpos($html, 'id="mega-menu-services"'));
-    $divider = strpos($panel, 'border-t border-ink/10');
+it('puts only the shared, capped featuredServices in the mega menu grid — no others row', function () {
+    // Bounded by "mega-backdrop" (the sibling element right after </nav>): the
+    // mobile menu further down the page always lists every service unfiltered,
+    // so an unbounded substr would false-positive on it.
+    $panel = function (string $html): string {
+        $start = (int) strpos($html, 'id="mega-menu-services"');
+        $end = strpos($html, 'mega-backdrop');
 
+        return substr($html, $start, $end - $start);
+    };
+
+    $html = $this->get('/')->getContent();
+
+    // Same rule as the home teaser (TAHAP 3, Bagian 2): only featuredServices, no
+    // "others" section — a service marked featured past the cap of 4 (by
+    // sort_order) never appears here either, matching FrontendData::build().
     expect(Service::query()->where('is_featured', true)->count())->toBe(4)
-        ->and($divider)->toBeGreaterThan(strpos($panel, 'Logistic Partnership'))
-        ->and(strpos($panel, 'Omnichannel Integration'))->toBeGreaterThan($divider);
+        ->and($panel($html))->not->toContain('border-t border-ink/10')
+        ->toContain('Logistic Partnership');
 
     Service::query()->where('slug', 'omnichannel-integration')->update(['is_featured' => true]);
     FrontendData::flush();
 
-    expect($this->get('/')->getContent())->not->toContain('border-t border-ink/10');
+    $html = $this->get('/')->getContent();
+
+    expect($panel($html))->not->toContain('border-t border-ink/10')
+        ->not->toContain('Omnichannel Integration');
 });
 
 it('caches only the front page data, never the rendered HTML', function () {
@@ -180,7 +194,7 @@ it('caches only the front page data, never the rendered HTML', function () {
     $cached = Cache::get(config('site.cache_key').'.en');
 
     expect($cached)->toBeArray()
-        ->and(array_keys($cached))->toBe(['settings', 'services', 'heroSlides', 'heroStats', 'sections', 'trustLogos'])
+        ->and(array_keys($cached))->toBe(['settings', 'services', 'featuredServices', 'heroSlides', 'heroStats', 'sections', 'trustLogos'])
         ->and(serialize($cached))->not->toContain('<html')
         ->not->toContain('/build/assets/');
 });
