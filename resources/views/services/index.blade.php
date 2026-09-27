@@ -154,7 +154,7 @@
                         <li x-data="animatedContent" x-intersect.once="show()" data-animate>
                             <a
                                 href="{{ $service['url'] ?? '#'.\App\Models\PageSection::CONTACT }}"
-                                class="group flex flex-col gap-4 rounded-card border border-ink/10 bg-white p-5 transition-colors duration-200 hover:border-brand/30 sm:flex-row sm:items-center sm:gap-5 sm:p-6"
+                                class="group flex flex-col gap-4 rounded-card border border-ink/10 bg-white p-5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-lg focus-visible:-translate-y-0.5 focus-visible:border-brand/30 focus-visible:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:flex-row sm:items-center sm:gap-5 sm:p-6"
                             >
                                 <span class="flex items-center gap-3 sm:w-56 sm:shrink-0">
                                     <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-brand/10 text-brand">

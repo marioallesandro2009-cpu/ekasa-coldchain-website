@@ -718,3 +718,36 @@ Section placeholder (`services`, `locations`, `about`, `clients`, `insights`, `c
 - Keterbacaan tanpa JavaScript, struktur SEO/JSON-LD, dan aksesibilitas (Lighthouse A11y 100, kontras terukur ≥ 5,18:1).
 - Tidak ada layout shift.
 - Panel admin yang lengkap, dengan cache yang otomatis tersinkron.
+
+---
+
+## 20. Tahap 3 (Layanan) — SELESAI
+
+Tanggal: 27 September 2026.
+
+Tahap 3 membangun modul Layanan secara menyeluruh: data dan panel admin (`Service`, drag-and-drop, toggle Utama/Pendukung/aktif, maks. 3 poin unggulan), section beranda (grid bento compact, reuse `service-card-index`), halaman index `/services` (bento tak terbatas + pita Pendukung) dan halaman detail per layanan (Builder blocks), blok khusus (`zona_suhu`, `katalog_armada`, `diagram_rute`, `alur_end_to_end`, `lokasi_gudang`), motif visual khas per layanan (tint, garis rute bergerak, ring radar, garis rantai — styling saja, tanpa field baru), serta aturan "Utama maks. 4" yang memisahkan `featuredServices` (beranda + mega menu, dibatasi `Service::MAX_FEATURED`) dari `services` (halaman /services, tanpa batas).
+
+Commit utama tahap ini (lihat `git log --oneline`): `c3187c7` data dan admin, `067657d` section beranda, `3df098e` template detail, `3e8bc1d` blok khusus, `a93f2bc` grid bento beranda, `cce44c2` background + 1 viewport index, `c767e3c` teaser beranda compact, `ff8ffc3` audit web-design-guidelines, `63f1349` motif per layanan, `9277686` aturan featured max-4 + perbaikan connector, `787c425` polish timing Linehaul, `517110e` perbaikan kartu terpotong di viewport pendek.
+
+### Audit penutup (27 September 2026)
+
+Sebelum tahap ini ditutup, dijalankan audit khusus untuk membuktikan halaman Layanan benar-benar dinamis terhadap data admin (bukan hardcode 4 kartu), dengan menambah data dummy sementara lalu membersihkannya kembali ke 5 layanan asli.
+
+| Skenario | Hasil |
+|---|---|
+| Featured baru disisipkan di tengah urutan (7 layanan total); yang tergeser keluar dari 4 besar tetap tampil di /services (baris "more"), tidak hilang | ✅ |
+| Featured ke-5 melebihi `MAX_FEATURED=4`: tampil di /services, tidak di beranda/mega menu | ✅ |
+| Non-featured baru (Pendukung), termasuk 2+ pita sekaligus | ✅ |
+| 0 layanan featured (beranda dan /services) | ✅ tanpa error, tanpa grid kosong aneh |
+| 1 layanan featured saja | ✅ kartu tunggal full-width, tanpa sisi kosong |
+| Ganti slug EN+ID pada layanan published | ✅ URL lama 404 bersih, URL baru 200, sitemap ter-update, tanpa link mati |
+| Hapus 1 blok Builder dari halaman detail | ✅ section menyambung normal, tanpa spasi kosong |
+| Pint, PHPStan | ✅ bersih |
+| Test suite penuh (2 batch) | ✅ 168 test, 168 lulus, 2.268 assertion |
+| Lighthouse mobile /services & /services/cold-storage | Performance 0,70 / 0,71 (server lokal, foto belum WebP — sama seperti temuan Tahap 1-2); A11y/BP/SEO 100/100/100; CLS 0 di keduanya |
+| Konsistensi EN/ID pada semua skenario di atas | ✅ |
+| Console error / 404 pada semua skenario yang diuji | ✅ 0 |
+
+Tidak ada temuan GAGAL. Polish desain kecil ikut disertakan: pita "Also Available" di /services kini punya hover lift + shadow dan focus ring warna brand, menyamakan bahasa interaksi dengan kartu bento di atasnya (sebelumnya hanya `hover:border-brand/30` tanpa focus state khusus).
+
+**Catatan:** perbandingan Lighthouse "sebelum/sesudah" commit `63f1349` (motif per layanan) tidak diukur lewat checkout historis (berisiko mengganggu dev server yang sedang dipakai); dinilai lewat ukuran diff commit tersebut (+51 baris CSS, tanpa library baru, animasi digated di belakang `prefers-reduced-motion`) dan CLS 0 pada kondisi sekarang — tidak ada indikasi regresi berarti.
