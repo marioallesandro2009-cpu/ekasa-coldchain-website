@@ -35,6 +35,9 @@ class PageSection extends Model implements HasTranslatableFields
     /** Section that holds the Services mega menu in the navbar. */
     public const SERVICES = 'services';
 
+    /** Section reused for the /locations index page's own SEO title/description. */
+    public const LOCATIONS = 'locations';
+
     /** Target of every "Get a Quote" button. */
     public const CONTACT = 'contact';
 

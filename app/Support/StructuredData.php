@@ -13,7 +13,7 @@ use App\Models\PageSection;
 final class StructuredData
 {
     /**
-     * @param  array{settings: array<string, mixed>, services: list<array<string, mixed>>}  $data
+     * @param  array{settings: array<string, mixed>, services: list<array<string, mixed>>, locations: list<array<string, mixed>>}  $data
      * @return array<string, mixed>
      */
     public static function home(array $data): array
@@ -53,7 +53,7 @@ final class StructuredData
 
         return self::withoutEmpty([
             '@context' => 'https://schema.org',
-            '@graph' => [...$graph, ...self::locations($orgId)],
+            '@graph' => [...$graph, ...self::locations($data['locations'], $orgId)],
         ]);
     }
 
@@ -267,14 +267,33 @@ final class StructuredData
     }
 
     /**
-     * LocalBusiness nodes per location (stage "Locations"). Each node should use
-     * '@type' => 'LocalBusiness', its own '@id', address/geo, and
-     * 'parentOrganization' => ['@id' => $orgId].
+     * LocalBusiness nodes, one per active location. opening_hours is deliberately
+     * left out: it is a freeform translatable string ("Mon-Sat, 7am-9pm"), not the
+     * structured day/time schema.org's openingHoursSpecification needs, and a wrong
+     * shape there is worse than omitting it.
      *
+     * @param  list<array<string, mixed>>  $locations
      * @return list<array<string, mixed>>
      */
-    private static function locations(string $orgId): array
+    private static function locations(array $locations, string $orgId): array
     {
-        return [];
+        return array_map(fn (array $location): array => self::withoutEmpty([
+            '@type' => 'LocalBusiness',
+            '@id' => Seo::baseUrl().'/#location-'.$location['id'],
+            'name' => $location['name'],
+            'parentOrganization' => ['@id' => $orgId],
+            'address' => $location['address'] || $location['city'] ? [
+                '@type' => 'PostalAddress',
+                'streetAddress' => $location['address'],
+                'addressLocality' => $location['city'],
+                'addressCountry' => 'ID',
+            ] : null,
+            'geo' => $location['lat'] !== null && $location['lng'] !== null ? [
+                '@type' => 'GeoCoordinates',
+                'latitude' => $location['lat'],
+                'longitude' => $location['lng'],
+            ] : null,
+            'telephone' => $location['phone'],
+        ]), $locations);
     }
 }

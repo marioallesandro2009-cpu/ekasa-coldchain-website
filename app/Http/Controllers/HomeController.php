@@ -17,6 +17,7 @@ class HomeController extends Controller
             'settings' => $data['settings'],
             'services' => $data['services'],
             'featuredServices' => $data['featuredServices'],
+            'locations' => $data['locations'],
             'heroSlides' => $data['heroSlides'],
             'heroStats' => $data['heroStats'],
             'trustLogos' => $data['trustLogos'],

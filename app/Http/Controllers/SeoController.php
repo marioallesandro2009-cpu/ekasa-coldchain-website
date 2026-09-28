@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\HeroSlide;
 use App\Models\HeroStat;
+use App\Models\Location;
 use App\Models\PageSection;
 use App\Models\Service;
 use App\Models\SiteSetting;
@@ -40,6 +41,7 @@ class SeoController extends Controller
         $lastModified = collect([
             SiteSetting::query()->max('updated_at'),
             Service::query()->max('updated_at'),
+            Location::query()->max('updated_at'),
             HeroSlide::query()->max('updated_at'),
             HeroStat::query()->max('updated_at'),
             PageSection::query()->max('updated_at'),

@@ -12,6 +12,10 @@
                 <x-sections.services :section="$section" :featured-services="$featuredServices" :texts="$settings['texts']" />
                 @continue
             @endif
+            @if ($section['id'] === \App\Models\PageSection::LOCATIONS)
+                <x-sections.locations :section="$section" :locations="$locations" :settings="$settings" />
+                @continue
+            @endif
             <x-ui.section :id="$section['id']" :variant="$section['background']" class="flex min-h-screen items-center" aria-labelledby="{{ $section['id'] }}-title" x-ignore data-alpine-defer>
                 <x-ui.section-heading
                     :id="$section['id'].'-title'"

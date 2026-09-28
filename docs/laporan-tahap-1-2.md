@@ -751,3 +751,34 @@ Sebelum tahap ini ditutup, dijalankan audit khusus untuk membuktikan halaman Lay
 Tidak ada temuan GAGAL. Polish desain kecil ikut disertakan: pita "Also Available" di /services kini punya hover lift + shadow dan focus ring warna brand, menyamakan bahasa interaksi dengan kartu bento di atasnya (sebelumnya hanya `hover:border-brand/30` tanpa focus state khusus).
 
 **Catatan:** perbandingan Lighthouse "sebelum/sesudah" commit `63f1349` (motif per layanan) tidak diukur lewat checkout historis (berisiko mengganggu dev server yang sedang dipakai); dinilai lewat ukuran diff commit tersebut (+51 baris CSS, tanpa library baru, animasi digated di belakang `prefers-reduced-motion`) dan CLS 0 pada kondisi sekarang — tidak ada indikasi regresi berarti.
+
+---
+
+## 21. Tahap 4 (Locations) — arsitektur one-page, bukan halaman index
+
+Tanggal: 28 September 2026.
+
+**Keputusan arsitektur (penting, beda dari Services):** situs ini pada dasarnya one-page/parallax — Services, Locations, About Us, Clients, Contact semuanya section di beranda, dituju lewat anchor scroll dari navbar. Services KEMUDIAN mendapat halaman `/services` terpisah (bento tak terbatas) sebagai pengembangan tambahan, dengan section beranda-nya sendiri jadi teaser ringkas. **Locations sengaja TIDAK mengikuti pola itu** — atas instruksi eksplisit klien, section `#locations` di beranda ADALAH pengalaman penuhnya (peta interaktif + daftar kartu + filter), bukan teaser menuju halaman lain. Percobaan awal membangun `/locations` sebagai halaman terpisah (mengikuti pola Services) di-revert penuh setelah klarifikasi ini. Kalau suatu saat Locations juga ingin punya halaman index unbounded seperti /services, itu perlu keputusan eksplisit terpisah, bukan asumsi default.
+
+### Implementasi
+
+- Section `#locations` di `home.blade.php`, komponen `components/sections/locations.blade.php` — peta Leaflet auto-fit bounds (1 lokasi: zoom dekat; 2+: `fitBounds`; 0: default Jabodetabek) disinkronkan 2 arah dengan daftar kartu (`components/sections/location-card.blade.php`) via Alpine (`resources/js/alpine/locationsIndex.js`).
+- Filter Semua/Gudang/Hub kota — tab selalu tampil walau salah satu kosong.
+- JSON-LD `LocalBusiness` per lokasi aktif tetap ada di `@graph` beranda (`StructuredData::locations()`) — `opening_hours` sengaja tidak dimasukkan (freeform text, bukan format terstruktur schema.org).
+- Mini-map preview di form admin Lokasi (`LocationForm::mapPreview()`) — dibangun dengan Alpine `x-init`, bukan `<script>` polos, karena re-render Livewire (`->live(onBlur:)`) memakai DOM morphing dan `<script>` yang disisipkan lewat morphing itu inert (tidak pernah dieksekusi ulang) — baru ketahuan setelah diuji coba nyata, bukan asumsi.
+- Peta Leaflet di-lazy-load lewat `IntersectionObserver` khusus (rootMargin 400px) di dalam komponennya sendiri, terpisah dari mekanisme `x-ignore`/`data-alpine-defer` situs (yang punya idle-timeout fallback beberapa detik setelah load, memuat Leaflet lebih awal dari yang diinginkan kalau diandalkan sendirian) — bug ini ketahuan lewat pengukuran jaringan langsung, bukan asumsi bahwa mekanisme lama sudah cukup.
+
+### Audit dinamisitas (28 September 2026)
+
+| Skenario | Hasil |
+|---|---|
+| JSON-LD `LocalBusiness` tetap ada di beranda + nama/kota/alamat di HTML mentah | ✅ (dicek via `curl`, bukan browser — memastikan bukan hasil render JS) |
+| Lighthouse mobile beranda: Leaflet eager vs lazy | Eager: 1.116.383 byte total, mainthread 20,1 s. Lazy: 835.922 byte (Leaflet 0 byte sampai discroll), mainthread 18,0 s. CLS 0,001 di keduanya (tinggi section sudah reserved, tanpa shift). TBT/TTI tidak bisa dihitung Lighthouse di kedua kondisi (`NO_TTI_CPU_IDLE_PERIOD`) — karakteristik beranda yang sudah lama (animasi hero/Ken Burns berjalan terus), bukan disebabkan Locations. |
+| Mini-map preview admin: sudah dibuat? | ✅ Sudah (sempat berstatus "belum" di audit pertama Tahap 4, sekarang selesai + diuji reaktivitasnya) |
+| 3 lokasi dummy: outlier jauh (Surabaya), tanpa foto, hub field kosong | ✅ Semua benar — outlier tidak terpotong dari `fitBounds` (dicek `map.getBounds()`), fallback ikon tampil, field kosong tidak dirender blank |
+| 0 lokasi aktif | ✅ peta default Jabodetabek (center/zoom cocok persis dengan konstanta kode), 0 marker, pesan "No locations yet.", 0 error |
+| lat=200 lewat form admin (submit penuh, bukan cuma pratinjau) | ✅ Ditolak validasi HTML5 native (`checkValidity(): false`, pesan "Value must be less than or equal to 90."), DB tidak berubah |
+| Data dummy dibersihkan | ✅ kembali ke 3 lokasi asli |
+| Test suite penuh | ✅ 176/176 lulus, 2.299 assertion |
+| Pint, PHPStan | ✅ bersih |
+| Screenshot desktop, mobile, popup marker, kartu ter-highlight, EN+ID | ✅ Tanpa JS diverifikasi lewat `curl` raw HTML (noscript + fallback Google Maps + kartu ter-render penuh tanpa JS), bukan toggle browser — tooling sesi ini tidak punya opsi disable-JS langsung.

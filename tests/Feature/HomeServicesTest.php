@@ -46,7 +46,7 @@ it('uses the fleet side view cropped around its focus point for the Linehaul car
     $this->get('/')->assertSee('style="object-position: 70% 50%"', false);
 });
 
-it('keeps at most three key points and links to #contact while the detail page is a draft', function () {
+it('keeps at most three key points and links to its own anchor while the detail page is a draft', function () {
     Service::query()->where('slug', 'cold-storage')->firstOrFail()
         ->update(['key_points' => ['en' => "One\nTwo\nThree\nFour"], 'detail_status' => Service::DRAFT]);
 
@@ -55,7 +55,10 @@ it('keeps at most three key points and links to #contact while the detail page i
     expect($cold['keyPoints'])->toBe(['One', 'Two', 'Three'])
         ->and($cold['url'])->toBeNull();
 
-    $this->get('/')->assertSee('href="#contact" class="focus-visible:outline-none', false);
+    // Links::service(): no published page yet, so the card falls back to the
+    // service's own home anchor (consistent with the mega menu and mobile menu),
+    // not the unrelated "#contact" anchor it used to hand-roll.
+    $this->get('/')->assertSee('href="#cold-storage" class="focus-visible:outline-none', false);
 });
 
 it('lays the main services out as a bento grid: the first large, three beside it', function () {

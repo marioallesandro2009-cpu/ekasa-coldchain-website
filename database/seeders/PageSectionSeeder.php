@@ -26,15 +26,22 @@ class PageSectionSeeder extends Seeder
                 'show_in_nav' => $inNav,
                 'eyebrow' => $pair($eyebrow),
                 'title' => $pair($title),
-                // DUMMY: the services text is an example; the other sections are placeholders
-                // until they are built.
-                'description' => $key === PageSection::SERVICES ? [
-                    'en' => 'Storage, transport and delivery that keep your products at the right temperature, from the first mile to the last.',
-                    'id' => 'Penyimpanan, transportasi, dan pengiriman yang menjaga produk Anda di suhu yang tepat, dari awal hingga akhir perjalanan.',
-                ] : [
-                    'en' => 'This section is a placeholder for the next stage.',
-                    'id' => 'Bagian ini akan diisi pada tahap berikutnya.',
-                ],
+                // DUMMY: the services/locations text is an example; the remaining
+                // sections are placeholders until they are built.
+                'description' => match ($key) {
+                    PageSection::SERVICES => [
+                        'en' => 'Storage, transport and delivery that keep your products at the right temperature, from the first mile to the last.',
+                        'id' => 'Penyimpanan, transportasi, dan pengiriman yang menjaga produk Anda di suhu yang tepat, dari awal hingga akhir perjalanan.',
+                    ],
+                    PageSection::LOCATIONS => [
+                        'en' => 'Where our warehouses and city hubs are, and how to reach them.',
+                        'id' => 'Lokasi gudang dan hub kota kami, serta cara menghubunginya.',
+                    ],
+                    default => [
+                        'en' => 'This section is a placeholder for the next stage.',
+                        'id' => 'Bagian ini akan diisi pada tahap berikutnya.',
+                    ],
+                },
                 'background' => $background,
                 'sort_order' => $index + 1,
                 'is_active' => true,

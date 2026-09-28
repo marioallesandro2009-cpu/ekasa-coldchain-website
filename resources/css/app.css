@@ -742,6 +742,47 @@ html:not(.js) .mobile-menu:target,
 }
 
 /*
+ * Glare hover: a diagonal light sweep across the card on hover (port of React
+ * Bits GlareHover). Unlike spotlight-card, the sweep is a plain background-
+ * position transition — no pointer tracking, so the defaults below already
+ * make it work without JS; glareHover.js only overrides the custom properties
+ * per instance (color/opacity, angle, size, duration). Off on touch screens
+ * and with reduced motion, same guard as spotlight-card.
+ */
+.glare-hover {
+    --glare-rgba: color-mix(in srgb, var(--color-white) 22%, transparent);
+    --glare-angle: -30deg;
+    --glare-size: 280%;
+    --glare-duration: 700ms;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+}
+
+.glare-hover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(var(--glare-angle), transparent 60%, var(--glare-rgba) 70%, transparent, transparent 100%);
+    background-size: var(--glare-size) var(--glare-size), 100% 100%;
+    background-repeat: no-repeat;
+    background-position: -100% -100%, 0 0;
+}
+
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .glare-hover::before {
+        transition: background-position var(--glare-duration) ease;
+    }
+
+    .glare-hover:hover::before,
+    .glare-hover:focus-within::before {
+        background-position: 100% 100%, 0 0;
+    }
+}
+
+/*
  * Service special blocks. Elements marked data-draw start empty only once JS
  * runs (.js-anim) and fill in when their block is visible (animatedContent adds
  * .is-in). Without JS or with reduced motion they show their final state.
@@ -916,13 +957,65 @@ html:not(.js) .mobile-menu:target,
     }
 }
 
-/* Leaflet map in the location panel: dimmed tiles, brand-coloured controls. */
+/* Leaflet map in the location panel (and the home page #locations map, same
+   class): dimmed tiles, brand-coloured controls. */
 .loc-map .leaflet-tile-pane {
     filter: grayscale(0.7) brightness(0.92) contrast(0.95);
 }
 
 .loc-map .leaflet-control-attribution {
     font-size: 11px;
+}
+
+/* Home page #locations section: custom marker (divIcon), same clip-path + pulse as the
+   lokasi_gudang block's markers, just sized for a full map instead of an SVG
+   illustration. --loc-marker-fill lets the hub variant reuse this with a
+   different colour instead of a second, near-duplicate rule. */
+.loc-marker {
+    --loc-marker-fill: var(--color-brand-soft);
+    position: relative;
+    display: grid;
+    place-items: center;
+}
+
+.loc-marker .loc-marker-pulse {
+    position: absolute;
+    inset: 0;
+    background: var(--loc-marker-fill);
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+}
+
+.loc-marker .loc-marker-dot {
+    position: relative;
+    inset: 0;
+    width: 20px;
+    height: 20px;
+    background: var(--loc-marker-fill);
+    box-shadow: 0 0 0 2px var(--color-white);
+    clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0 50%);
+    transition: transform 200ms ease-out;
+}
+
+.loc-marker:hover .loc-marker-dot,
+.loc-marker.is-active .loc-marker-dot {
+    transform: scale(1.2);
+}
+
+.loc-marker--hub {
+    --loc-marker-fill: var(--color-highlight);
+}
+
+/* Location card (home page #locations section): a brief highlight when its marker is
+   clicked on the map, matching .connector-dot's brand ring language. */
+.location-card {
+    transition:
+        border-color 300ms ease,
+        box-shadow 300ms ease;
+}
+
+.location-card.is-highlighted {
+    border-color: var(--color-brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-brand) 20%, transparent);
 }
 
 /* ---------------------------------------------------------------------------
@@ -1016,6 +1109,11 @@ html:not(.js) .mobile-menu:target,
     .hub-radar {
         animation: none;
         opacity: 0;
+    }
+
+    .loc-marker-dot,
+    .location-card {
+        transition: none;
     }
 
     .route-flow {

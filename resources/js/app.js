@@ -5,8 +5,10 @@ import animatedList from './alpine/animatedList';
 import blurText from './alpine/blurText';
 import countUp from './alpine/countUp';
 import fleetShowcase from './alpine/fleetShowcase';
+import glareHover from './alpine/glareHover';
 import hero from './alpine/hero';
 import locationMap from './alpine/locationMap';
+import locationsIndex from './alpine/locationsIndex';
 import navbar from './alpine/navbar';
 import rotatingText from './alpine/rotatingText';
 import splitText from './alpine/splitText';
@@ -27,8 +29,10 @@ Alpine.data('animatedContent', animatedContent);
 Alpine.data('splitText', splitText);
 Alpine.data('animatedList', animatedList);
 Alpine.data('spotlightCard', spotlightCard);
+Alpine.data('glareHover', glareHover);
 Alpine.data('fleetShowcase', fleetShowcase);
 Alpine.data('locationMap', locationMap);
+Alpine.data('locationsIndex', locationsIndex);
 
 // Links to sections that do not exist yet (e.g. a service anchor) go to #services.
 document.addEventListener('click', (event) => {

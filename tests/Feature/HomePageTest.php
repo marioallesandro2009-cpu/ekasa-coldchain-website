@@ -26,13 +26,13 @@ it('renders the home page with title, meta description and headline in the raw H
 it('puts the navbar, mega menu links, final statistics and a single h1 in the HTML', function () {
     $html = $this->get('/')->getContent();
 
-    foreach (['Services', 'Locations', 'About Us', 'Clients', 'Contact', 'Get a Quote', 'Explore Services'] as $text) {
+    foreach (['Home', 'Services', 'Locations', 'About Us', 'Clients', 'Contact', 'Get a Quote', 'Explore Services'] as $text) {
         expect($html)->toContain($text);
     }
 
-    // Navbar: Services, Locations, About Us, Clients, Contact; no Insights or Careers sections.
+    // Navbar: Home, Services, Locations, About Us, Clients, Contact; no Insights or Careers sections.
     preg_match_all('#data-spy="([a-z-]+)"#', $html, $spy);
-    expect(array_values(array_unique($spy[1])))->toBe(['services', 'locations', 'about', 'clients', 'contact'])
+    expect(array_values(array_unique($spy[1])))->toBe(['home', 'services', 'locations', 'about', 'clients', 'contact'])
         ->and($html)->not->toContain('id="insights"')
         ->not->toContain('id="careers"');
 
@@ -194,7 +194,7 @@ it('caches only the front page data, never the rendered HTML', function () {
     $cached = Cache::get(config('site.cache_key').'.en');
 
     expect($cached)->toBeArray()
-        ->and(array_keys($cached))->toBe(['settings', 'services', 'featuredServices', 'heroSlides', 'heroStats', 'sections', 'trustLogos'])
+        ->and(array_keys($cached))->toBe(['settings', 'services', 'locations', 'featuredServices', 'heroSlides', 'heroStats', 'sections', 'trustLogos'])
         ->and(serialize($cached))->not->toContain('<html')
         ->not->toContain('/build/assets/');
 });

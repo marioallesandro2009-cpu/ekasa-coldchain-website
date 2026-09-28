@@ -8,6 +8,9 @@ use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\RegistersWebpConversions;
 use App\Models\Concerns\Sortable;
 use App\Models\Contracts\HasTranslatableFields;
+use App\Support\Locales;
+use App\Support\MediaPresenter;
+use App\Support\TemperatureZones;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
@@ -77,5 +80,35 @@ class Location extends Model implements HasMedia, HasTranslatableFields
             : trim($this->name.', '.$this->address.', '.$this->city, ', ');
 
         return 'https://www.google.com/maps/search/?api=1&query='.rawurlencode($query);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function toFrontend(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'kind' => $this->kind,
+            'kindLabel' => __($this->kind === 'hub' ? 'City hub' : 'Warehouse'),
+            'city' => trim($this->city.($this->area ? ', '.$this->area : '')),
+            'address' => $this->address,
+            'zones' => array_values(array_filter(array_map(
+                fn (string $key): ?string => TemperatureZones::label($key, Locales::current()),
+                (array) $this->temperature_zones,
+            ))),
+            'commodities' => $this->translate('commodities'),
+            'capacity' => $this->translate('capacity'),
+            // Freeform text (not structured day/time), so it is shown on the card
+            // but deliberately left out of LocalBusiness JSON-LD — see
+            // StructuredData::locations().
+            'hours' => $this->translate('opening_hours'),
+            'phone' => $this->phone,
+            'lat' => $this->lat !== null ? (float) $this->lat : null,
+            'lng' => $this->lng !== null ? (float) $this->lng : null,
+            'mapsUrl' => $this->mapsUrl(),
+            'photo' => MediaPresenter::image($this->getFirstMedia('photo'), 'lg', 'sm', 1200, 600, $this->name),
+        ];
     }
 }
