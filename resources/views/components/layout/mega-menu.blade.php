@@ -16,7 +16,7 @@
 >
     <x-ui.container>
         <div class="mega-card grid grid-cols-[minmax(0,1fr)_320px] gap-6 rounded-2xl bg-white p-5 text-ink ring-1 ring-ink/5 xl:grid-cols-[minmax(0,1fr)_360px]">
-            <div class="flex flex-col">
+            <div class="flex flex-col justify-between">
                 @if ($featured)
                     <ul class="grid grid-cols-2 content-start gap-1">
                         @foreach ($featured as $service)

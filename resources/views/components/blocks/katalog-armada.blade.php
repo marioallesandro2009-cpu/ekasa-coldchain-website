@@ -28,12 +28,25 @@
 
     @if ($block['layout'] === 'showcase')
         <div
-            class="mt-10 sm:mt-12"
+            class="mt-8 sm:mt-10"
             x-data="fleetShowcase({ count: {{ $count }}, announce: @js($announce) })"
         >
             <p class="sr-only" aria-live="polite" x-text="message"></p>
 
-            <div class="relative overflow-hidden rounded-2xl" @pointerdown="pointerDown($event)" @pointerup="pointerUp($event)">
+            {{-- overflow-hidden with NO rounded-* here (each slide's own
+                 .fleet-hero-panel already rounds the photo itself, so this
+                 outer clip's own corners are never actually seen): pairing
+                 overflow-hidden with a border-radius on this specific element
+                 reproduced a real Chromium bug — the mobile eyebrow's first
+                 glyph (a capital R or D, both letters with a near-zero left
+                 side-bearing straight stem) rendered with that stem shaved
+                 off, only at small sizes, only inside a rounded clip mask.
+                 Confirmed by elimination (tracking, uppercase, transform,
+                 opacity, font-weight, padding all ruled out first): a plain
+                 rectangular overflow-hidden clip never triggers it, a rounded
+                 one (via border-radius OR an equivalent clip-path) always
+                 does, regardless of the text's own styling or position. --}}
+            <div class="relative overflow-hidden" @pointerdown="pointerDown($event)" @pointerup="pointerUp($event)">
                 <div class="showcase-track flex flex-col gap-10 lg:gap-14" :style="trackStyle()">
                     @foreach ($items as $i => $item)
                         <div
@@ -43,9 +56,31 @@
                             aria-labelledby="{{ $block['id'] }}-tab-{{ $i }}"
                             x-bind:aria-hidden="(index !== {{ $i }}).toString()"
                             x-bind:inert="index !== {{ $i }}"
+                            x-bind:class="index === {{ $i }} ? 'is-active' : ''"
                             x-data="animatedContent" x-intersect.once="show()" data-draw
                         >
-                            <div class="studio-panel relative aspect-[16/10] overflow-hidden rounded-2xl lg:aspect-[15/7]">
+                            {{-- Mobile content order: eyebrow → title → description → image → CTA →
+                                 specs → fleet selector. Below lg this info sits in normal flow on the
+                                 section's own dark background (no photo behind it yet, so no scrim is
+                                 needed) rather than overlaid on the photo — the overlaid treatment
+                                 only starts fitting once the panel is wide enough to keep it clear of
+                                 the vehicle, which is also where the desktop-only copy below lives. --}}
+                            <div class="lg:hidden">
+                                <x-blocks.partials.fleet-truck-info :item="$item" />
+                            </div>
+
+                            {{-- Box matches the source photos' native ratio (both are ~16:9: FE71
+                                 1600x900 exactly, FE74 1672x941 ~= 16:9) instead of the old 75:35
+                                 (15:7 = 2.14, meaningfully wider than the source's 1.78) — that gap
+                                 was exactly why object-cover was cropping top/bottom, swallowing the
+                                 cabin and wheels: cover scales the image up until it fills the box's
+                                 width, and whatever wider-aspect box demands gets made up by cropping
+                                 the excess height. Matching the ratio means near-zero crop either way,
+                                 so the full vehicle — cabin, box, wheels, brand — reads as one object.
+                                 fleet-hero-panel (not the light studio-panel gradient used by the grid
+                                 layout below): a dark placeholder so nothing here ever flashes as a
+                                 pale card against the section's dark background. --}}
+                            <div class="fleet-hero-panel relative mt-4 aspect-[16/9] overflow-hidden rounded-2xl lg:mt-0">
                                 @if ($image = $item['image'])
                                     <img
                                         src="{{ $image['small']['url'] }}"
@@ -61,65 +96,104 @@
                                     >
                                 @endif
 
-                                {{-- Name + type badge, top-left. The scrim stays flat/dark through the
-                                     whole text zone (badge+title+2-line description) and only fades in
-                                     the trailing padding below the text, measured against the actual
-                                     rendered pixels. Text itself is fully opaque, not relying on shadow.
-                                     max-w below lg keeps the wrapped description from reaching the
-                                     right edge, where the vertically-centred nav arrow sits on the
-                                     shorter mobile image box — otherwise its round white background
-                                     can land under the last line of text. --}}
-                                <div class="pointer-events-none absolute inset-x-0 top-0 max-w-[calc(100%-4rem)] bg-linear-to-b from-overlay/92 via-65% via-overlay/92 to-transparent p-5 pb-16 sm:p-7 sm:pb-20 lg:max-w-[60%]">
-                                    {{-- bg-overlay/50 (not bg-white/10): a lighter pill backdrop lifts
-                                         the highlight green just enough to fail contrast against it. --}}
-                                    <span @class([
-                                        'inline-flex rounded-full border border-white/15 bg-overlay px-2.5 py-0.5 text-xs font-semibold',
-                                        'text-highlight' => $item['type'] === 'reefer',
-                                        'text-white' => $item['type'] !== 'reefer',
-                                    ])>{{ $item['typeLabel'] }}</span>
-                                    <h3 class="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">{{ $item['name'] }}</h3>
-                                    @if ($item['description'])
-                                        <p class="mt-1.5 line-clamp-2 max-w-md text-sm font-medium text-white sm:text-base">{{ $item['description'] }}</p>
-                                    @endif
+                                {{-- Edge vignette (see CSS): darkens only toward the panel's corners,
+                                     transparent through the middle where the truck sits, so the photo's
+                                     own light studio backdrop melts into the dark section instead of
+                                     reading as a pale rectangle pasted on the page. --}}
+                                <div class="pointer-events-none absolute inset-0 fleet-vignette"></div>
+
+                                {{-- Desktop only: the same eyebrow/title/description overlaid top-left
+                                     on the photo, plus the CTA — grouped together here since at this
+                                     width they read as one composition instead of separate flow steps.
+                                     The scrim div spans the FULL photo (inset-0), not just a
+                                     content-sized box — an earlier version sized it to the text's own
+                                     height/width and faded within that box, which put the fade's last,
+                                     steepest stops inside the photo instead of at its edges: from the
+                                     panel's own edges inward the tint looked flat, then dropped off
+                                     abruptly right where the box happened to end, reading as a pasted
+                                     rounded-rect card. This full-panel scrim (see CSS) has no box of
+                                     its own to end at — it just fades continuously toward the photo,
+                                     transparent well before the panel's real edges. --}}
+                                <div class="pointer-events-none absolute inset-0 hidden fleet-scrim lg:block">
+                                    <div class="pointer-events-auto max-w-[55%] p-7 pb-12">
+                                        <x-blocks.partials.fleet-truck-info :item="$item" />
+                                        <x-ui.button
+                                            :href="$item['ask']['href']"
+                                            tone="dark"
+                                            icon="arrow-right"
+                                            class="group mt-5"
+                                            :target="$item['ask']['external'] ? '_blank' : null"
+                                            :rel="$item['ask']['external'] ? 'noopener' : null"
+                                        >{{ $item['ask']['label'] }}<span class="sr-only">: {{ $item['name'] }}</span></x-ui.button>
+                                    </div>
                                 </div>
 
-                                {{-- Spec card: floating over the photo on desktop only. right-20 (not
-                                     right-6): the "next" arrow is vertically centred on the whole panel
-                                     at lg:right-3/size-12 (spans panel-right 12-60px) — right-6 put the
-                                     card's edge at 24px, squarely inside that span, so the arrow rendered
-                                     half-hidden behind the card. right-20 (80px) clears it with margin. --}}
-                                <x-blocks.partials.fleet-spec-card :item="$item" class="hidden lg:absolute lg:top-6 lg:right-20 lg:block lg:w-72" />
-
-                                {{-- Arrows live inside each slide's own image box (not the outer wrapper),
-                                     so they stay centred on the photo whatever the mobile spec card below
-                                     adds to the slide's total height. Only the active slide is on-screen
-                                     (the rest are translated away and inert), so only one pair is ever seen.
-                                     Below lg the image is short enough that a true vertical centre lands
-                                     on the top-left title/description block, so they sit near the bottom
-                                     edge there instead (clear of the text) and only centre once the panel
-                                     is tall enough (lg:aspect-[15/7] at typical desktop widths) to leave
-                                     both zones their own space. --}}
+                                {{-- Arrows live inside each slide's own image box (not the outer
+                                     wrapper), so they stay positioned on the photo itself. Only the
+                                     active slide is on-screen (the rest are translated away and
+                                     inert), so only one pair is ever seen. Bottom corners (not vertical
+                                     centre): centred arrows sat mid-body on every one of these side-view
+                                     trucks, right across the cargo box — bottom corners land past the
+                                     wheels instead, out of the vehicle's own visual mass. Thin outlined
+                                     circles, no solid fill: they read as a quiet hero control, not an
+                                     oversized e-commerce carousel button. Same position at every
+                                     breakpoint — nothing else in the panel needs clearing any more. --}}
                                 @if ($count > 1)
-                                    <button type="button" data-nav="prev" @click="prev()" class="js-only absolute bottom-4 left-3 z-10 grid size-9 place-items-center rounded-full bg-white/80 text-ink opacity-80 shadow-md backdrop-blur transition hover:bg-white hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:bottom-6 sm:left-4 lg:top-1/2 lg:bottom-auto lg:-translate-y-1/2 lg:size-12">
-                                        <x-ui.icon name="arrow-right" class="size-4 rotate-180 lg:size-5" />
+                                    <button type="button" data-nav="prev" @click="prev()" class="js-only absolute bottom-4 left-4 z-10 grid size-8 place-items-center rounded-full border border-white/30 bg-overlay/30 text-white/80 backdrop-blur-sm transition hover:-translate-x-0.5 hover:border-white hover:bg-overlay/70 hover:text-white focus-visible:border-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight sm:size-9">
+                                        <x-ui.icon name="arrow-right" class="size-3.5 rotate-180" />
                                         <span class="sr-only">{{ __('Previous truck') }}</span>
                                     </button>
-                                    <button type="button" data-nav="next" @click="next()" class="js-only absolute bottom-4 right-3 z-10 grid size-9 place-items-center rounded-full bg-white/80 text-ink opacity-80 shadow-md backdrop-blur transition hover:bg-white hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:bottom-6 sm:right-4 lg:top-1/2 lg:bottom-auto lg:-translate-y-1/2 lg:size-12">
-                                        <x-ui.icon name="arrow-right" class="size-4 lg:size-5" />
+                                    <button type="button" data-nav="next" @click="next()" class="js-only absolute right-4 bottom-4 z-10 grid size-8 place-items-center rounded-full border border-white/30 bg-overlay/30 text-white/80 backdrop-blur-sm transition hover:translate-x-0.5 hover:border-white hover:bg-overlay/70 hover:text-white focus-visible:border-white focus-visible:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight sm:size-9">
+                                        <x-ui.icon name="arrow-right" class="size-3.5" />
                                         <span class="sr-only">{{ __('Next truck') }}</span>
                                     </button>
                                 @endif
                             </div>
 
-                            {{-- Spec card again on phones: below the photo, in normal flow, never covering the truck. --}}
-                            <x-blocks.partials.fleet-spec-card :item="$item" class="mt-4 block lg:hidden" />
+                            {{-- Mobile only: the CTA after the image (see content-order note above).
+                                 Desktop's copy lives inside the overlay, right after the description. --}}
+                            <div class="mt-4 lg:hidden">
+                                <x-ui.button
+                                    :href="$item['ask']['href']"
+                                    tone="dark"
+                                    icon="arrow-right"
+                                    class="group w-full justify-center sm:w-auto sm:justify-start"
+                                    :target="$item['ask']['external'] ? '_blank' : null"
+                                    :rel="$item['ask']['external'] ? 'noopener' : null"
+                                >{{ $item['ask']['label'] }}<span class="sr-only">: {{ $item['name'] }}</span></x-ui.button>
+                            </div>
+
+                            {{-- Technical spec strip: replaces the old floating white card
+                                 (desktop, absolutely positioned over the photo) and the full spec
+                                 card (mobile, in flow). Same underlying $item['specs']/notes data,
+                                 same conditional label rendering (a truck missing a field just
+                                 drops that column) — just a thin typographic bar instead of a
+                                 shadowed white tile, shown once per truck at every breakpoint
+                                 instead of two breakpoint-specific copies of the same information. --}}
+                            @if ($item['specs'])
+                                <dl class="mt-5 flex flex-wrap gap-x-6 gap-y-3 border-t border-white/10 pt-4 sm:gap-x-10">
+                                    @foreach ($item['specs'] as $spec)
+                                        <div class="min-w-28">
+                                            <dt class="text-xs font-semibold tracking-wide text-white/50 uppercase">{{ $spec['label'] }}</dt>
+                                            <dd class="mt-1 font-bold tabular-nums text-white">{{ $spec['value'] }}</dd>
+                                        </div>
+                                    @endforeach
+                                </dl>
+                            @endif
+                            @if ($item['notes'])
+                                <p class="mt-3 text-xs text-white/50">{{ $item['notes'] }}</p>
+                            @endif
                         </div>
                     @endforeach
                 </div>
             </div>
 
+            {{-- Fleet selector: a numbered list (01/02…), not a thumbnail gallery — the
+                 photo is already the hero image above, so a row of small duplicate crops
+                 added nothing but visual noise. Same tablist/tab roles, ids and Alpine
+                 wiring as before, restyled only. --}}
             @if ($count > 1)
-                <div class="js-only scrollbar-none mt-5 flex gap-3 overflow-x-auto" role="tablist" aria-label="{{ $block['title'] ?? __('Fleet') }}" x-ref="tabs" @keydown="onTabKey($event)">
+                <div class="js-only scrollbar-none mt-6 flex items-center gap-6 overflow-x-auto border-t border-white/10 pt-4 sm:gap-8" role="tablist" aria-label="{{ $block['title'] ?? __('Fleet') }}" x-ref="tabs" @keydown="onTabKey($event)">
                     @foreach ($items as $i => $item)
                         <button
                             type="button"
@@ -129,14 +203,12 @@
                             x-bind:aria-selected="(index === {{ $i }}).toString()"
                             x-bind:tabindex="index === {{ $i }} ? 0 : -1"
                             @click="go({{ $i }})"
-                            class="w-32 shrink-0 rounded-lg text-left transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:w-40"
+                            class="shrink-0 rounded-sm text-left whitespace-nowrap transition focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"
                         >
-                            <span class="studio-panel block aspect-[15/7] overflow-hidden rounded-lg ring-2 ring-transparent" :class="index === {{ $i }} ? 'ring-brand!' : 'opacity-70 hover:opacity-100'">
-                                @if ($image = $item['image'])
-                                    <img src="{{ $image['small']['url'] }}" alt="" width="{{ $image['small']['width'] }}" height="{{ $image['small']['height'] }}" loading="lazy" class="size-full object-cover" style="object-position: {{ $item['focus'] }}">
-                                @endif
+                            <span class="flex items-baseline gap-2 border-b-2 pb-3 transition-colors" :class="index === {{ $i }} ? 'border-highlight' : 'border-transparent'">
+                                <span class="text-xs font-semibold tabular-nums transition-colors" :class="index === {{ $i }} ? 'text-highlight' : 'text-white/35'">{{ sprintf('%02d', $i + 1) }}</span>
+                                <span class="text-sm font-bold tracking-tight transition-colors sm:text-base" :class="index === {{ $i }} ? 'text-white' : 'text-white/45 hover:text-white/70'">{{ $item['name'] }}</span>
                             </span>
-                            <span class="mt-1.5 block truncate text-sm font-semibold" :class="index === {{ $i }} ? 'text-brand' : 'text-white/60'">{{ $item['name'] }}</span>
                         </button>
                     @endforeach
                 </div>

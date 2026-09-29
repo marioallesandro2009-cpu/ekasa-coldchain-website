@@ -902,6 +902,56 @@ html:not(.js) .mobile-menu:target,
     transform: scaleX(0);
 }
 
+/* Fleet hero panel: dark placeholder behind the photo (not .studio-panel's
+   light gradient, used by the grid layout below) so nothing here ever
+   flashes as a pale card against the section's own dark background while
+   the lazy-loaded image is still loading in. */
+.fleet-hero-panel {
+    background-color: var(--color-dark);
+}
+
+/* Fleet hero panel (desktop overlay): a radial scrim anchored at the top-left
+   corner, eased over many stops (same many-stop-gradient technique as the
+   hero's own overlays above, to avoid a visible straight edge). Sized well
+   short of the full panel (68% width / 92% height at its fully-transparent
+   stop) so it stays inside the text column's own max-w-[55%] and never
+   reaches the EKASA wordmark, which sits printed on the box at roughly
+   70-90% across every current fleet photo (FE 71, FE 74) — checked against
+   both source photos, not just assumed from the text column width. */
+.fleet-scrim {
+    --scrim: var(--color-overlay);
+    background-image: radial-gradient(
+        68% 92% at 0% 0%,
+        color-mix(in srgb, var(--scrim) 92%, transparent) 0%,
+        color-mix(in srgb, var(--scrim) 85%, transparent) 20%,
+        color-mix(in srgb, var(--scrim) 70%, transparent) 36%,
+        color-mix(in srgb, var(--scrim) 52%, transparent) 50%,
+        color-mix(in srgb, var(--scrim) 34%, transparent) 64%,
+        color-mix(in srgb, var(--scrim) 18%, transparent) 76%,
+        color-mix(in srgb, var(--scrim) 8%, transparent) 88%,
+        transparent 100%
+    );
+}
+
+/* Fleet hero panel: a faint all-round vignette (corners only, transparent
+   through the middle where the truck itself sits) so the photo's light
+   studio backdrop reads as part of the dark section instead of a pale
+   rectangle, and so the nav arrows/tab strip sitting near the edges keep
+   some separation from the photo. Deliberately much fainter than
+   .fleet-scrim (max ~30% at the extreme corners) since it covers the whole
+   panel, including the corner nearest the EKASA wordmark. */
+.fleet-vignette {
+    --scrim: var(--color-overlay);
+    background-image: radial-gradient(
+        130% 130% at 50% 50%,
+        transparent 45%,
+        color-mix(in srgb, var(--scrim) 6%, transparent) 62%,
+        color-mix(in srgb, var(--scrim) 14%, transparent) 76%,
+        color-mix(in srgb, var(--scrim) 22%, transparent) 88%,
+        color-mix(in srgb, var(--scrim) 30%, transparent) 100%
+    );
+}
+
 .studio-panel {
     background: linear-gradient(to bottom, var(--color-studio-top), var(--color-studio-bottom));
 }

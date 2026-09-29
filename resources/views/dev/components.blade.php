@@ -1,5 +1,16 @@
 {{-- Preview of the ported React Bits components (local only, routes/web.php). DUMMY content. --}}
 @php
+    // Real seeded Location photos (Tahap 3, Bagian A) so the glareHover vs
+    // spotlightCard comparison below is judged on an actual full-bleed location
+    // card, not a placeholder box.
+    $glareLocations = \App\Models\Location::query()->active()->ordered()->get()
+        ->map(fn (\App\Models\Location $l) => [
+            'name' => $l->name,
+            'city' => $l->city,
+            'image' => \App\Support\MediaPresenter::image($l->getFirstMedia('photo'), 'lg', 'sm', 1200, 600, $l->name),
+        ])
+        ->filter(fn (array $l) => $l['image'])
+        ->values();
     $services = [
         ['snowflake', 'Cold Storage', 'Ruang chiller dan frozen dengan suhu terpantau.'],
         ['reefer-truck', 'Linehaul Transport', 'Truk berpendingin antarkota.'],
@@ -41,14 +52,62 @@
 <body class="bg-white font-sans text-ink antialiased">
     <x-ui.section variant="surface" class="min-h-[70vh]">
         <p class="text-sm font-bold tracking-[0.14em] text-brand uppercase">/dev/components · lokal saja</p>
-        <h1 class="mt-3 text-3xl font-extrabold">Pratinjau splitText, spotlightCard, animatedList</h1>
+        <h1 class="mt-3 text-3xl font-extrabold">Pratinjau splitText, spotlightCard, glareHover, animatedList</h1>
         <ul class="mt-6 max-w-3xl list-disc space-y-2 pl-5 text-ink-muted">
             <li><strong>splitText</strong>: judul section masuk per kata saat terlihat (sekali). Gulir ke bawah.</li>
             <li><strong>spotlightCard</strong>: arahkan kursor ke kartu (cahaya mengikuti kursor, kartu naik 4 px). Mati di layar sentuh dan saat reduced motion.</li>
+            <li><strong>glareHover</strong> (baru, Tahap 4 Bagian 0): sapuan cahaya diagonal murni CSS, tanpa pelacakan kursor — tetap jalan tanpa JS. Perbandingan dengan spotlightCard di kartu lokasi asli di bawah.</li>
             <li><strong>animatedList</strong>: kartu lokasi dan FAQ muncul satu per satu saat masuk layar.</li>
             <li>Muat ulang halaman untuk mengulang animasi. Tanpa JavaScript atau dengan reduced motion, semua konten langsung tampil utuh.</li>
         </ul>
     </x-ui.section>
+
+    {{-- Tahap 4, Bagian 0: glareHover vs spotlightCard on the same real location
+         photos, so the hover-effect decision is judged on the actual card
+         context (full-bleed photo + dark text scrim), not an abstract box. --}}
+    @if ($glareLocations->count())
+        <x-ui.section variant="dark">
+            <x-ui.section-heading
+                tone="dark"
+                eyebrow="Tahap 4 · Bagian 0"
+                title="glareHover vs spotlightCard: kartu lokasi"
+                description="Foto dan data sama persis di kedua baris — hanya efek hover-nya yang beda. Arahkan kursor untuk membandingkan."
+            />
+            <div class="mt-10 space-y-10">
+                <div>
+                    <p class="text-sm font-bold tracking-[0.14em] text-highlight uppercase">spotlightCard (sudah dipakai kartu layanan)</p>
+                    <div class="mt-4 grid gap-6 md:grid-cols-3">
+                        @foreach ($glareLocations as $loc)
+                            <a href="#" x-data="spotlightCard" class="spotlight-card group relative isolate flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-card bg-dark text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight">
+                                <img src="{{ $loc['image']['small']['url'] }}" alt="" loading="lazy" class="absolute inset-0 -z-10 size-full object-cover">
+                                <div class="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-linear-to-t from-black/85 to-transparent" aria-hidden="true"></div>
+                                <div class="p-5">
+                                    <h3 class="text-lg font-bold">{{ $loc['name'] }}</h3>
+                                    <p class="text-white/80">{{ $loc['city'] }}</p>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                <div>
+                    <p class="text-sm font-bold tracking-[0.14em] text-highlight uppercase">glareHover (kandidat baru)</p>
+                    <div class="mt-4 grid gap-6 md:grid-cols-3">
+                        @foreach ($glareLocations as $loc)
+                            <a href="#" x-data="glareHover({ opacity: 0.22, angle: -30, size: 280, duration: 700 })" class="glare-hover group relative isolate flex aspect-[4/3] flex-col justify-end overflow-hidden rounded-card bg-dark text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight">
+                                <img src="{{ $loc['image']['small']['url'] }}" alt="" loading="lazy" class="absolute inset-0 -z-20 size-full object-cover">
+                                <div class="absolute inset-x-0 bottom-0 -z-10 h-2/3 bg-linear-to-t from-black/85 to-transparent" aria-hidden="true"></div>
+                                <div class="p-5">
+                                    <h3 class="text-lg font-bold">{{ $loc['name'] }}</h3>
+                                    <p class="text-white/80">{{ $loc['city'] }}</p>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </x-ui.section>
+    @endif
 
     {{-- splitText + spotlightCard on a dark background --}}
     <x-ui.section variant="dark">
