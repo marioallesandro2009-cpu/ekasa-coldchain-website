@@ -169,7 +169,10 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    // Follows FORCE_HTTPS unless SESSION_SECURE_COOKIE says otherwise, so that one switch (turned
+    // on after SSL is installed) makes the cookie https-only; a secure cookie over plain http is
+    // never stored, which would break the login and every form before SSL exists.
+    'secure' => env('SESSION_SECURE_COOKIE', env('FORCE_HTTPS', false)),
 
     /*
     |--------------------------------------------------------------------------
