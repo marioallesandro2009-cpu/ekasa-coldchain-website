@@ -45,6 +45,8 @@ export default ({ error, errors = {} }) => ({
             this.message = error;
         } finally {
             this.loading = false;
+            // A Turnstile token works once: ask for a fresh one after every attempt.
+            window.turnstile?.reset();
             setTimeout(() => this.$refs.live?.focus(), 60);
         }
     },

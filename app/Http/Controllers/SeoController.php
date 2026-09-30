@@ -28,7 +28,9 @@ class SeoController extends Controller
             '# Search engines and AI crawlers are welcome.',
             'User-agent: *',
             'Allow: /',
-            'Disallow: /admin',
+            // A custom ADMIN_PATH is not announced here (that would publish it); the admin pages
+            // carry "X-Robots-Tag: noindex" instead (SecurityHeaders).
+            ...(config('security.admin_path') === 'admin' ? ['Disallow: /admin'] : []),
             'Disallow: /livewire',
             '',
             'Sitemap: '.Seo::baseUrl().'/sitemap.xml',

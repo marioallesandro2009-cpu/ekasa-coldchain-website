@@ -129,14 +129,13 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
-        );
+        // One strong rule for every password the app sets (admin:create, the admin profile,
+        // the local seeder). Only the leaked-password lookup (an online check) is left out of
+        // local development and tests.
+        Password::defaults(function (): Password {
+            $rule = Password::min(12)->mixedCase()->letters()->numbers()->symbols();
+
+            return app()->isProduction() ? $rule->uncompromised() : $rule;
+        });
     }
 }

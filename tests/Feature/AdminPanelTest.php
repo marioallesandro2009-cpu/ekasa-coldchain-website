@@ -21,13 +21,14 @@ it('redirects guests from /admin to the login page', function () {
     $this->get('/admin/settings')->assertRedirect('/admin/login');
 });
 
-it('seeds the administrator from the .env credentials', function () {
-    config(['site.admin.email' => 'owner@example.test', 'site.admin.password' => 'secret-password']);
+it('seeds the administrator from the .env credentials when the password is strong', function () {
+    config(['site.admin.email' => 'owner@example.test', 'site.admin.password' => 'Owner-Secret-2026!']);
 
     $this->seed(AdminUserSeeder::class);
 
     $admin = User::query()->where('email', 'owner@example.test')->firstOrFail();
-    expect(password_verify('secret-password', $admin->password))->toBeTrue();
+    expect(password_verify('Owner-Secret-2026!', $admin->password))->toBeTrue()
+        ->and($admin->is_admin)->toBeTrue();
 });
 
 it('skips the administrator when no credentials are configured', function () {

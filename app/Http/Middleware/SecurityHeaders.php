@@ -42,6 +42,10 @@ class SecurityHeaders
         $headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()');
         $headers->set('Cross-Origin-Opener-Policy', 'same-origin');
 
+        if ($this->isAdminArea($request)) {
+            $headers->set('X-Robots-Tag', 'noindex, nofollow, noarchive');
+        }
+
         $maxAge = (int) config('security.hsts.max_age', 0);
 
         if ($request->isSecure() && $maxAge > 0) {

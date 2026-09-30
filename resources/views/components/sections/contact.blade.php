@@ -187,6 +187,14 @@
                         <p id="contact-message-error" class="mt-1 text-sm text-red-300" x-text="errors.message">{{ $errors->first('message') }}</p>
                     </div>
 
+                    @if (\App\Support\Turnstile::enabled())
+                        {{-- Cloudflare Turnstile (TURNSTILE_ENABLED): needs JavaScript; its token is posted as
+                             cf-turnstile-response, checked in ContactController. --}}
+                        <div class="cf-turnstile" data-sitekey="{{ \App\Support\Turnstile::siteKey() }}" data-theme="dark" data-language="{{ app()->getLocale() }}"></div>
+                        <noscript><p class="text-sm text-white/75">{{ __('Please enable JavaScript to send the form, or use WhatsApp.') }}</p></noscript>
+                        <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer @if ($nonce = \Illuminate\Support\Facades\Vite::cspNonce()) nonce="{{ $nonce }}" @endif></script>
+                    @endif
+
                     <button
                         type="submit"
                         class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-highlight px-6 font-semibold text-dark transition-transform hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70 sm:w-auto sm:px-8"

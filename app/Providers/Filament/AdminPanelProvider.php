@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
 use App\Support\FrontendData;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -26,8 +27,12 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
-            ->login()
+            // ADMIN_PATH in .env (default "admin"): hides the address, it is not a lock.
+            ->path(config('security.admin_path'))
+            ->login(Login::class)
+            // Own name/email/password page (strong-password rule); without it a password could only
+            // be changed from the command line.
+            ->profile()
             ->brandName(fn (): string => self::brandName())
             // Brand scale from resources/css/app.css, one step lighter than Filament's
             // default mapping: Filament draws buttons and links with 600, which is then

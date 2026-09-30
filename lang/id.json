@@ -114,5 +114,7 @@
     "You can also press Reply on this email: it goes straight to the sender.": "Anda juga bisa menekan Balas pada email ini: balasan langsung ke pengirim.",
     "New inquiry from :name": "Pesan baru dari :name",
     "Thank you! Your message has been received and our team will get back to you soon.": "Terima kasih! Pesan Anda sudah kami terima dan tim kami akan segera menghubungi Anda.",
-    "Your message could not be sent. Please try again or contact us on WhatsApp.": "Pesan Anda tidak dapat dikirim. Silakan coba lagi atau hubungi kami lewat WhatsApp."
+    "Your message could not be sent. Please try again or contact us on WhatsApp.": "Pesan Anda tidak dapat dikirim. Silakan coba lagi atau hubungi kami lewat WhatsApp.",
+    "Security check failed. Reload the page and try again.": "Verifikasi keamanan gagal. Muat ulang halaman lalu coba lagi.",
+    "Please enable JavaScript to send the form, or use WhatsApp.": "Aktifkan JavaScript untuk mengirim formulir, atau hubungi kami lewat WhatsApp."
 }

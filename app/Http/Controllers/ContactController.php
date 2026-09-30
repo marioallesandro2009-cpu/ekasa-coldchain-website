@@ -7,6 +7,7 @@ use App\Models\ContactMessage;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Support\Links;
+use App\Support\Turnstile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,6 +35,19 @@ class ContactController extends Controller
         // Bot: pretend it worked, tell it nothing, store nothing.
         if (filled($request->input(self::HONEYPOT))) {
             return $this->respond($request, $success);
+        }
+
+        // Optional Cloudflare Turnstile (off by default; see App\Support\Turnstile).
+        if (! Turnstile::passes($request->input(Turnstile::RESPONSE_FIELD), $request->ip())) {
+            $failed = __('Security check failed. Reload the page and try again.');
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $failed], 422);
+            }
+
+            return redirect(Links::section('contact'))
+                ->with('contact_error', $failed)
+                ->withInput($request->except(self::HONEYPOT));
         }
 
         $validator = Validator::make($request->all(), [
