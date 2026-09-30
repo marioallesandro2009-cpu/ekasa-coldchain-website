@@ -24,6 +24,9 @@ class ContactMessagesTable
     {
         return $table
             ->defaultSort('created_at', 'desc')
+            // No per-cell links (the View page would otherwise make every cell a Tab stop): one
+            // "Buka" action per row keeps keyboard navigation short.
+            ->recordUrl(null)
             ->recordClasses(fn (ContactMessage $record): ?string => $record->status === ContactMessage::NEW ? 'font-semibold' : null)
             ->columns([
                 TextColumn::make('name')->label('Nama')->searchable()->weight('medium'),

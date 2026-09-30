@@ -30,7 +30,7 @@ await page.goto(`${BASE}/admin/contact-messages`, { waitUntil: 'networkidle' });
 await sleep(800);
 await page.screenshot({ path: `${OUT}/admin-leads-table.png` });
 
-await page.locator('table tbody tr').first().click();
+await page.getByRole('link', { name: 'Buka' }).first().click();
 await page.waitForURL(/contact-messages\/\d+/);
 await sleep(800);
 await page.screenshot({ path: `${OUT}/admin-lead-detail.png`, fullPage: true });

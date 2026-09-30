@@ -5,9 +5,10 @@
  *
  * Saves desktop / mobile, validation errors, success (JS and no-JS), EN + ID, and
  * prints console errors, failed requests (404) and the result of each submit.
- * NOTE: it really submits the form (5 per 15 min per IP is the limit), so run
- * `php artisan cache:clear` first if you re-run it.
+ * NOTE: it really submits the form (and resets the rate limiter between scenarios with
+ * `php artisan cache:clear`), so run it against a local database only.
  */
+import { execSync } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
 import { chromium } from 'playwright-core';
 
@@ -19,7 +20,11 @@ mkdirSync(OUT, { recursive: true });
 const browser = await chromium.launch({ channel: 'chrome', headless: true });
 const problems = [];
 
+// Every request to the form counts toward its 5 per 15 minutes limit: reset it per scenario.
+const resetLimiter = () => execSync('php artisan cache:clear', { stdio: 'ignore' });
+
 async function page(width, height, { js = true, reduce = false } = {}) {
+    resetLimiter();
     const context = await browser.newContext({
         viewport: { width, height },
         javaScriptEnabled: js,
@@ -68,10 +73,10 @@ for (const w of [375, 768]) {
     await p.context().close();
 }
 
-// 3. Validation errors (server, via fetch): bad email + short message
-{
+// 3. Validation errors (server, via fetch): bad email + short message, ID + EN
+for (const [locale, path] of [['id', '/id'], ['en', '/']]) {
     const p = await page(1440, 900);
-    await toContact(p, '/id');
+    await toContact(p, path);
     await fill(p, { name: 'Budi', email: 'budi@klien.test', message: 'pendek' });
     // bypass the browser's own checks so the SERVER answers
     await p.evaluate(() => document.querySelectorAll('#contact form [required], #contact form [minlength]').forEach((el) => { el.removeAttribute('required'); el.removeAttribute('minlength'); }));
@@ -81,36 +86,36 @@ for (const w of [375, 768]) {
     await sleep(1500);
     await p.evaluate(() => document.querySelector('#contact form').scrollIntoView({ block: 'center' }));
     await sleep(400);
-    await p.screenshot({ path: `${OUT}/validation-error-id.png` });
+    await p.screenshot({ path: `${OUT}/validation-error-${locale}.png` });
     await p.context().close();
 }
 
-// 4. Success with JS (fetch), ID
-{
+// 4. Success with JS (fetch), ID + EN
+for (const [locale, path] of [['id', '/id'], ['en', '/']]) {
     const p = await page(1440, 900);
-    await toContact(p, '/id');
+    await toContact(p, path);
     await fill(p, { name: 'Budi Santoso', email: 'budi@klien.test', phone: '+62 812 3456 7890', company: 'PT Klien', message: 'Kami butuh cold storage untuk 20 pallet frozen.' });
     await p.selectOption('#contact [name="service_id"]', { index: 1 });
     await p.click('#contact button[type="submit"]', { force: true });
     await sleep(2000);
     await p.evaluate(() => document.querySelector('#contact form').scrollIntoView({ block: 'center' }));
     await sleep(400);
-    await p.screenshot({ path: `${OUT}/success-js-id.png` });
-    console.log('success-js text:', (await p.locator('#contact [role="status"]').allInnerTexts()).join(' | '));
+    await p.screenshot({ path: `${OUT}/success-js-${locale}.png` });
+    console.log(`success-js (${locale}) text:`, (await p.locator('#contact [role="status"]').allInnerTexts()).join(' | '));
     await p.context().close();
 }
 
-// 5. Success WITHOUT JavaScript (plain POST + redirect), EN
-{
+// 5. Success WITHOUT JavaScript (plain POST + redirect), EN + ID
+for (const [locale, path] of [['en', '/'], ['id', '/id']]) {
     const p = await page(1440, 900, { js: false });
-    await p.goto(`${BASE}/`, { waitUntil: 'load' });
+    await p.goto(`${BASE}${path}`, { waitUntil: 'load' });
     await fill(p, { name: 'Jane Doe', email: 'jane@client.test', message: 'We need reefer trucks for weekly Jakarta to Surabaya runs.' });
     await p.click('#contact button[type="submit"]', { force: true });
     await sleep(2500);
     await sleep(800);
     console.log('no-JS redirect ->', p.url());
     await p.evaluate(() => document.getElementById('contact').scrollIntoView());
-    await p.screenshot({ path: `${OUT}/success-nojs-en.png` });
+    await p.screenshot({ path: `${OUT}/success-nojs-${locale}.png` });
     await p.context().close();
 }
 

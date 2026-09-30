@@ -176,7 +176,7 @@ for (const [name, path] of [['ADMIN list', '/admin/contact-messages'], ['ADMIN d
     if (path) {
         await page.goto(`${BASE}${path}`, { waitUntil: 'networkidle' });
     } else {
-        await page.locator('table tbody tr').first().click();
+        await page.getByRole('link', { name: 'Buka' }).first().click();
         await page.waitForURL(/contact-messages\/\d+/);
     }
     await sleep(800);
