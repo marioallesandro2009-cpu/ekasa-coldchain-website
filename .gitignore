@@ -47,3 +47,4 @@ yarn-error.log
 /storage/app/private/seed-placeholders/
 /storage/app/_backup-lighthouse/
 /lighthouse-*.json
+/storage/media-library/
