@@ -6,9 +6,11 @@ use App\Models\Concerns\FlushesFrontendCache;
 use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\RegistersWebpConversions;
 use App\Models\Contracts\HasTranslatableFields;
+use App\Support\Html;
 use App\Support\MediaPresenter;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
@@ -50,7 +52,7 @@ class AboutContent extends Model implements HasMedia, HasTranslatableFields
      */
     public function photo(): ?array
     {
-        return MediaPresenter::image($this->getFirstMedia('photo'), 'lg', 'sm', 1200, 1500, (string) $this->translate('story'));
+        return MediaPresenter::image($this->getFirstMedia('photo'), 'lg', 'sm', 1200, 1500, Str::limit(trim(strip_tags((string) $this->translate('story'))), 125, ''));
     }
 
     /**
@@ -59,7 +61,7 @@ class AboutContent extends Model implements HasMedia, HasTranslatableFields
     public function toFrontend(): array
     {
         return [
-            'story' => $this->translate('story'),
+            'story' => Html::rich($this->translate('story')),
             'photo' => $this->photo(),
         ];
     }

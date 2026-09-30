@@ -147,10 +147,12 @@ class ManageSiteSettings extends Page
                                 TextInput::make('instagram_url')
                                     ->label('URL Instagram')
                                     ->url()
+                                    ->rules(['url:http,https'])
                                     ->maxLength(255),
                                 TextInput::make('linkedin_url')
                                     ->label('URL LinkedIn')
                                     ->url()
+                                    ->rules(['url:http,https'])
                                     ->maxLength(255),
                                 Translatable::fields(fn (string $locale): TextInput => TextInput::make("cta_label.{$locale}")
                                     ->label(Translatable::label('Label tombol CTA', $locale))

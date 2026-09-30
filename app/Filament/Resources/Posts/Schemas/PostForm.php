@@ -7,6 +7,7 @@ use App\Models\Post;
 use App\Models\SiteSetting;
 use App\Support\ImageUpload;
 use App\Support\Locales;
+use App\Support\SeoAnalyzer;
 use Closure;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
@@ -17,13 +18,12 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Component;
 use Filament\Schemas\Components\Grid;
-use Filament\Schemas\Components\View;
-use App\Support\SeoAnalyzer;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Str;
@@ -212,6 +212,7 @@ class PostForm
                     }),
             ]);
     }
+
     private static function uniqueSlug(string $locale, ?Post $record): Closure
     {
         return function (string $attribute, mixed $value, Closure $fail) use ($locale, $record): void {

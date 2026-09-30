@@ -10,6 +10,7 @@ use App\Support\MediaPresenter;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -39,9 +40,20 @@ class AppServiceProvider extends ServiceProvider
         $this->configureDefaults();
         $this->configureMedia();
         $this->configureRateLimiting();
+        $this->configureMail();
 
         // <x-layouts::app> resolves to resources/views/layouts/app.blade.php.
         Blade::anonymousComponentPath(resource_path('views/layouts'), 'layouts');
+    }
+
+    /**
+     * Text that visitors type (name, message...) goes into Markdown mails. With secured
+     * encoding every interpolated value is escaped so it cannot become a live link, an
+     * external image or HTML in the team's inbox (see tests/Feature/SecurityXssTest.php).
+     */
+    protected function configureMail(): void
+    {
+        Markdown::withSecuredEncoding();
     }
 
     /**

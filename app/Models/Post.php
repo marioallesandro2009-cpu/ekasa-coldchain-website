@@ -6,6 +6,7 @@ use App\Models\Concerns\FlushesFrontendCache;
 use App\Models\Concerns\HasTranslations;
 use App\Models\Concerns\RegistersWebpConversions;
 use App\Models\Contracts\HasTranslatableFields;
+use App\Support\Html;
 use App\Support\Locales;
 use App\Support\MediaPresenter;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -189,7 +190,7 @@ class Post extends Model implements HasMedia, HasTranslatableFields
     {
         return [
             ...$this->toFrontend(),
-            'content' => $this->translate('content'),
+            'content' => Html::rich($this->translate('content')),
             'seoTitle' => $this->translate('seo_title'),
             'seoDescription' => $this->translate('seo_description'),
             'updatedAt' => $this->updated_at?->toAtomString(),
