@@ -1,3 +1,13 @@
+# Never serve hidden files (.env, .git, .htpasswd ...; .htaccess itself is never served by
+# Apache), dependency manifests, logs, dumps or backups. The document root is meant to be
+# ~/ekasa/public so none of these exist here; this is the second line of defence if the
+# symlink ever points one level too high. ".well-known" (AutoSSL) stays reachable.
+<FilesMatch "^\.(?!well-known$)">
+    Require all denied
+</FilesMatch>
+<FilesMatch "(^(composer\.(json|lock)|package(-lock)?\.json|artisan|phpunit\.xml(\.dist)?|vite\.config\.js|\.env.*)$|\.(log|sql|sqlite[0-9]?|bak|old|orig|swp|dist|md|yml|yaml|ini)$)">
+    Require all denied
+</FilesMatch>
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes
@@ -5,13 +15,9 @@
 
     RewriteEngine On
 
-    # Force HTTPS (behind a proxy/CDN too). Skipped for local hosts.
-    # The canonical host (www or non-www) follows APP_URL via the
-    # EnforceCanonicalHost middleware, so no domain is hardcoded here.
-    RewriteCond %{HTTPS} off
-    RewriteCond %{HTTP:X-Forwarded-Proto} !https
-    RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:\d+)?$ [NC]
-    RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+    # https and the canonical host (www or non-www) are NOT decided here: .htaccess cannot
+    # read .env, and forcing https before SSL is installed would make the site unreachable.
+    # They follow APP_URL and FORCE_HTTPS via the EnforceCanonicalHost middleware.
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
@@ -60,6 +66,11 @@
     <If "%{REQUEST_URI} =~ m#^/storage/#">
         Header set Cache-Control "public, max-age=2592000"
     </If>
+    # An SVG opened directly (not via <img>) must never run script: logo/favicon SVGs
+    # uploaded in the admin are stored as-is, so they are served in a locked-down sandbox.
+    <FilesMatch "\.svg$">
+        Header set Content-Security-Policy "default-src 'none'; style-src 'unsafe-inline'; sandbox"
+    </FilesMatch>
     Header always set X-Content-Type-Options "nosniff"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>

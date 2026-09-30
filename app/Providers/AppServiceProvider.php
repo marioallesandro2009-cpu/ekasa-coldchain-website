@@ -7,8 +7,10 @@ use App\Support\FaviconIco;
 use App\Support\FrontendData;
 use App\Support\Links;
 use App\Support\MediaPresenter;
+use App\Support\TrustedProxies;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Markdown;
 use Illuminate\Support\Facades\Blade;
@@ -16,6 +18,7 @@ use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Spatie\MediaLibrary\Conversions\Events\ConversionHasBeenCompletedEvent;
@@ -41,9 +44,28 @@ class AppServiceProvider extends ServiceProvider
         $this->configureMedia();
         $this->configureRateLimiting();
         $this->configureMail();
+        $this->configureRequestSecurity();
 
         // <x-layouts::app> resolves to resources/views/layouts/app.blade.php.
         Blade::anonymousComponentPath(resource_path('views/layouts'), 'layouts');
+    }
+
+    /**
+     * https and proxies from config/security.php (read here, not in bootstrap/app.php, so it keeps
+     * working after `config:cache`): FORCE_HTTPS makes every generated URL https; TRUSTED_PROXIES
+     * lets Laravel read the visitor's real IP behind Cloudflare (default: trust nobody).
+     */
+    protected function configureRequestSecurity(): void
+    {
+        if (config('security.force_https')) {
+            URL::forceScheme('https');
+        }
+
+        $proxies = TrustedProxies::resolve((string) config('security.trusted_proxies'));
+
+        if ($proxies !== null) {
+            TrustProxies::at($proxies);
+        }
     }
 
     /**

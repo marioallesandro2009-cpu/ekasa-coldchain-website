@@ -6,15 +6,15 @@ beforeEach(function () {
 });
 
 it('redirects www to the non-www host from APP_URL with a 301', function () {
-    config(['app.url' => 'https://example.co.id']);
+    config(['app.url' => 'https://example.co.id', 'security.force_https' => true]);
 
     $this->get('https://www.example.co.id/?utm=1')
         ->assertStatus(301)
         ->assertRedirect('https://example.co.id/?utm=1');
 });
 
-it('redirects http to https', function () {
-    config(['app.url' => 'https://example.co.id']);
+it('redirects http to https when FORCE_HTTPS is on', function () {
+    config(['app.url' => 'https://example.co.id', 'security.force_https' => true]);
 
     $this->get('http://example.co.id/robots.txt')
         ->assertStatus(301)

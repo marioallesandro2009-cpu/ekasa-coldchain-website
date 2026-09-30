@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnforceCanonicalHost;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -15,6 +16,8 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         // Redirects to the scheme + host of APP_URL (https, www or non-www) in production.
         $middleware->prepend(EnforceCanonicalHost::class);
+        // Security headers (HSTS, X-Frame-Options, report-only CSP) on every response.
+        $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

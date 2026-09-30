@@ -60,7 +60,7 @@
 
         {{-- Marks the page as JS-enabled; animation hiding classes only apply with this.
              Removed again if Alpine has not started after 3s (e.g. the bundle failed). --}}
-        <script>
+        <script @if ($nonce = \Illuminate\Support\Facades\Vite::cspNonce()) nonce="{{ $nonce }}" @endif>
             (function (html) {
                 html.classList.add('js');
                 if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) html.classList.add('js-anim');
