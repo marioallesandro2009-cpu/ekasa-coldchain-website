@@ -97,16 +97,20 @@ it('fits a non-square favicon on a transparent square', function () {
         ->and(imagecolorsforindex($icon, imagecolorat($icon, 24, 24)))->toMatchArray(['red' => 15, 'green' => 107, 'blue' => 70, 'alpha' => 0]);
 })->skip(fn () => ! extension_loaded('gd'), 'GD is not available on this machine.');
 
-it('copies an uploaded .ico as it is and keeps the file for an SVG', function () {
+it('copies an uploaded .ico as it is and refuses an SVG favicon', function () {
     $ico = (string) FaviconIco::fromImage((string) solidPng([15, 107, 70], 64)->getContent());
 
     // Same type a real .ico upload is detected as (a fake file guesses "application/ico" from the name).
     uploadFavicon(UploadedFile::fake()->createWithContent('favicon.ico', $ico)->mimeType('image/vnd.microsoft.icon'));
     expect(file_get_contents(FaviconIco::path()))->toBe($ico);
 
-    // GD cannot rasterize SVG: favicon.ico stays as it was.
-    uploadFavicon(UploadedFile::fake()->createWithContent('favicon.svg', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16"/></svg>'));
-    expect(SiteSetting::current()->getFirstMedia('favicon')->mime_type)->toBe('image/svg+xml')
+    // SVG is not accepted any more (it can carry script): the error shows and the old favicon stays.
+    Livewire::test(ManageSiteSettings::class)
+        ->fillForm(['favicon' => UploadedFile::fake()->createWithContent('favicon.svg', '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16"/></svg>')])
+        ->call('save')
+        ->assertHasFormErrors(['favicon']);
+
+    expect(SiteSetting::current()->getFirstMedia('favicon')->mime_type)->toBeIn(['image/x-icon', 'image/vnd.microsoft.icon'])
         ->and(file_get_contents(FaviconIco::path()))->toBe($ico);
 })->skip(fn () => ! extension_loaded('gd'), 'GD is not available on this machine.');
 

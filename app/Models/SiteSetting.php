@@ -101,9 +101,9 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
 
     public const IMAGE_MIMES = ['image/jpeg', 'image/png', 'image/webp'];
 
-    public const LOGO_MIMES = ['image/png', 'image/svg+xml', 'image/webp', 'image/jpeg'];
+    public const LOGO_MIMES = ['image/png', 'image/webp', 'image/jpeg'];
 
-    public const FAVICON_MIMES = ['image/png', 'image/svg+xml', 'image/x-icon', 'image/vnd.microsoft.icon'];
+    public const FAVICON_MIMES = ['image/png', 'image/webp', 'image/x-icon', 'image/vnd.microsoft.icon'];
 
     /**
      * Brand colors (hex), editable in the admin. The defaults are the semantic
@@ -186,12 +186,10 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
         $this->addWebpConversion('menu_lg', 1200, 'mega_menu_image');
         $this->addWebpConversion('menu_sm', 600, 'mega_menu_image');
 
-        // Logos keep their original PNG/SVG; a WebP copy is added for raster logos only.
-        if ($media?->mime_type !== 'image/svg+xml') {
-            $this->addWebpConversion('logo_webp', 600, ['logo_white', 'logo_color']);
-        }
+        // Logos keep their original PNG/WebP/JPEG; a WebP copy is added for faster loading.
+        $this->addWebpConversion('logo_webp', 600, ['logo_white', 'logo_color']);
 
-        // Favicon sizes (see MediaPresenter::favicon); SVG and ICO uploads are used as they are.
+        // Favicon sizes (see MediaPresenter::favicon); an ICO upload is used as it is.
         if (ImageConversions::enabled() && in_array($media?->mime_type, ['image/png', 'image/webp'], true)) {
             foreach (MediaPresenter::FAVICON_SIZES as $size) {
                 $this->addMediaConversion("favicon_{$size}")

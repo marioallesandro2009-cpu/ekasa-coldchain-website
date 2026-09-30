@@ -36,7 +36,7 @@ trait SeedsImages
 
     protected function seedImagePath(string $name, int $width, int $height): string
     {
-        foreach (['png', 'jpg', 'jpeg', 'webp', 'svg'] as $extension) {
+        foreach (['png', 'jpg', 'jpeg', 'webp'] as $extension) {
             $path = database_path("seeders/images/{$name}.{$extension}");
 
             if (is_file($path)) {

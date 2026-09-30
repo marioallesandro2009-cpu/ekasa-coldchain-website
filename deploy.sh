@@ -73,6 +73,13 @@ mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessi
     storage/framework/views storage/logs bootstrap/cache
 chmod -R ug+rwX storage bootstrap/cache
 
+# Uploads live here and are served at /storage: this file stops any script in them from
+# running (SECURITY_AUDIT F-1). It is tracked in git; refuse to go on without it.
+if [ ! -f storage/app/public/.htaccess ]; then
+    echo "!! storage/app/public/.htaccess hilang. Jalankan: git checkout -- storage/app/public/.htaccess" >&2
+    exit 1
+fi
+
 step "Migrasi database"
 $ARTISAN migrate --force
 

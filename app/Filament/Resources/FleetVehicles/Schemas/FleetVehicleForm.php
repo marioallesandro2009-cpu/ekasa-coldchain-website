@@ -71,9 +71,9 @@ class FleetVehicleForm
                             ->label('Gambar tampak samping')
                             ->collection('side')
                             ->image()
-                            ->acceptedFileTypes(SiteSetting::LOGO_MIMES)
+                            ->acceptedFileTypes(SiteSetting::IMAGE_MIMES)
                             ->maxSize(5120)
-                            ->helperText('Latar abu-abu polos, truk menghadap kiri. Ideal sekitar 2400 × 1120 px (rasio 75:35, dipakai penuh di bidang showcase). Foto landscape biasa seperti 16:9 (contoh: FE 71, FE 74) juga aman dipakai — bagian yang terpotong otomatis hanya latar kosong di atas/bawah truk, selama badan truk tidak terlalu mepet ke tepi foto. Minimal '.FleetVehicle::MIN_SIDE_WIDTH.' px lebarnya. File tidak diubah; potongan tampilan diatur di bawah.'),
+                            ->helperText('Latar abu-abu polos, truk menghadap kiri. Ideal sekitar 2400 × 1120 px (rasio 75:35, dipakai penuh di bidang showcase). Foto landscape biasa seperti 16:9 (contoh: FE 71, FE 74) juga aman dipakai — bagian yang terpotong otomatis hanya latar kosong di atas/bawah truk, selama badan truk tidak terlalu mepet ke tepi foto. Minimal '.FleetVehicle::MIN_SIDE_WIDTH.' px lebarnya. Foto tidak dipotong (hanya dibersihkan dari metadata saat diunggah); potongan tampilan diatur di bawah.'),
                         Grid::make(3)->schema([
                             TextInput::make('focus_x')->label('Titik fokus horizontal')->numeric()->minValue(0)->maxValue(100)->suffix('%')->default(50),
                             TextInput::make('focus_y')->label('Titik fokus vertikal')->numeric()->minValue(0)->maxValue(100)->suffix('%')->default(50),

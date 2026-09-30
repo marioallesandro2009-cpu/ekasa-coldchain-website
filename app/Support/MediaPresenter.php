@@ -77,7 +77,7 @@ final class MediaPresenter
     }
 
     /**
-     * Logo payload: the original file (PNG/SVG) plus the WebP version when available.
+     * Logo payload: the original file (PNG/WebP/JPEG) plus the WebP version when available.
      *
      * @return array{url: string, webp: string|null, width: int, height: int}|null
      */
@@ -120,7 +120,7 @@ final class MediaPresenter
 
     /**
      * Favicon payload: the original file plus one URL per size in FAVICON_SIZES
-     * (the original when that size was not generated, e.g. for an SVG or ICO).
+     * (the original when that size was not generated, e.g. for an ICO).
      *
      * @return array{url: string, mime: string, width: int, height: int, sizes: array<int, string>}|null
      */
@@ -168,23 +168,6 @@ final class MediaPresenter
     private static function readDimensions(Media $media): array
     {
         $path = $media->getPath();
-
-        if ($media->mime_type === 'image/svg+xml' && is_file($path)) {
-            $svg = @simplexml_load_file($path);
-
-            if ($svg !== false) {
-                $width = (int) ($svg['width'] ?? 0);
-                $height = (int) ($svg['height'] ?? 0);
-
-                if (($width === 0 || $height === 0) && isset($svg['viewBox'])) {
-                    $box = preg_split('/[\s,]+/', trim((string) $svg['viewBox'])) ?: [];
-                    $width = (int) ($box[2] ?? 0);
-                    $height = (int) ($box[3] ?? 0);
-                }
-
-                return [$width, $height];
-            }
-        }
 
         $size = is_file($path) ? @getimagesize($path) : false;
 

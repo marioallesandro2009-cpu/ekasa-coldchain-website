@@ -27,8 +27,8 @@ final class FaviconIco
     }
 
     /**
-     * Rebuild favicon.ico from a favicon media item. An SVG upload (GD cannot
-     * rasterize SVG) or a missing GD extension keeps the current file.
+     * Rebuild favicon.ico from a favicon media item. A missing GD extension or an
+     * unsupported type keeps the current file.
      */
     public static function writeFromMedia(Media $media): bool
     {

@@ -161,15 +161,15 @@ class ManageSiteSettings extends Page
                             ]),
                             Grid::make(3)->schema([
                                 self::logoUpload('logo_white', 'Logo putih')
-                                    ->helperText('Versi terang: ikon dan tulisan putih. Tampil di navbar transparan dan latar gelap. PNG/SVG transparan, tinggi ideal minimal 72 px.'),
+                                    ->helperText('Versi terang: ikon dan tulisan putih. Tampil di navbar transparan dan latar gelap. PNG/WebP transparan, tinggi ideal minimal 72 px.'),
                                 self::logoUpload('logo_color', 'Logo berwarna')
-                                    ->helperText('Versi standar (berwarna) untuk latar terang. PNG/SVG transparan.'),
+                                    ->helperText('Versi standar (berwarna) untuk latar terang. PNG/WebP transparan.'),
                                 ImageUpload::limitDimensions(SpatieMediaLibraryFileUpload::make('favicon'), '512 x 512 px')
                                     ->label('Favicon')
                                     ->collection('favicon')
                                     ->acceptedFileTypes(SiteSetting::FAVICON_MIMES)
                                     ->maxSize(1024)
-                                    ->helperText('PNG persegi 512 x 512 px, SVG, atau ICO. Maks. 1 MB. PNG dan ICO juga memperbarui favicon.ico (16/32/48 px).'),
+                                    ->helperText('PNG/WebP persegi 512 x 512 px, atau ICO. Maks. 1 MB. PNG dan ICO juga memperbarui favicon.ico (16/32/48 px).'),
                             ]),
                         ]),
                     Tab::make('Kontak')

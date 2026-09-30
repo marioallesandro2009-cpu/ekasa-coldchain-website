@@ -35,7 +35,7 @@ class TrustLogoForm
                             ->acceptedFileTypes(SiteSetting::LOGO_MIMES)
                             ->maxSize(1024)
                             ->required()
-                            ->helperText('SVG atau PNG transparan, sebaiknya versi putih. Tampil 24 px tinggi dan otomatis dibuat putih agar seragam. Maks. 1 MB.')
+                            ->helperText('PNG atau WebP transparan, sebaiknya versi putih. Tampil 24 px tinggi dan otomatis dibuat putih agar seragam. Maks. 1 MB.')
                             ->columnSpanFull(),
                     ]),
             ]);

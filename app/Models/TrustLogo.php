@@ -43,10 +43,8 @@ class TrustLogo extends Model implements HasMedia
 
     public function registerMediaConversions(?Media $media = null): void
     {
-        // Shown 24px high: a 400px wide WebP copy is plenty (SVG stays as it is).
-        if ($media?->mime_type !== 'image/svg+xml') {
-            $this->addWebpConversion('logo_webp', 400, 'logo');
-        }
+        // Shown 24px high: a 400px wide WebP copy is plenty.
+        $this->addWebpConversion('logo_webp', 400, 'logo');
     }
 
     /**
