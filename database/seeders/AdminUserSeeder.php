@@ -25,6 +25,6 @@ class AdminUserSeeder extends Seeder
                 'password' => $password,
                 'email_verified_at' => now(),
             ],
-        );
+        )->forceFill(['is_admin' => true])->save();
     }
 }

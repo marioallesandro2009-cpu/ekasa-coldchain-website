@@ -19,6 +19,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $email_verified_at
  * @property string $password
  * @property string|null $remember_token
+ * @property bool $is_admin
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
@@ -30,12 +31,13 @@ class User extends Authenticatable implements FilamentUser
     use HasFactory, Notifiable;
 
     /**
-     * Public registration is disabled, so every user is an administrator
-     * created through the seeder or by another administrator.
+     * Public registration is disabled. Only an account flagged as administrator may open the
+     * admin panel (is_admin is NOT mass assignable: it is set by `php artisan admin:create`,
+     * the seeder, or by hand in the database).
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return $panel->getId() === 'admin';
+        return $panel->getId() === 'admin' && $this->is_admin;
     }
 
     /**
@@ -48,6 +50,7 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',
         ];
     }
 }
