@@ -16,6 +16,9 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\ToggleButtons;
 use Filament\Schemas\Components\Component;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\View;
+use App\Support\SeoAnalyzer;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -39,13 +42,18 @@ class PostForm
     {
         return $schema
             ->components([
-                Tabs::make('post')
+                Grid::make(['default' => 1, 'xl' => 3])
                     ->columnSpanFull()
-                    ->persistTabInQueryString()
-                    ->tabs([
-                        Tab::make('Konten')->icon(Heroicon::OutlinedDocumentText)->schema(self::content()),
-                        Tab::make('Foto sampul')->icon(Heroicon::OutlinedPhoto)->schema(self::photo()),
-                        Tab::make('SEO')->icon(Heroicon::OutlinedGlobeAlt)->schema(self::seo()),
+                    ->schema([
+                        Tabs::make('post')
+                            ->columnSpan(['xl' => 2])
+                            ->persistTabInQueryString()
+                            ->tabs([
+                                Tab::make('Konten')->icon(Heroicon::OutlinedDocumentText)->schema(self::content()),
+                                Tab::make('Foto sampul')->icon(Heroicon::OutlinedPhoto)->schema(self::photo()),
+                                Tab::make('SEO')->icon(Heroicon::OutlinedGlobeAlt)->schema(self::seo()),
+                            ]),
+                        self::analyzer(),
                     ]),
             ]);
     }
@@ -79,9 +87,11 @@ class PostForm
                         ->label(Translatable::label('Ringkasan', $locale))
                         ->rows(2)
                         ->maxLength(200)
+                        ->live(debounce: 800)
                         ->helperText('Tampil di daftar blog, kartu, dan hasil pencarian.')),
                     Translatable::fields(fn (string $locale): RichEditor => RichEditor::make("content.{$locale}")
                         ->label(Translatable::label('Isi artikel', $locale))
+                        ->live(debounce: 1500)
                         ->columnSpanFull()),
                     ToggleButtons::make('status')
                         ->label('Status')
@@ -108,6 +118,7 @@ class PostForm
                         ->required()
                         ->maxLength(150)
                         ->alphaDash()
+                        ->live(debounce: 800)
                         ->rule(fn (?Post $record): Closure => self::uniqueSlug($locale, $record))),
                     TextInput::make('slug')
                         ->label('Kunci internal')
@@ -145,19 +156,62 @@ class PostForm
     {
         return [
             Section::make('Mesin pencari')->schema([
+                Translatable::fields(fn (string $locale): TextInput => TextInput::make("focus_keyword.{$locale}")
+                    ->label(Translatable::label('Focus keyword', $locale))
+                    ->maxLength(80)
+                    ->live(debounce: 800)
+                    ->helperText('Kata/frasa utama yang ingin dicari orang, misalnya "cold storage jakarta". Dipakai analisis SEO di samping.')),
                 Translatable::fields(fn (string $locale): TextInput => TextInput::make("seo_title.{$locale}")
                     ->label(Translatable::label('Judul SEO', $locale))
                     ->maxLength(70)
+                    ->live(debounce: 800)
                     ->helperText('Kosong: "<Judul artikel> | <nama perusahaan>". Maks. 70 karakter.')),
                 Translatable::fields(fn (string $locale): Textarea => Textarea::make("seo_description.{$locale}")
                     ->label(Translatable::label('Deskripsi SEO', $locale))
                     ->rows(2)
                     ->maxLength(160)
+                    ->live(debounce: 800)
                     ->helperText('Kosong: ringkasan artikel. Maks. 160 karakter.')),
             ]),
         ];
     }
 
+    /**
+     * Live SEO panel: re-analyses the form state for the chosen language on every
+     * (debounced) change. Only reads state, saves nothing.
+     */
+    private static function analyzer(): Section
+    {
+        return Section::make('SEO Analyzer')
+            ->columnSpan(['xl' => 1])
+            ->extraAttributes(['style' => 'position: sticky; top: 5rem; max-height: calc(100vh - 7rem); overflow-y: auto;'])
+            ->schema([
+                ToggleButtons::make('seo_locale')
+                    ->hiddenLabel()
+                    ->options(array_combine(Locales::all(), array_map('strtoupper', Locales::all())))
+                    ->default(Locales::default())
+                    ->inline()
+                    ->grouped()
+                    ->live()
+                    ->dehydrated(false),
+                View::make('filament.seo-analyzer')
+                    ->viewData(function (Get $get): array {
+                        $locale = $get('seo_locale') ?: Locales::default();
+                        $value = fn (string $field): ?string => is_string($state = $get("{$field}.{$locale}")) ? $state : null;
+
+                        return ['result' => SeoAnalyzer::analyze([
+                            'title' => $value('title'),
+                            'slug' => $value('slugs'),
+                            'excerpt' => $value('excerpt'),
+                            'content' => $value('content'),
+                            'seo_title' => $value('seo_title'),
+                            'seo_description' => $value('seo_description'),
+                            'keyword' => $value('focus_keyword'),
+                            'has_cover' => filled($get('cover')),
+                        ])];
+                    }),
+            ]);
+    }
     private static function uniqueSlug(string $locale, ?Post $record): Closure
     {
         return function (string $attribute, mixed $value, Closure $fail) use ($locale, $record): void {

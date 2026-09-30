@@ -35,17 +35,18 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property array<string, string|null>|null $content
  * @property array<string, string|null>|null $seo_title
  * @property array<string, string|null>|null $seo_description
+ * @property array<string, string|null>|null $focus_keyword
  * @property string $status
  * @property Carbon|null $published_at
  * @property bool $is_active
  * @property array<string, array<string, string>>|null $translation_status
  */
-#[Fillable(['title', 'slug', 'slugs', 'excerpt', 'content', 'seo_title', 'seo_description', 'status', 'published_at', 'is_active', 'translation_status'])]
+#[Fillable(['title', 'slug', 'slugs', 'excerpt', 'content', 'seo_title', 'seo_description', 'focus_keyword', 'status', 'published_at', 'is_active', 'translation_status'])]
 class Post extends Model implements HasMedia, HasTranslatableFields
 {
     use FlushesFrontendCache, HasTranslations, InteractsWithMedia, RegistersWebpConversions;
 
-    public const TRANSLATABLE = ['title', 'excerpt', 'content', 'seo_title', 'seo_description'];
+    public const TRANSLATABLE = ['title', 'excerpt', 'content', 'seo_title', 'seo_description', 'focus_keyword'];
 
     public const DRAFT = 'draft';
 
