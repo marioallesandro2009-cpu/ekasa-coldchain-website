@@ -15,6 +15,11 @@ Alur: **laptop → GitHub → `git pull` di server** lewat Terminal cPanel.
 - Asset Vite **di-build di laptop**; folder `public/build` ikut di-commit (server tidak perlu Node/npm).
 - Session, cache, dan antrean memakai `database` / `sync`: tidak butuh Redis atau queue worker.
 - Tidak ada scheduler (`routes/console.php` hanya berisi perintah manual), jadi **tidak perlu cron job**.
+- Dua template env: `.env.example` untuk **lokal** (sqlite, debug; dipakai `composer setup`) dan `.env.production.example` untuk **server** (MySQL, production).
+
+> ### ⚠️ Penting: `deploy.sh` belum pernah dijalankan sungguhan
+>
+> Script `deploy.sh` baru diperiksa sintaksnya (`bash -n`), **belum pernah dijalankan di server** (atau di lingkungan cPanel mana pun). Karena itu, **deploy pertama JANGAN langsung `bash deploy.sh`.** Jalankan tiap perintah pada bagian A7 dan A12 **satu per satu, manual**, sambil membaca outputnya. Setelah terbukti setiap langkah berhasil, baru pakai `bash deploy.sh` penuh untuk update-update berikutnya (bagian B). Jika `deploy.sh` ternyata gagal di suatu langkah, perbaiki scriptnya dulu lalu commit, jangan dipaksa.
 
 ---
 
@@ -110,9 +115,11 @@ Prefix `exos7198_` **wajib** ada di `DB_DATABASE` dan `DB_USERNAME`.
 
 ```bash
 cd ~/ekasa
-cp .env.example .env
+cp .env.production.example .env
 nano .env
 ```
+
+> Di server pakai `.env.production.example`, **bukan** `.env.example` (itu untuk lokal: sqlite dan `APP_DEBUG=true`).
 
 Yang harus diisi/dicek:
 
@@ -123,7 +130,7 @@ Yang harus diisi/dicek:
 | `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | dari langkah A5; `DB_HOST=localhost` |
 | `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | akun admin CMS yang dibuat seeder (pakai password kuat) |
 | `WHATSAPP_NUMBER` | nomor awal (opsional, bisa diubah di CMS) |
-| `MAIL_*` | opsional; isi bila situs perlu kirim email (pakai akun email cPanel) |
+| `MAIL_*` | opsional; **saat ini situs tidak mengirim email** (lihat A11). Isi bila fitur kirim email ditambahkan |
 
 Simpan di nano: `Ctrl+O`, Enter, `Ctrl+X`. Lalu buat kunci aplikasi:
 
@@ -178,16 +185,64 @@ Direktori `~/ekasa` dan `~` sendiri sebaiknya `755` (bukan `777`), agar Apache b
 
 cPanel → **SSL/TLS Status** → centang `ekasacoldchain.com` dan `www.ekasacoldchain.com` → **Run AutoSSL**. Tunggu beberapa menit sampai sertifikat aktif. `public/.htaccess` sudah memaksa redirect HTTPS, dan middleware `EnforceCanonicalHost` mengarahkan ke host di `APP_URL`.
 
-### A11. Cache produksi dan tes
+### A11. Email domain: SPF, DKIM, DMARC, From vs Reply-To
+
+**Status saat ini:** aplikasi **belum mengirim email apa pun**. Form Contact di beranda (`#contact`) tidak punya endpoint server: saat dikirim, ia menyusun pesan dan membuka **WhatsApp** (`wa.me`) dengan pesan terisi. `MAIL_MAILER=log` sudah cukup dan tidak ada yang perlu diatur di `.env` untuk email.
+
+Bagian ini tetap perlu dikerjakan **sekali** untuk email domain (mis. `info@ekasacoldchain.com` yang tampil di situs dan dipakai di email bisnis), dan menjadi dasar bila kelak form Contact diubah agar mengirim email.
+
+**1. Buat akun email** (cPanel → **Email Accounts**), mis. `info@ekasacoldchain.com`.
+
+**2. SPF dan DKIM** (cPanel → **Email Deliverability**, pilih `ekasacoldchain.com`):
+- Status akan menampilkan masalah bila SPF/DKIM belum ada. Klik **Repair** / **Install the suggested record** untuk kedua record. Jika DNS domain **tidak** dikelola di cPanel (nameserver lain), klik **Manage → Customize/Copy**, lalu tambahkan record TXT yang disarankan di penyedia DNS.
+- SPF, contoh bentuknya (pakai nilai yang disarankan cPanel/Rumahweb, bukan contoh ini):
+  `@  TXT  "v=spf1 +a +mx +ip4:<IP-server> include:<domain-spf-rumahweb> ~all"`
+- DKIM: record TXT `default._domainkey` berisi public key yang dibuat cPanel.
+- Tunggu propagasi (hingga beberapa jam), lalu buka lagi Email Deliverability: keduanya harus berstatus **valid**.
+
+**3. DMARC** (disarankan), record TXT di DNS domain, mulai longgar:
+
+```
+_dmarc  TXT  "v=DMARC1; p=none; rua=mailto:info@ekasacoldchain.com"
+```
+
+Setelah beberapa minggu laporan bersih, naikkan ke `p=quarantine`.
+
+**4. Tes:** kirim email dari `info@ekasacoldchain.com` ke akun Gmail dan pilih **Show original**: SPF, DKIM, dan DMARC harus `PASS`. Tanpa ini email cenderung masuk spam.
+
+**5. From vs Reply-To** (berlaku bila form Contact kelak mengirim email):
+
+| Header | Isi | Alasan |
+|---|---|---|
+| `From` | **selalu alamat domain sendiri**, mis. `info@ekasacoldchain.com` (`MAIL_FROM_ADDRESS`) | SPF/DKIM hanya lolos untuk domain yang Anda kendalikan. Memakai alamat pengunjung (mis. `budi@gmail.com`) sebagai `From` akan gagal SPF/DKIM/DMARC dan masuk spam atau ditolak. |
+| `Reply-To` | **alamat email pengunjung** yang mengisi form | Saat tim menekan "Balas", balasan langsung ke pengunjung, bukan ke `info@` sendiri. |
+| `To` | kotak masuk tim (mis. `info@ekasacoldchain.com`) | Penerima notifikasi lead. |
+
+Nama pengunjung boleh ditaruh di subjek atau isi email (bukan di `From`). Nilai `Reply-To` berasal dari input pengunjung, jadi harus divalidasi sebagai email dan tidak boleh mengandung baris baru (header injection); Laravel `Mail::...->replyTo()` sudah menanganinya bila input divalidasi.
+
+Bila fitur ini ditambahkan: gunakan `MAIL_MAILER=smtp`, `MAIL_HOST=mail.ekasacoldchain.com`, port 465 (`MAIL_SCHEME=smtps`) atau 587, `MAIL_USERNAME`/`MAIL_PASSWORD` dari akun email A11.1, dan tambahkan rate limiting serta honeypot pada endpoint form.
+
+### A12. Cache produksi dan tes (manual, satu per satu)
+
+**Deploy pertama: jangan `bash deploy.sh`** (script belum pernah diuji, lihat peringatan di atas). Jalankan perintah berikut satu per satu, baca outputnya, dan berhenti bila ada error:
 
 ```bash
 cd ~/ekasa
-bash deploy.sh
+PHP=/opt/cpanel/ea-php83/root/usr/bin/php
+
+$PHP artisan optimize:clear
+$PHP artisan config:cache
+$PHP artisan route:cache
+$PHP artisan view:cache
 ```
+
+(Langkah `composer install`, `migrate`, `storage:link`, dan `filament:assets` sudah dijalankan manual di A7.)
 
 Buka `https://ekasacoldchain.com`, lalu `https://ekasacoldchain.com/admin` dan login dengan `ADMIN_EMAIL` / `ADMIN_PASSWORD`. Cek juga `https://ekasacoldchain.com/up` (health check, harus 200).
 
-### A12. Cron scheduler
+Setelah situs terbukti jalan, ujilah `deploy.sh` sekali pada perubahan kecil (mis. edit satu teks, push, lalu `bash deploy.sh` sambil mengawasi outputnya). Baru sejak itu ia dianggap teruji untuk update rutin.
+
+### A13. Cron scheduler
 
 Tidak diperlukan: proyek ini tidak mendefinisikan jadwal (`Schedule::`). Jika suatu hari ditambah, tambahkan di cPanel → **Cron Jobs** (setiap menit):
 
@@ -211,6 +266,8 @@ git push origin main
 `public/build` **harus ikut di-commit** setiap kali CSS/JS/Blade (kelas Tailwind baru) berubah. Jika `git status` menampilkan perubahan di `public/build`, itu normal.
 
 **Di server (Terminal cPanel):**
+
+> Hanya setelah `deploy.sh` teruji (lihat peringatan di awal dokumen dan A12). Pada deploy pertama, jalankan perintah A7 dan A12 secara manual.
 
 ```bash
 cd ~/ekasa && bash deploy.sh

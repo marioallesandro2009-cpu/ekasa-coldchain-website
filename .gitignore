@@ -43,6 +43,7 @@ yarn-error.log
 # Local-only files (keep public/build tracked: it is deployed as-is to cPanel)
 .env.*
 !.env.example
+!.env.production.example
 /database/seeders/images/_original/
 /storage/app/private/seed-placeholders/
 /storage/app/_backup-lighthouse/
