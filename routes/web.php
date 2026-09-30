@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\ServiceController;
@@ -33,6 +34,11 @@ foreach (Locales::all() as $locale) {
             Route::get('/'.config("site.locales.{$locale}.segments.blog", 'blog').'/{slug}', BlogController::class)
                 ->where('slug', '[a-z0-9-]+')
                 ->name('blog.show');
+            // Contact form submit: /contact, /id/kontak. Limited to 5 per 15 minutes per IP
+            // (limiter "contact", AppServiceProvider); works as plain POST and as fetch.
+            Route::post('/'.config("site.locales.{$locale}.segments.contact", 'contact'), ContactController::class)
+                ->middleware('throttle:contact')
+                ->name('contact.store');
         });
 }
 

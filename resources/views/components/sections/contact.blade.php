@@ -1,20 +1,28 @@
 {{--
-    Home page contact section (#contact): a proper B2B conversion layout —
-    left column real contact channels (WhatsApp/email/phone from SiteSetting,
-    address/hours from the first active Location — HQ, by admin order), right
-    column a lead form. No backend endpoint exists yet, so the form is not a
-    dead UI: on submit it builds a prefilled WhatsApp message (via the same
-    wa.me link SiteSetting already exposes) and opens it — a real, working
-    action rather than a fake "sent" state. A small capability strip closes
-    the section. Nothing here is fabricated: every channel, address and hour
-    is admin data; the four capability labels describe the business itself
-    (cold storage, 24/7 operations), not invented numbers.
+    Home page contact section (#contact): a B2B conversion layout in two columns.
+    Left: heading, intro, real contact channels (email/phone from SiteSetting,
+    address/hours from the first active Location — HQ, by admin order) and, when a
+    number is set, a separate WhatsApp button for a quick chat without the form.
+    Right: the lead form. It is a real HTML form (POST + CSRF + redirect with a flash
+    message), so it works without JavaScript; with Alpine (contactForm) the same
+    form is sent with fetch and answered inline. The server decides what is valid.
+    Spam: a hidden honeypot field (a bot that fills it gets a fake "sent" and nothing
+    is stored) and a rate limit per IP (see ContactController / AppServiceProvider).
+    Nothing here is fabricated: every channel, address and hour is admin data; the
+    four capability labels describe the business itself, not invented numbers.
 --}}
 @props(['section', 'settings', 'locations', 'services'])
 @php
     $hq = $locations[0] ?? null;
     $wa = $settings['whatsappUrl'];
-    $needs = collect($services)->filter(fn (array $s): bool => $s['url'] !== null)->values();
+    $texts = $settings['texts'];
+    $errors = $errors->getBag('contact');
+    $success = session('contact_status');
+    $blocked = session('contact_error');
+    $input = 'mt-1.5 h-11 w-full rounded-full border bg-white/5 px-4 text-white placeholder-white/65 outline-none focus:border-highlight focus:ring-2 focus:ring-highlight/60';
+    // Invalid fields get a red border (server flash or client errors), the message under the field.
+    $border = fn (string $field): string => $errors->has($field) ? 'border-red-300!' : 'border-white/50';
+    $waMessage = __('Hi, I would like to ask about your cold chain services.');
 @endphp
 <x-ui.section
     :id="$section['id']"
@@ -33,22 +41,11 @@
     />
 
     <div class="mt-10 grid gap-10 sm:mt-12 lg:grid-cols-12 lg:gap-8">
-        {{-- Left: real contact channels. --}}
-        <div class="lg:col-span-5">
+        {{-- Left: real contact channels + separate WhatsApp button. --}}
+        <div class="lg:col-span-5" x-data="animatedContent" x-intersect.once="show()" data-animate>
             <h3 class="text-sm font-bold tracking-[0.14em] text-highlight uppercase">{{ __('Contact Us') }}</h3>
 
             <ul class="mt-5 space-y-5" role="list">
-                @if ($wa)
-                    <li class="flex items-start gap-4">
-                        <span class="grid size-11 shrink-0 place-items-center rounded-full bg-white/10 text-highlight">
-                            <x-ui.icon name="chat-bubble" class="size-5" />
-                        </span>
-                        <div class="min-w-0 pt-1.5">
-                            <a href="{{ $wa }}" target="_blank" rel="noopener" class="font-semibold text-white hover:text-highlight">WhatsApp</a>
-                            <p class="mt-0.5 text-sm text-white/65">{{ __('Fastest way to reach us') }}</p>
-                        </div>
-                    </li>
-                @endif
                 @if ($settings['email'])
                     <li class="flex items-start gap-4">
                         <span class="grid size-11 shrink-0 place-items-center rounded-full bg-white/10 text-highlight">
@@ -94,73 +91,112 @@
                     </li>
                 @endif
             </ul>
+
+            @if ($wa)
+                <div class="mt-8 rounded-card border border-white/15 bg-white/[0.04] p-5">
+                    <p class="text-sm font-semibold text-white">{{ __('Prefer a quick answer?') }}</p>
+                    <p class="mt-1 text-sm text-white/70">{{ __('Fastest way to reach us') }}</p>
+                    <a
+                        href="{{ $wa }}?text={{ rawurlencode($waMessage) }}"
+                        target="_blank"
+                        rel="noopener"
+                        class="mt-4 inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/40 px-6 font-semibold text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-highlight"
+                    >
+                        <x-ui.icon name="message-circle" class="size-5" />
+                        {{ $texts['whatsapp_button'] }}
+                    </a>
+                </div>
+            @endif
         </div>
 
-        {{-- Right: lead form. No backend yet — submits as a prefilled WhatsApp message. --}}
-        <div class="lg:col-span-7">
+        {{-- Right: the lead form. --}}
+        <div class="lg:col-span-7" x-data="animatedContent" x-intersect.once="show()" data-animate data-delay="0.15">
             <div
                 class="rounded-card border border-white/15 bg-white/[0.04] p-6 sm:p-8"
-                x-data="{
-                    name: '', company: '', contactInfo: '', need: '', message: '', sent: false,
-                    send() {
-                        const lines = [
-                            {{ Js::from(__('New inquiry via website:')) }},
-                            {{ Js::from(__('Name')) }} + ': ' + this.name,
-                            {{ Js::from(__('Company')) }} + ': ' + this.company,
-                            {{ Js::from(__('Email / WhatsApp')) }} + ': ' + this.contactInfo,
-                            this.need ? ({{ Js::from(__('Need')) }} + ': ' + this.need) : null,
-                            this.message ? ('\n' + this.message) : null,
-                        ].filter(Boolean).join('\n');
-                        window.open('{{ $wa }}?text=' + encodeURIComponent(lines), '_blank', 'noopener');
-                        this.sent = true;
-                    }
-                }"
+                x-data="contactForm({ error: @js($texts['contact_error']), errors: @js(collect($errors->messages())->map(fn ($messages) => $messages[0])->all()) })"
             >
                 <h3 class="text-lg font-bold text-white">{{ __('Send a Request') }}</h3>
+                <p class="mt-1 text-sm text-white/70">{{ __('Fill in the form and we will reply by email.') }}</p>
 
-                <template x-if="!sent">
-                    <form class="mt-5 space-y-4" @submit.prevent="send()">
-                        <div class="grid gap-4 sm:grid-cols-2">
-                            <div>
-                                <label for="contact-name" class="text-sm font-medium text-white/80">{{ __('Name') }}</label>
-                                <input id="contact-name" x-model="name" required type="text" class="mt-1.5 h-11 w-full rounded-full border border-white/20 bg-white/5 px-4 text-white placeholder-white/40 outline-none focus:border-highlight" placeholder="{{ __('Your name') }}">
-                            </div>
-                            <div>
-                                <label for="contact-company" class="text-sm font-medium text-white/80">{{ __('Company') }}</label>
-                                <input id="contact-company" x-model="company" type="text" class="mt-1.5 h-11 w-full rounded-full border border-white/20 bg-white/5 px-4 text-white placeholder-white/40 outline-none focus:border-highlight" placeholder="{{ __('Company name') }}">
-                            </div>
-                        </div>
-                        <div>
-                            <label for="contact-info" class="text-sm font-medium text-white/80">{{ __('Email / WhatsApp') }}</label>
-                            <input id="contact-info" x-model="contactInfo" required type="text" class="mt-1.5 h-11 w-full rounded-full border border-white/20 bg-white/5 px-4 text-white placeholder-white/40 outline-none focus:border-highlight" placeholder="{{ __('How can we reach you?') }}">
-                        </div>
-                        @if ($needs->isNotEmpty())
-                            <div>
-                                <label for="contact-need" class="text-sm font-medium text-white/80">{{ __('Need') }}</label>
-                                <select id="contact-need" x-model="need" class="mt-1.5 h-11 w-full rounded-full border border-white/20 bg-white/5 px-4 text-white outline-none focus:border-highlight">
-                                    <option value="" class="bg-dark">{{ __('Select a service') }}</option>
-                                    @foreach ($needs as $service)
-                                        <option value="{{ $service['title'] }}" class="bg-dark">{{ $service['title'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        @endif
-                        <div>
-                            <label for="contact-message" class="text-sm font-medium text-white/80">{{ __('Message (optional)') }}</label>
-                            <textarea id="contact-message" x-model="message" rows="3" class="mt-1.5 w-full rounded-2xl border border-white/20 bg-white/5 px-4 py-3 text-white placeholder-white/40 outline-none focus:border-highlight" placeholder="{{ __('Tell us a bit more...') }}"></textarea>
-                        </div>
-                        <button type="submit" class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-highlight px-6 font-semibold text-dark transition-transform hover:scale-[1.01] sm:w-auto sm:px-8">
-                            {{ __('Ask about availability') }}
-                        </button>
-                    </form>
-                </template>
-
-                <template x-if="sent">
-                    <div class="mt-5 flex items-start gap-3 rounded-2xl border border-highlight/30 bg-highlight/10 p-4">
-                        <x-ui.icon name="chat-bubble" class="mt-0.5 size-5 shrink-0 text-highlight" />
-                        <p class="text-sm text-white/85">{{ __('Your message is ready on WhatsApp — send it there to reach our team directly.') }}</p>
+                {{-- Server-rendered result (plain POST). Alpine removes it when the next fetch starts. --}}
+                @if ($success || $blocked)
+                    <div x-ref="flash" role="status" tabindex="-1" class="mt-5 flex items-start gap-3 rounded-2xl border p-4 {{ $success ? 'border-highlight/30 bg-highlight/10' : 'border-red-300/50 bg-red-400/10' }}">
+                        <x-ui.icon name="chat-bubble" class="mt-0.5 size-5 shrink-0 {{ $success ? 'text-highlight' : 'text-red-300' }}" />
+                        <p class="text-sm text-white/90">{{ $success ?: $blocked }}</p>
                     </div>
-                </template>
+                @endif
+
+                {{-- Client-side result (fetch). --}}
+                <div x-cloak x-show="message" x-ref="live" role="status" aria-live="polite" tabindex="-1" class="mt-5 flex items-start gap-3 rounded-2xl border p-4" :class="ok ? 'border-highlight/30 bg-highlight/10' : 'border-red-300/50 bg-red-400/10'">
+                    <p class="text-sm text-white/90" x-text="message"></p>
+                </div>
+
+                <form
+                    class="mt-5 space-y-4"
+                    method="POST"
+                    action="{{ \App\Support\Links::contactAction() }}"
+                    @submit.prevent="submit($event)"
+                    x-ref="form"
+                >
+                    @csrf
+                    {{-- Honeypot: humans never see or fill this. --}}
+                    <div aria-hidden="true" style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
+                        <label>Website <input type="text" name="website" value="" tabindex="-1" autocomplete="off"></label>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="contact-name" class="text-sm font-medium text-white/80">{{ __('Name') }} <span aria-hidden="true">*</span></label>
+                            <input id="contact-name" name="name" value="{{ old('name') }}" required maxlength="120" autocomplete="name" type="text" placeholder="{{ __('Your name') }}" class="{{ $input }} {{ $border('name') }}" :class="errors.name && 'border-red-300!'" :aria-invalid="errors.name ? 'true' : null" aria-describedby="contact-name-error" @if ($errors->has('name')) aria-invalid="true" @endif>
+                            <p id="contact-name-error" class="mt-1 text-sm text-red-300" x-text="errors.name">{{ $errors->first('name') }}</p>
+                        </div>
+                        <div>
+                            <label for="contact-email" class="text-sm font-medium text-white/80">{{ __('Email') }} <span aria-hidden="true">*</span></label>
+                            <input id="contact-email" name="email" value="{{ old('email') }}" required maxlength="190" autocomplete="email" type="email" placeholder="{{ __('Your email') }}" class="{{ $input }} {{ $border('email') }}" :class="errors.email && 'border-red-300!'" :aria-invalid="errors.email ? 'true' : null" aria-describedby="contact-email-error" @if ($errors->has('email')) aria-invalid="true" @endif>
+                            <p id="contact-email-error" class="mt-1 text-sm text-red-300" x-text="errors.email">{{ $errors->first('email') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="contact-phone" class="text-sm font-medium text-white/80">{{ __('Phone (optional)') }}</label>
+                            <input id="contact-phone" name="phone" value="{{ old('phone') }}" maxlength="40" autocomplete="tel" type="tel" placeholder="+62 812 3456 7890" class="{{ $input }} {{ $border('phone') }}" :class="errors.phone && 'border-red-300!'" :aria-invalid="errors.phone ? 'true' : null" aria-describedby="contact-phone-error" @if ($errors->has('phone')) aria-invalid="true" @endif>
+                            <p id="contact-phone-error" class="mt-1 text-sm text-red-300" x-text="errors.phone">{{ $errors->first('phone') }}</p>
+                        </div>
+                        <div>
+                            <label for="contact-company" class="text-sm font-medium text-white/80">{{ __('Company (optional)') }}</label>
+                            <input id="contact-company" name="company" value="{{ old('company') }}" maxlength="150" autocomplete="organization" type="text" placeholder="{{ __('Company name') }}" class="{{ $input }} {{ $border('company') }}">
+                        </div>
+                    </div>
+
+                    @if (count($services) > 0)
+                        <div>
+                            <label for="contact-service" class="text-sm font-medium text-white/80">{{ __('Service of interest (optional)') }}</label>
+                            <select id="contact-service" name="service_id" class="{{ $input }} border-white/50">
+                                <option value="" class="bg-dark">{{ __('Select a service') }}</option>
+                                @foreach ($services as $service)
+                                    <option value="{{ $service['id'] }}" class="bg-dark" @selected((string) old('service_id') === (string) $service['id'])>{{ $service['title'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
+                    <div>
+                        <label for="contact-message" class="text-sm font-medium text-white/80">{{ __('Message') }} <span aria-hidden="true">*</span></label>
+                        <textarea id="contact-message" name="message" required minlength="10" maxlength="3000" rows="4" placeholder="{{ __('How can we help?') }}" class="mt-1.5 w-full rounded-2xl border bg-white/5 px-4 py-3 text-white placeholder-white/65 outline-none focus:border-highlight focus:ring-2 focus:ring-highlight/60 {{ $border('message') }}" :class="errors.message && 'border-red-300!'" :aria-invalid="errors.message ? 'true' : null" aria-describedby="contact-message-error" @if ($errors->has('message')) aria-invalid="true" @endif>{{ old('message') }}</textarea>
+                        <p id="contact-message-error" class="mt-1 text-sm text-red-300" x-text="errors.message">{{ $errors->first('message') }}</p>
+                    </div>
+
+                    <button
+                        type="submit"
+                        class="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-highlight px-6 font-semibold text-dark transition-transform hover:scale-[1.01] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white disabled:cursor-wait disabled:opacity-70 sm:w-auto sm:px-8"
+                        :disabled="loading"
+                        :aria-busy="loading.toString()"
+                    >
+                        <span x-show="!loading">{{ __('Send Message') }}</span>
+                        <span x-cloak x-show="loading">{{ __('Sending...') }}</span>
+                    </button>
+                </form>
             </div>
         </div>
     </div>

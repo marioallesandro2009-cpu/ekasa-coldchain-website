@@ -20,6 +20,16 @@ final class Links
     }
 
     /**
+     * Where the #contact form posts to: /contact, /id/kontak.
+     */
+    public static function contactAction(): string
+    {
+        $locale = Locales::current();
+
+        return Locales::path($locale, '/'.config("site.locales.{$locale}.segments.contact", 'contact'));
+    }
+
+    /**
      * A service: its detail page once published, else its home page anchor.
      *
      * @param  array{url?: string|null, anchor: string}  $service

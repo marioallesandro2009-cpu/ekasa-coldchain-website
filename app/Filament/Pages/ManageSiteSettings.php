@@ -11,6 +11,7 @@ use App\Support\ImageUpload;
 use App\Support\Locales;
 use App\Support\Translation\Translator;
 use BackedEnum;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Repeater;
@@ -27,6 +28,8 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Text;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\HtmlString;
@@ -78,6 +81,7 @@ class ManageSiteSettings extends Page
         $this->form->fill([
             ...$record->attributesToArray(),
             'ui_texts' => $texts,
+            'contact_recipients' => implode("\n", (array) $record->contact_recipients),
             'colors' => $record->brandColors(),
         ]);
     }
@@ -165,6 +169,28 @@ class ManageSiteSettings extends Page
                                     ->maxSize(1024)
                                     ->helperText('PNG persegi 512 x 512 px, SVG, atau ICO. Maks. 1 MB. PNG dan ICO juga memperbarui favicon.ico (16/32/48 px).'),
                             ]),
+                        ]),
+                    Tab::make('Kontak')
+                        ->icon(Heroicon::OutlinedEnvelope)
+                        ->schema([
+                            View::make('filament.contact-recipients-notice')
+                                ->viewData(fn (Get $get): array => [
+                                    'empty' => blank(trim((string) $get('contact_recipients'))),
+                                    'fallback' => $get('email'),
+                                ])
+                                ->columnSpanFull(),
+                            Textarea::make('contact_recipients')
+                                ->label('Penerima notifikasi leads')
+                                ->rows(4)
+                                ->placeholder("nama@gmail.com\nmarketing@perusahaan.co.id")
+                                ->live(debounce: 600)
+                                ->helperText('Satu alamat email per baris (maks. 10). Setiap pesan dari form Kontak dikirim ke semua alamat ini; bisa Gmail pribadi dan bisa diganti kapan saja. Balas email langsung ke pengunjung karena Reply-To sudah berisi email mereka. Pengirim (From) diatur di server, bukan di sini.')
+                                ->rules([fn (): Closure => self::validateRecipients()]),
+                            Text::make('Nomor WhatsApp (tombol WhatsApp di section Kontak) diatur di tab Umum. Kosongkan nomornya untuk menyembunyikan tombol.')
+                                ->color('gray'),
+                            self::uiText('contact_email_subject', 'Subjek email notifikasi', 'Ikut bahasa pengunjung. ":name" diganti nama pengirim.', 160),
+                            self::uiText('contact_success', 'Pesan sukses form', 'Tampil setelah form terkirim.', 240),
+                            self::uiText('contact_error', 'Pesan gagal form', 'Tampil jika pengiriman ditolak (mis. terlalu sering mengirim).', 240),
                         ]),
                     Tab::make('Hero')
                         ->icon(Heroicon::OutlinedPhoto)
@@ -345,7 +371,11 @@ class ManageSiteSettings extends Page
         $record = $this->getRecord();
 
         $this->form->model($record);
-        $record->update($this->form->getState());
+
+        $state = $this->form->getState();
+        $state['contact_recipients'] = self::parseRecipients((string) ($state['contact_recipients'] ?? ''));
+
+        $record->update($state);
 
         FrontendData::flush();
 
@@ -385,13 +415,45 @@ class ManageSiteSettings extends Page
     /**
      * One UI text in every language, side by side; empty = the default text.
      */
-    private static function uiText(string $key, string $label, ?string $help = null): Grid
+    private static function uiText(string $key, string $label, ?string $help = null, int $max = 120): Grid
     {
         return Translatable::fields(fn (string $locale): TextInput => TextInput::make("ui_texts.{$locale}.{$key}")
             ->label(Translatable::label($label, $locale))
             ->placeholder(SiteSetting::defaultUiText($key, $locale))
             ->helperText($locale === Locales::default() ? $help : null)
-            ->maxLength(120));
+            ->maxLength($max));
+    }
+
+    /**
+     * One email per line, at most 10, every line a valid address.
+     */
+    private static function validateRecipients(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail): void {
+            $lines = self::parseRecipients((string) $value);
+
+            if (count($lines) > 10) {
+                $fail('Maksimal 10 alamat email.');
+
+                return;
+            }
+
+            foreach ($lines as $line) {
+                if (! filter_var($line, FILTER_VALIDATE_EMAIL)) {
+                    $fail('"'.$line.'" bukan alamat email yang valid.');
+
+                    return;
+                }
+            }
+        };
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function parseRecipients(string $text): array
+    {
+        return array_values(array_unique(array_filter(array_map('trim', preg_split('/[\r\n,;]+/', $text) ?: []))));
     }
 
     private static function logoUpload(string $collection, string $label): SpatieMediaLibraryFileUpload

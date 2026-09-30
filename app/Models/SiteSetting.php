@@ -37,6 +37,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property array<string, string|null>|null $mega_menu_title
  * @property array<string, string|null>|null $mega_menu_link_label
  * @property array<string, array<string, string|null>>|null $ui_texts
+ * @property list<string>|null $contact_recipients
  * @property array<string, string|null>|null $colors
  * @property array<string, string|null>|null $seo_title
  * @property array<string, string|null>|null $seo_description
@@ -61,6 +62,7 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
     'mega_menu_title',
     'mega_menu_link_label',
     'ui_texts',
+    'contact_recipients',
     'colors',
     'seo_title',
     'seo_description',
@@ -129,6 +131,9 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
     public const UI_TEXT_DEFAULTS = [
         'hero_secondary_cta' => 'Explore Services',
         'whatsapp_button' => 'Chat on WhatsApp',
+        'contact_success' => 'Thank you! Your message has been received and our team will get back to you soon.',
+        'contact_error' => 'Your message could not be sent. Please try again or contact us on WhatsApp.',
+        'contact_email_subject' => 'New inquiry from :name',
         'trust_label' => 'Trusted by',
         'service_card_link' => 'Learn more',
         'service_supporting_label' => 'Also available',
@@ -149,6 +154,7 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
         return [
             'hero_slide_duration' => 'integer',
             'ui_texts' => 'array',
+            'contact_recipients' => 'array',
             'colors' => 'array',
             'translation_glossary' => 'json:unicode',
         ];
@@ -280,6 +286,34 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
         }
 
         return $rows;
+    }
+
+    /**
+     * Where the #contact form notifications go: the addresses set in the admin
+     * (Kontak tab), else the public contact email as a stop-gap, else nobody.
+     *
+     * @return list<string>
+     */
+    public function contactRecipients(): array
+    {
+        $emails = array_values(array_filter(
+            array_map(fn ($email): string => trim((string) $email), (array) $this->contact_recipients),
+            fn (string $email): bool => filter_var($email, FILTER_VALIDATE_EMAIL) !== false,
+        ));
+
+        if ($emails === [] && filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+            return [(string) $this->email];
+        }
+
+        return $emails;
+    }
+
+    /**
+     * True while no recipient list is set and notifications fall back to the public email.
+     */
+    public function usesFallbackRecipient(): bool
+    {
+        return array_filter(array_map(fn ($email): string => trim((string) $email), (array) $this->contact_recipients)) === [];
     }
 
     public static function defaultUiText(string $key, string $locale): string

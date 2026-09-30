@@ -82,14 +82,19 @@ it('never grows past 4 cards on the home teaser: a 5th featured service is cappe
     Service::query()->create(['title' => ['en' => 'Cross Docking'], 'slug' => 'cross-docking', 'icon' => 'box', 'is_featured' => true, 'is_active' => true]);
 
     $html = $this->get('/')->getContent();
-    $section = substr($html, (int) strpos($html, 'id="services"'));
+    $start = (int) strpos($html, 'id="services"');
+    // Only the services teaser: up to the next section. (The #contact form lists every
+    // active service in its dropdown, and the blog teaser has its own articles.)
+    $section = substr($html, $start, (int) strpos($html, 'id="locations"') - $start);
 
     // Unlike /services (unbounded), the home teaser stays at the shared,
     // capped featuredServices — the 5th featured service never gets a
     // "more" row here, it only ever shows up on the full index.
     expect(substr_count($section, '<article'))->toBe(4)
         ->and($section)->not->toContain('lg:col-span-4')
-        ->not->toContain('Cross Docking');
+        ->not->toContain('Cross Docking')
+        // ...but it is still a valid choice in the contact form.
+        ->and($html)->toContain('Cross Docking');
 });
 
 it('makes the first main service in the admin order the large card', function () {

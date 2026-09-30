@@ -49,3 +49,7 @@ yarn-error.log
 /storage/app/_backup-lighthouse/
 /lighthouse-*.json
 /storage/media-library/
+
+# Contact form verification output (screenshots, sample email log): local only
+/docs/screenshots/contact/
+/docs/screenshots/contact/email-log-contoh.txt

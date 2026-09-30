@@ -42,8 +42,14 @@ it('puts the navbar, mega menu links, final statistics and a single h1 in the HT
         ->toContain('href="#omnichannel-integration"')
         ->toContain('600+')
         ->toContain('-25°C to 6°C')
-        ->not->toContain('Contact Us')
         ->and(substr_count($html, '<h1'))->toBe(1);
+
+    // The navbar's link is "Contact" (not "Contact Us"). "Contact Us" is the heading of
+    // the #contact section itself (its channels column), so only the navbar is checked.
+    $navbar = substr($html, (int) strpos($html, '<header'), (int) strpos($html, '</header>') - (int) strpos($html, '<header'));
+
+    expect($navbar)->toContain('Contact')->not->toContain('Contact Us')
+        ->and($html)->toContain('Contact Us');
 });
 
 it('preloads the first hero photo with the same srcset/sizes as the image', function () {
@@ -266,7 +272,10 @@ it('shows the statistic icons chosen in the admin and keeps an empty slot for st
     FrontendData::flush();
 
     $html = $this->get('/')->getContent();
-    $bar = substr($html, (int) strpos($html, '<dl'));
+    // Only the hero statistics bar: later sections (the #contact capability strip has
+    // its own icons of the same class) are not part of it.
+    $start = (int) strpos($html, '<dl');
+    $bar = substr($html, $start, (int) strpos($html, '</dl>', $start) - $start);
 
     expect(substr_count($bar, 'size-5 text-highlight'))->toBe(3)
         ->and(substr_count($bar, '<span class="mb-2 block size-5 lg:shorter:mb-1.5" aria-hidden="true"></span>'))->toBe(1);

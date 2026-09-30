@@ -130,7 +130,7 @@ Yang harus diisi/dicek:
 | `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | dari langkah A5; `DB_HOST=localhost` |
 | `ADMIN_NAME`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` | akun admin CMS yang dibuat seeder (pakai password kuat) |
 | `WHATSAPP_NUMBER` | nomor awal (opsional, bisa diubah di CMS) |
-| `MAIL_*` | opsional; **saat ini situs tidak mengirim email** (lihat A11). Isi bila fitur kirim email ditambahkan |
+| `MAIL_*` | **wajib** agar email leads terkirim: SMTP akun email cPanel (lihat A11) |
 
 Simpan di nano: `Ctrl+O`, Enter, `Ctrl+X`. Lalu buat kunci aplikasi:
 
@@ -185,42 +185,67 @@ Direktori `~/ekasa` dan `~` sendiri sebaiknya `755` (bukan `777`), agar Apache b
 
 cPanel → **SSL/TLS Status** → centang `ekasacoldchain.com` dan `www.ekasacoldchain.com` → **Run AutoSSL**. Tunggu beberapa menit sampai sertifikat aktif. `public/.htaccess` sudah memaksa redirect HTTPS, dan middleware `EnforceCanonicalHost` mengarahkan ke host di `APP_URL`.
 
-### A11. Email domain: SPF, DKIM, DMARC, From vs Reply-To
+### A11. Email leads dari form Kontak: akun email, SMTP, SPF/DKIM, From vs Reply-To
 
-**Status saat ini:** aplikasi **belum mengirim email apa pun**. Form Contact di beranda (`#contact`) tidak punya endpoint server: saat dikirim, ia menyusun pesan dan membuka **WhatsApp** (`wa.me`) dengan pesan terisi. `MAIL_MAILER=log` sudah cukup dan tidak ada yang perlu diatur di `.env` untuk email.
+**Status saat ini:** form Kontak di beranda (`#contact`) **sungguh mengirim email**. Setiap pesan disimpan dulu ke database (admin: **Pesan Masuk**), lalu diemail ke daftar penerima di **Pengaturan Situs → tab Kontak** setelah respons dikirim ke pengunjung. Jika SMTP gagal, pengunjung tetap melihat sukses (pesan sudah tersimpan) dan pesan itu ditandai **"Email gagal terkirim"** di admin. Tanpa langkah di bawah ini, email akan gagal dan pesan hanya terbaca di admin.
 
-Bagian ini tetap perlu dikerjakan **sekali** untuk email domain (mis. `info@ekasacoldchain.com` yang tampil di situs dan dipakai di email bisnis), dan menjadi dasar bila kelak form Contact diubah agar mengirim email.
+**1. Buat akun email pengirim** (cPanel → **Email Accounts**): `noreply@ekasacoldchain.com` dengan password kuat. Akun ini hanya dipakai untuk mengirim (SMTP); kotak masuknya tidak perlu dibaca.
 
-**1. Buat akun email** (cPanel → **Email Accounts**), mis. `info@ekasacoldchain.com`.
+**2. Isi `.env` di server** (template: `.env.production.example`):
 
-**2. SPF dan DKIM** (cPanel → **Email Deliverability**, pilih `ekasacoldchain.com`):
-- Status akan menampilkan masalah bila SPF/DKIM belum ada. Klik **Repair** / **Install the suggested record** untuk kedua record. Jika DNS domain **tidak** dikelola di cPanel (nameserver lain), klik **Manage → Customize/Copy**, lalu tambahkan record TXT yang disarankan di penyedia DNS.
+```
+MAIL_MAILER=smtp
+MAIL_SCHEME=smtps
+MAIL_HOST=mail.ekasacoldchain.com
+MAIL_PORT=465
+MAIL_USERNAME=noreply@ekasacoldchain.com
+MAIL_PASSWORD=<password akun email>
+MAIL_FROM_ADDRESS="noreply@ekasacoldchain.com"
+MAIL_FROM_NAME="${APP_NAME}"
+```
+
+Lalu `php artisan config:clear && php artisan config:cache`. Nilai dan port pastinya ada di cPanel → Email Accounts → **Connect Devices** (ikuti "Secure SSL/TLS Settings"; jika 465 tidak jalan pakai port 587 dengan `MAIL_SCHEME=null`). `MAIL_FROM_ADDRESS` **tidak bisa diubah dari admin**: hanya di `.env`.
+
+**3. SPF dan DKIM** (cPanel → **Email Deliverability**, pilih `ekasacoldchain.com`):
+- Status akan menampilkan masalah bila SPF/DKIM belum ada. Klik **Repair** / **Install the suggested record** untuk kedua record. Jika DNS domain **tidak** dikelola di cPanel (nameserver lain, mis. Cloudflare), klik **Manage → Customize/Copy**, lalu tambahkan record TXT yang disarankan di penyedia DNS (jangan diproksi/oranye untuk record TXT; TXT tidak bisa diproksi).
 - SPF, contoh bentuknya (pakai nilai yang disarankan cPanel/Rumahweb, bukan contoh ini):
   `@  TXT  "v=spf1 +a +mx +ip4:<IP-server> include:<domain-spf-rumahweb> ~all"`
 - DKIM: record TXT `default._domainkey` berisi public key yang dibuat cPanel.
+- Hanya boleh ada **satu** record SPF per domain; gabungkan `include:` bila sudah ada.
 - Tunggu propagasi (hingga beberapa jam), lalu buka lagi Email Deliverability: keduanya harus berstatus **valid**.
 
-**3. DMARC** (disarankan), record TXT di DNS domain, mulai longgar:
+**4. DMARC** (disarankan), record TXT di DNS domain, mulai longgar:
 
 ```
-_dmarc  TXT  "v=DMARC1; p=none; rua=mailto:info@ekasacoldchain.com"
+_dmarc  TXT  "v=DMARC1; p=none; rua=mailto:<email-penerima-laporan>"
 ```
 
 Setelah beberapa minggu laporan bersih, naikkan ke `p=quarantine`.
 
-**4. Tes:** kirim email dari `info@ekasacoldchain.com` ke akun Gmail dan pilih **Show original**: SPF, DKIM, dan DMARC harus `PASS`. Tanpa ini email cenderung masuk spam.
+**5. Isi daftar penerima di admin** (Pengaturan Situs → tab **Kontak**): satu alamat per baris, boleh Gmail pribadi dan lebih dari satu (maks. 10). Bisa diganti kapan saja tanpa deploy. Selama daftar ini kosong, admin menampilkan banner peringatan dan notifikasi sementara jatuh ke email publik di tab Umum.
 
-**5. From vs Reply-To** (berlaku bila form Contact kelak mengirim email):
+**6. Tes:**
+1. Buka situs, kirim pesan lewat form Kontak dengan email Anda sendiri.
+2. Cek admin → **Pesan Masuk**: pesan muncul dan **tidak** ada badge merah "Email gagal terkirim".
+3. Cek Gmail penerima (juga folder Spam): email masuk dengan subjek sesuai bahasa pengunjung. Buka **Show original**: `SPF`, `DKIM`, dan `DMARC` harus `PASS`.
+4. Tekan **Balas** di Gmail: kolom "Kepada" harus berisi email pengunjung (Reply-To), bukan `noreply@`.
+5. Jika ada badge "Email gagal terkirim": lihat `storage/logs/laravel-*.log` (baris "Contact email failed" berisi alasannya, mis. autentikasi SMTP salah), perbaiki `.env`, lalu balas pesan itu manual dari admin ("Balas via email").
+
+**7. From vs Reply-To** (yang dilakukan aplikasi):
 
 | Header | Isi | Alasan |
 |---|---|---|
-| `From` | **selalu alamat domain sendiri**, mis. `info@ekasacoldchain.com` (`MAIL_FROM_ADDRESS`) | SPF/DKIM hanya lolos untuk domain yang Anda kendalikan. Memakai alamat pengunjung (mis. `budi@gmail.com`) sebagai `From` akan gagal SPF/DKIM/DMARC dan masuk spam atau ditolak. |
-| `Reply-To` | **alamat email pengunjung** yang mengisi form | Saat tim menekan "Balas", balasan langsung ke pengunjung, bukan ke `info@` sendiri. |
-| `To` | kotak masuk tim (mis. `info@ekasacoldchain.com`) | Penerima notifikasi lead. |
+| `From` | **selalu alamat domain sendiri**: `noreply@ekasacoldchain.com` (`MAIL_FROM_ADDRESS`) | SPF/DKIM hanya lolos untuk domain yang Anda kendalikan. Memakai alamat pengunjung (mis. `budi@gmail.com`) sebagai `From` akan gagal SPF/DKIM/DMARC dan masuk spam atau ditolak. |
+| `Reply-To` | **email pengunjung** yang mengisi form | Saat tim menekan "Balas", balasan langsung ke calon klien, bukan ke `noreply@`. |
+| `To` | tiap alamat di daftar penerima (satu email per alamat) | Satu alamat yang bermasalah tidak menggagalkan yang lain. |
 
-Nama pengunjung boleh ditaruh di subjek atau isi email (bukan di `From`). Nilai `Reply-To` berasal dari input pengunjung, jadi harus divalidasi sebagai email dan tidak boleh mengandung baris baru (header injection); Laravel `Mail::...->replyTo()` sudah menanganinya bila input divalidasi.
+Subjek mengikuti bahasa pengunjung (diatur di tab Kontak; `:name` diganti nama pengirim), isi email selalu Bahasa Indonesia. Nama pengunjung dibersihkan dari karakter kontrol dan diberi validasi email sehingga tidak bisa menyisipkan header (header injection).
 
-Bila fitur ini ditambahkan: gunakan `MAIL_MAILER=smtp`, `MAIL_HOST=mail.ekasacoldchain.com`, port 465 (`MAIL_SCHEME=smtps`) atau 587, `MAIL_USERNAME`/`MAIL_PASSWORD` dari akun email A11.1, dan tambahkan rate limiting serta honeypot pada endpoint form.
+**8. Catatan operasional:**
+- Pengiriman email berjalan **setelah** respons (`afterResponse`, tanpa queue worker). Kegagalan SMTP tidak terlihat oleh pengunjung; pantau badge "Email gagal terkirim" dan badge angka **Pesan Masuk** di sidebar admin.
+- Batas kirim per jam dari hosting (umumnya ratusan email/jam per akun) jauh di atas beban form ini, yang sendirinya dibatasi 5 kiriman per 15 menit per IP.
+- Form dilindungi CSRF, honeypot tersembunyi, dan rate limit per IP. Di belakang Cloudflare kelak, IP pengunjung baru terbaca benar setelah proxy tepercaya dikonfigurasi; sampai itu, batas per IP akan menghitung IP Cloudflare.
+- Pesan menyimpan IP dan user-agent pengunjung (data pribadi; hanya tampil di detail pesan di admin). Lihat catatan retensi di `docs/kesiapan-produksi.md`.
 
 ### A12. Cache produksi dan tes (manual, satu per satu)
 
@@ -336,3 +361,4 @@ Catatan:
 
 **Gagal `ssh-keygen` / `composer` kehabisan memori**
 - Jalankan `php -d memory_limit=-1 ~/composer.phar install --no-dev --optimize-autoloader`. Bila akun membatasi proses, ulangi di jam sepi.
+

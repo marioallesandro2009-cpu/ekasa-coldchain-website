@@ -7,8 +7,8 @@ return [
     'favicon_ico_path' => env('FAVICON_ICO_PATH'),
 
     'locales' => [
-        'en' => ['prefix' => '', 'og' => 'en_US', 'native' => 'English', 'segments' => ['services' => 'services', 'blog' => 'blog']],
-        'id' => ['prefix' => 'id', 'og' => 'id_ID', 'native' => 'Bahasa Indonesia', 'segments' => ['services' => 'layanan', 'blog' => 'blog']],
+        'en' => ['prefix' => '', 'og' => 'en_US', 'native' => 'English', 'segments' => ['services' => 'services', 'blog' => 'blog', 'contact' => 'contact']],
+        'id' => ['prefix' => 'id', 'og' => 'id_ID', 'native' => 'Bahasa Indonesia', 'segments' => ['services' => 'layanan', 'blog' => 'blog', 'contact' => 'kontak']],
     ],
 
     'locale_switch_order' => ['id', 'en'],
