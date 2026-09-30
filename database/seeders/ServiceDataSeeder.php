@@ -52,7 +52,7 @@ class ServiceDataSeeder extends Seeder
                 'box_width' => $boxWidth,
                 'box_height' => $boxHeight,
                 'focus_x' => 50,
-                'focus_y' => 50,
+                'focus_y' => 35,
                 'zoom' => 100,
                 'sort_order' => $index + 1,
                 'is_active' => true,

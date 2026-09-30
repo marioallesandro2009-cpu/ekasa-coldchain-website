@@ -130,7 +130,7 @@ class ManageSiteSettings extends Page
                                     ->tel()
                                     ->maxLength(32)
                                     ->placeholder('+62 812 3456 7890')
-                                    ->helperText('Dipakai untuk tombol WhatsApp di menu mobile. Kosongkan untuk menyembunyikan tombol.'),
+                                    ->helperText('Dipakai untuk semua tombol WhatsApp (tombol "Tanya ketersediaan" di armada, CTA layanan, footer, menu mobile). Kosongkan: tombol armada/CTA diarahkan ke form kontak.'),
                                 TextInput::make('email')
                                     ->label('Email')
                                     ->email()

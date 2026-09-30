@@ -65,8 +65,18 @@
                                  needed) rather than overlaid on the photo — the overlaid treatment
                                  only starts fitting once the panel is wide enough to keep it clear of
                                  the vehicle, which is also where the desktop-only copy below lives. --}}
-                            <div class="lg:hidden">
-                                <x-blocks.partials.fleet-truck-info :item="$item" />
+                            <div class="lg:flex lg:items-end lg:justify-between lg:gap-10">
+                                <div class="lg:max-w-2xl">
+                                    <x-blocks.partials.fleet-truck-info :item="$item" />
+                                </div>
+                                <x-ui.button
+                                    :href="$item['ask']['href']"
+                                    tone="dark"
+                                    icon="arrow-right"
+                                    class="group hidden shrink-0 lg:inline-flex"
+                                    :target="$item['ask']['external'] ? '_blank' : null"
+                                    :rel="$item['ask']['external'] ? 'noopener' : null"
+                                >{{ $item['ask']['label'] }}<span class="sr-only">: {{ $item['name'] }}</span></x-ui.button>
                             </div>
 
                             {{-- Box matches the source photos' native ratio (both are ~16:9: FE71
@@ -80,7 +90,7 @@
                                  fleet-hero-panel (not the light studio-panel gradient used by the grid
                                  layout below): a dark placeholder so nothing here ever flashes as a
                                  pale card against the section's dark background. --}}
-                            <div class="fleet-hero-panel relative mt-4 aspect-[16/9] overflow-hidden rounded-2xl lg:mt-0">
+                            <div class="fleet-hero-panel relative mt-4 aspect-[16/9] overflow-hidden rounded-2xl lg:mt-6 lg:aspect-[11/5]">
                                 @if ($image = $item['image'])
                                     <img
                                         src="{{ $image['small']['url'] }}"
@@ -101,32 +111,6 @@
                                      own light studio backdrop melts into the dark section instead of
                                      reading as a pale rectangle pasted on the page. --}}
                                 <div class="pointer-events-none absolute inset-0 fleet-vignette"></div>
-
-                                {{-- Desktop only: the same eyebrow/title/description overlaid top-left
-                                     on the photo, plus the CTA — grouped together here since at this
-                                     width they read as one composition instead of separate flow steps.
-                                     The scrim div spans the FULL photo (inset-0), not just a
-                                     content-sized box — an earlier version sized it to the text's own
-                                     height/width and faded within that box, which put the fade's last,
-                                     steepest stops inside the photo instead of at its edges: from the
-                                     panel's own edges inward the tint looked flat, then dropped off
-                                     abruptly right where the box happened to end, reading as a pasted
-                                     rounded-rect card. This full-panel scrim (see CSS) has no box of
-                                     its own to end at — it just fades continuously toward the photo,
-                                     transparent well before the panel's real edges. --}}
-                                <div class="pointer-events-none absolute inset-0 hidden fleet-scrim lg:block">
-                                    <div class="pointer-events-auto max-w-[55%] p-7 pb-12">
-                                        <x-blocks.partials.fleet-truck-info :item="$item" />
-                                        <x-ui.button
-                                            :href="$item['ask']['href']"
-                                            tone="dark"
-                                            icon="arrow-right"
-                                            class="group mt-5"
-                                            :target="$item['ask']['external'] ? '_blank' : null"
-                                            :rel="$item['ask']['external'] ? 'noopener' : null"
-                                        >{{ $item['ask']['label'] }}<span class="sr-only">: {{ $item['name'] }}</span></x-ui.button>
-                                    </div>
-                                </div>
 
                                 {{-- Arrows live inside each slide's own image box (not the outer
                                      wrapper), so they stay positioned on the photo itself. Only the

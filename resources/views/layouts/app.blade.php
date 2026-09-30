@@ -88,5 +88,6 @@
     </head>
     <body class="bg-white font-sans text-ink antialiased">
         {{ $slot }}
+        <x-layout.whatsapp-float :settings="$settings" />
     </body>
 </html>

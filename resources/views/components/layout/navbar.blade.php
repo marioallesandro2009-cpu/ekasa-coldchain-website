@@ -20,7 +20,7 @@
 @endphp
 <div x-data="navbar({ forceSolid: @js($solid) })" @keydown.escape.window="closeAll()">
     <header
-        @class(['site-header on-dark fixed inset-x-0 top-0 z-50 text-white', 'is-solid' => $solid])
+        @class(['site-header fixed inset-x-0 top-0 z-50 text-ink', 'is-solid' => $solid])
         :class="{ 'is-solid': scrolled || megaOpen || forceSolid, 'is-scrolled': scrolled }"
     >
         <a
@@ -33,7 +33,7 @@
             x-bind:class="{ 'is-compact': scrolled }"
         >
             <x-layout.logo
-                :logo="$settings['logoWhite']"
+                :logo="$settings['logoColor'] ?? $settings['logoWhite']"
                 :name="$settings['companyName']"
                 :height="48"
                 class="justify-self-start"
@@ -53,7 +53,7 @@
                             >
                                 <a
                                     href="{{ \App\Models\Service::indexPath() }}"
-                                    class="nav-link relative inline-flex h-10 items-center gap-1 rounded-md px-3 text-[15px] font-medium text-white/85 transition-colors duration-200 hover:text-white"
+                                    class="nav-link relative inline-flex h-10 items-center gap-1 rounded-md px-3 text-[15px] font-medium text-ink/75 transition-colors duration-200 hover:text-ink"
                                     :class="{ 'is-active': active === '{{ $item['id'] }}' }"
                                     data-spy="{{ $item['id'] }}"
                                     x-ref="megaTrigger"
@@ -84,7 +84,7 @@
                             <li>
                                 <a
                                     href="{{ \App\Support\Links::section($item['id']) }}"
-                                    class="nav-link relative inline-flex h-10 items-center rounded-md px-3 text-[15px] font-medium text-white/85 transition-colors duration-200 hover:text-white"
+                                    class="nav-link relative inline-flex h-10 items-center rounded-md px-3 text-[15px] font-medium text-ink/75 transition-colors duration-200 hover:text-ink"
                                     :class="{ 'is-active': active === '{{ $item['id'] }}' }"
                                     :aria-current="active === '{{ $item['id'] }}' ? 'location' : null"
                                     data-spy="{{ $item['id'] }}"
@@ -96,7 +96,7 @@
             </nav>
 
             <div class="flex items-center justify-self-end gap-5">
-                <x-layout.language-switch :label="$texts['language']" class="hidden lg:flex" />
+                <x-layout.language-switch :label="$texts['language']" class="lang-switch hidden lg:flex" />
 
                 <div class="hidden lg:block">
                     <x-ui.button :href="\App\Support\Links::section($contactId)" class="nav-cta">
@@ -106,7 +106,7 @@
 
                 <a
                     href="#mobile-menu"
-                    class="-mr-2 grid size-12 place-items-center rounded-full transition-colors hover:bg-white/10 lg:hidden"
+                    class="-mr-2 grid size-12 place-items-center rounded-full transition-colors hover:bg-ink/5 lg:hidden"
                     aria-label="{{ $texts['menu_open'] }}"
                     x-ref="hamburger"
                     x-bind:role="'button'"
