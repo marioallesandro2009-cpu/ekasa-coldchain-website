@@ -274,7 +274,10 @@ it('verifies the Turnstile token with Cloudflare and refuses a missing or reject
 
 it('fails open, with a log line, when Cloudflare is unreachable, erroring, or our secret key is wrong', function () {
     turnstileOn();
-    Log::spy();
+    $log = storage_path('logs/security-auth-test.log');
+    @unlink($log);
+    config(['logging.channels.security' => ['driver' => 'single', 'path' => $log, 'level' => 'info']]);
+    Log::forgetChannel('security');
 
     Http::fake(['challenges.cloudflare.com/*' => Http::sequence()
         ->pushFailedConnection()
@@ -285,7 +288,11 @@ it('fails open, with a log line, when Cloudflare is unreachable, erroring, or ou
         ->and(Turnstile::passes('token'))->toBeTrue()
         ->and(Turnstile::passes('token'))->toBeTrue();
 
-    Log::shouldHaveReceived('warning')->atLeast()->once();
+    $written = (string) file_get_contents($log);
+    @unlink($log);
+
+    expect(substr_count($written, 'turnstile.fail_open'))->toBe(3)
+        ->and($written)->toContain('unreachable')->toContain('server_error')->toContain('bad_secret_key');
 });
 
 it('puts the Turnstile widget on the contact form only when it is on, and refuses a bad token', function () {

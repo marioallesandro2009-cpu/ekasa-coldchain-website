@@ -4,6 +4,7 @@ namespace App\Filament\Pages\Auth;
 
 use App\Filament\Forms\Components\TurnstileField;
 use App\Support\LoginThrottle;
+use App\Support\SecurityLog;
 use App\Support\Turnstile;
 use Filament\Auth\Http\Responses\Contracts\LoginResponse;
 use Filament\Auth\Pages\Login as BaseLogin;
@@ -72,6 +73,8 @@ class Login extends BaseLogin
 
     private function notifyLocked(int $seconds): void
     {
+        SecurityLog::event('login.blocked', ['email' => SecurityLog::maskEmail($this->data['email'] ?? null), 'retry_after' => $seconds]);
+
         Notification::make()
             ->title('Terlalu banyak percobaan login')
             ->body('Coba lagi dalam '.max(1, (int) ceil($seconds / 60)).' menit.')

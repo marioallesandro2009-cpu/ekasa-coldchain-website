@@ -7,11 +7,11 @@ use App\Models\ContactMessage;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Support\Links;
+use App\Support\SecurityLog;
 use App\Support\Turnstile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Throwable;
@@ -34,11 +34,14 @@ class ContactController extends Controller
 
         // Bot: pretend it worked, tell it nothing, store nothing.
         if (filled($request->input(self::HONEYPOT))) {
+            SecurityLog::event('contact.blocked', ['reason' => 'honeypot']);
+
             return $this->respond($request, $success);
         }
 
         // Optional Cloudflare Turnstile (off by default; see App\Support\Turnstile).
         if (! Turnstile::passes($request->input(Turnstile::RESPONSE_FIELD), $request->ip())) {
+            SecurityLog::event('contact.blocked', ['reason' => 'turnstile']);
             $failed = __('Security check failed. Reload the page and try again.');
 
             if ($request->expectsJson()) {
@@ -114,7 +117,8 @@ class ContactController extends Controller
                 Mail::to($recipient)->send(new ContactMessageReceived($message));
             } catch (Throwable $e) {
                 $failed = true;
-                Log::warning('Contact email failed', ['message_id' => $message->id, 'recipient' => $recipient, 'error' => $e->getMessage()]);
+                // Ids and the exception class only: no address, no SMTP text, no message content.
+                SecurityLog::event('contact.email_failed', ['lead' => $message->id, 'error' => $e::class]);
             }
         }
 

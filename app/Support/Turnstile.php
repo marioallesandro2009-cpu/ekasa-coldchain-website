@@ -4,7 +4,6 @@ namespace App\Support;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Cloudflare Turnstile (a CAPTCHA that mostly runs invisibly) for the public contact form and
@@ -55,13 +54,13 @@ final class Turnstile
                 'remoteip' => $ip,
             ]));
         } catch (ConnectionException $e) {
-            Log::warning('Turnstile unreachable, letting the request through.', ['error' => $e::class]);
+            SecurityLog::event('turnstile.fail_open', ['reason' => 'unreachable', 'error' => $e::class]);
 
             return true;
         }
 
         if ($response->serverError()) {
-            Log::warning('Turnstile server error, letting the request through.', ['status' => $response->status()]);
+            SecurityLog::event('turnstile.fail_open', ['reason' => 'server_error', 'status' => $response->status()]);
 
             return true;
         }
@@ -69,7 +68,7 @@ final class Turnstile
         $codes = (array) $response->json('error-codes', []);
 
         if (array_intersect($codes, ['missing-input-secret', 'invalid-input-secret'])) {
-            Log::error('Turnstile secret key is wrong; the check is skipped until it is fixed.');
+            SecurityLog::event('turnstile.fail_open', ['reason' => 'bad_secret_key']);
 
             return true;
         }

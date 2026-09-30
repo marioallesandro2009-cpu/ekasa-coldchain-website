@@ -20,6 +20,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SecurityHeaders::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Never flash these back into a form after a validation error.
+        $exceptions->dontFlash(['current_password', 'password', 'password_confirmation', 'passwordConfirmation', 'currentPassword', 'cf-turnstile-response', 'turnstile']);
+
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
