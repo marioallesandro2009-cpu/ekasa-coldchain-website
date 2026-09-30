@@ -109,10 +109,10 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
      * sync); a value that differs from its default overrides --color-<key> at runtime.
      */
     public const COLOR_DEFAULTS = [
-        'brand' => '#0F6B46',
-        'brand-soft' => '#38A169',
-        'highlight' => '#9AD5AF',
-        'dark' => '#16231D',
+        'brand' => '#006C5E',
+        'brand-soft' => '#00A390',
+        'highlight' => '#88D6C8',
+        'dark' => '#142421',
         'surface' => '#F5F7FA',
         'ink' => '#2D3748',
         'ink-muted' => '#647084',

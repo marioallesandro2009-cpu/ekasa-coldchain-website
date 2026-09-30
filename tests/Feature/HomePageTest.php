@@ -26,13 +26,13 @@ it('renders the home page with title, meta description and headline in the raw H
 it('puts the navbar, mega menu links, final statistics and a single h1 in the HTML', function () {
     $html = $this->get('/')->getContent();
 
-    foreach (['Home', 'Services', 'Locations', 'About Us', 'Clients', 'Contact', 'Get a Quote', 'Explore Services'] as $text) {
+    foreach (['Home', 'Services', 'Locations', 'About Us', 'Clients', 'Blog', 'Contact', 'Get a Quote', 'Explore Services'] as $text) {
         expect($html)->toContain($text);
     }
 
-    // Navbar: Home, Services, Locations, About Us, Clients, Contact; no Insights or Careers sections.
+    // Navbar: Home, Services, Locations, About Us, Clients, Blog, Contact; no Insights or Careers sections.
     preg_match_all('#data-spy="([a-z-]+)"#', $html, $spy);
-    expect(array_values(array_unique($spy[1])))->toBe(['home', 'services', 'locations', 'about', 'clients', 'contact'])
+    expect(array_values(array_unique($spy[1])))->toBe(['home', 'services', 'locations', 'about', 'clients', 'blog', 'contact'])
         ->and($html)->not->toContain('id="insights"')
         ->not->toContain('id="careers"');
 
@@ -194,7 +194,7 @@ it('caches only the front page data, never the rendered HTML', function () {
     $cached = Cache::get(config('site.cache_key').'.en');
 
     expect($cached)->toBeArray()
-        ->and(array_keys($cached))->toBe(['settings', 'services', 'locations', 'featuredServices', 'heroSlides', 'heroStats', 'sections', 'trustLogos'])
+        ->and(array_keys($cached))->toBe(['settings', 'services', 'locations', 'featuredServices', 'heroSlides', 'heroStats', 'sections', 'recentPosts', 'about', 'trustLogos', 'clientLogos'])
         ->and(serialize($cached))->not->toContain('<html')
         ->not->toContain('/build/assets/');
 });
@@ -226,6 +226,9 @@ function trustLogo(string $name, bool $active = true): TrustLogo
 }
 
 it('does not render the trust row without active logos', function () {
+    // Neutralize the seeded (TrustLogoSeeder) logos: this test is about the
+    // zero-active case specifically, not about how many the seeder ships with.
+    TrustLogo::query()->update(['is_active' => false]);
     trustLogo('Hidden Client', active: false);
     FrontendData::flush();
 
@@ -235,6 +238,8 @@ it('does not render the trust row without active logos', function () {
 });
 
 it('renders at most five active trust logos in admin order, with the editable label', function () {
+    TrustLogo::query()->update(['is_active' => false]);
+
     foreach (range(1, 6) as $i) {
         trustLogo("Client {$i}");
     }
@@ -244,10 +249,16 @@ it('renders at most five active trust logos in admin order, with the editable la
 
     $html = $this->get('/')->getContent();
 
+    // Bounded to the hero's own trust row (id="home" .. next section): the
+    // #clients section below also renders every active logo, uncapped, by
+    // design (App\Support\FrontendData's clientLogos vs trustLogos pair) —
+    // an unbounded assertion would see both and miscount.
+    $hero = substr($html, (int) strpos($html, 'id="home"'), strpos($html, 'id="services"') - strpos($html, 'id="home"'));
+
     expect($html)->toContain('Our clients')
-        ->not->toContain('alt="Client 1"')
-        ->and(substr_count($html, 'alt="Client '))->toBe(5)
-        ->and(strpos($html, 'alt="Client 2"'))->toBeLessThan(strpos($html, 'alt="Client 6"'));
+        ->and($hero)->not->toContain('alt="Client 1"')
+        ->and(substr_count($hero, 'alt="Client '))->toBe(5)
+        ->and(strpos($hero, 'alt="Client 2"'))->toBeLessThan(strpos($hero, 'alt="Client 6"'));
 });
 
 it('shows the statistic icons chosen in the admin and keeps an empty slot for stats without one', function () {

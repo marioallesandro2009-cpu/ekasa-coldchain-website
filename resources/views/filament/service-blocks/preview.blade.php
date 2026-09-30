@@ -11,7 +11,7 @@
 @endphp
 <div style="padding:14px 16px;{{ $hidden ? 'opacity:.55;' : '' }}">
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:12px;">
-        <span style="{{ $badge }}background:#E6F2EC;color:#0F6B46;">{{ \App\Support\ServiceBlocks::label($type) }}</span>
+        <span style="{{ $badge }}background:#DFF2EE;color:#006C5E;">{{ \App\Support\ServiceBlocks::label($type) }}</span>
         @if ($hidden)
             <span style="{{ $badge }}background:#EEF0F3;color:#475467;">Disembunyikan</span>
         @endif
@@ -20,7 +20,7 @@
         @endunless
     </div>
     @if ($eyebrow !== '')
-        <p style="margin-top:8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#0F6B46;font-weight:700;">{{ $eyebrow }}</p>
+        <p style="margin-top:8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#006C5E;font-weight:700;">{{ $eyebrow }}</p>
     @endif
     <p style="margin-top:4px;font-size:15px;font-weight:700;">{{ $title !== '' ? $title : ($type === 'hero_layanan' ? 'Judul = nama layanan' : 'Tanpa judul') }}</p>
     @if ($summary !== '')

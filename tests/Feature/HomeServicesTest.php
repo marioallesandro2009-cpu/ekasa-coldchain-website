@@ -10,7 +10,11 @@ beforeEach(fn () => seedSite(serviceImages: true));
 
 it('shows only the featured services as cards, no supporting ribbon', function () {
     $html = $this->get('/')->assertOk()->getContent();
-    $section = substr($html, (int) strpos($html, 'id="services"'));
+    // Bounded to just this section (id="services" .. id="locations"): further
+    // down the page the #blog section has its own, unrelated "Learn more"
+    // links, and an unbounded substr would see those too.
+    $servicesStart = (int) strpos($html, 'id="services"');
+    $section = substr($html, $servicesStart, strpos($html, 'id="locations"') - $servicesStart);
 
     // Teaser (TAHAP 3, Bagian 2): compact cards (number + title + photo only, no
     // key points or "Learn more" text) plus a link to the full /services index.
@@ -63,10 +67,15 @@ it('keeps at most three key points and links to its own anchor while the detail 
 
 it('lays the main services out as a bento grid: the first large, three beside it', function () {
     $html = $this->get('/')->getContent();
+    // Bounded to just this section: #about further down the page reuses the
+    // same bento CSS classes for its own value cards (up to 3, same shape),
+    // and an unbounded count would add those in too.
+    $servicesStart = (int) strpos($html, 'id="services"');
+    $section = substr($html, $servicesStart, strpos($html, 'id="locations"') - $servicesStart);
 
-    expect($html)->toContain('lg:col-span-7 lg:row-span-3')
-        ->and(substr_count($html, 'lg:col-span-5'))->toBe(3)
-        ->and($html)->not->toContain('lg:col-span-4');
+    expect($section)->toContain('lg:col-span-7 lg:row-span-3')
+        ->and(substr_count($section, 'lg:col-span-5'))->toBe(3)
+        ->and($section)->not->toContain('lg:col-span-4');
 });
 
 it('never grows past 4 cards on the home teaser: a 5th featured service is capped away, not added below', function () {

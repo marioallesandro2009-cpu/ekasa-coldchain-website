@@ -46,14 +46,14 @@
                 default => 'lg:col-span-7 lg:row-span-3',
             };
         @endphp
-        <ul class="mt-8 grid gap-4 sm:mt-10 sm:gap-5 lg:grid-cols-12" role="list">
+        <ul class="mt-6 grid gap-3 sm:mt-8 sm:gap-4 lg:grid-cols-12" role="list">
             <x-sections.service-card-index :service="$lead" :number="1" size="large" :texts="$texts" compact :class="$leadClass" />
             @foreach ($side as $i => $service)
                 <x-sections.service-card-index :service="$service" :number="$i + 2" :texts="$texts" compact :delay="0.1 + $i * 0.08" class="lg:col-span-5" />
             @endforeach
         </ul>
 
-        <div class="mt-6 text-center sm:mt-8">
+        <div class="mt-5 text-center sm:mt-6">
             <x-ui.button :href="\App\Models\Service::indexPath()" tone="light" icon="arrow-right" class="group">
                 {{ __('View all services') }}
             </x-ui.button>

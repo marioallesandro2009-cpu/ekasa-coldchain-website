@@ -38,6 +38,15 @@ class PageSection extends Model implements HasTranslatableFields
     /** Section reused for the /locations index page's own SEO title/description. */
     public const LOCATIONS = 'locations';
 
+    /** Section that holds the company story, stats and values. */
+    public const ABOUT = 'about';
+
+    /** Section that teases the latest posts on the home page. */
+    public const BLOG = 'blog';
+
+    /** Section that shows the client logo loop. */
+    public const CLIENTS = 'clients';
+
     /** Target of every "Get a Quote" button. */
     public const CONTACT = 'contact';
 

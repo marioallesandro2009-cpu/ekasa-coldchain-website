@@ -166,7 +166,7 @@ it('changes the brand colors with hex codes and outputs them as CSS variables', 
     $this->actingAs(User::factory()->create());
 
     Livewire::test(ManageSiteSettings::class)
-        ->assertSet('data.colors.brand', '#0F6B46')
+        ->assertSet('data.colors.brand', '#006C5E')
         ->set('data.colors.brand', '#123456')
         ->set('data.colors.brand-soft', '#e85d04')
         ->call('save')
@@ -184,7 +184,7 @@ it('leaves the colors to app.css while they are the defaults', function () {
 
     $this->get('/')
         ->assertDontSee('<style>:root{', false)
-        ->assertSee('<meta name="theme-color" content="#0F6B46">', false);
+        ->assertSee('<meta name="theme-color" content="#006C5E">', false);
 });
 
 it('keeps the default colors in sync with the tokens in app.css', function () {

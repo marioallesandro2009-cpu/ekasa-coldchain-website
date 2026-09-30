@@ -18,9 +18,14 @@ class DatabaseSeeder extends Seeder
             IconLibrarySeeder::class,
             ServiceDataSeeder::class,
             PageSectionSeeder::class,
+            AboutContentSeeder::class,
+            AboutStatSeeder::class,
+            AboutValueSeeder::class,
+            PostSeeder::class,
             ServiceSeeder::class,
             HeroSlideSeeder::class,
             HeroStatSeeder::class,
+            TrustLogoSeeder::class,
         ]);
 
         FrontendData::flush();

@@ -30,20 +30,21 @@ class AdminPanelProvider extends PanelProvider
             ->brandName(fn (): string => self::brandName())
             // Brand scale from resources/css/app.css, one step lighter than Filament's
             // default mapping: Filament draws buttons and links with 600, which is then
-            // exactly the client green #0F6B46 (brand 700 on the site).
+            // exactly the site's brand 700 (#006C5E, teal — hue nudged from the
+            // original green to sit closer to the real EKASA logo's blue/cyan).
             ->colors([
                 'primary' => [
-                    50 => '#F0FAF4',
-                    100 => '#E2F2E8',
-                    200 => '#C6E4D3',
-                    300 => '#A0D2B6',
-                    400 => '#479D73',
-                    500 => '#29835A',
-                    600 => '#0F6B46',
-                    700 => '#015032',
-                    800 => '#01341F',
-                    900 => '#001C0F',
-                    950 => '#001209',
+                    50 => '#EEFAF7',
+                    100 => '#DFF2EE',
+                    200 => '#C0E5DE',
+                    300 => '#94D3C7',
+                    400 => '#219E8F',
+                    500 => '#008475',
+                    600 => '#006C5E',
+                    700 => '#005146',
+                    800 => '#00342D',
+                    900 => '#001C18',
+                    950 => '#00120F',
                 ],
             ])
             ->navigationGroups(['Konten Beranda', 'Data Layanan'])

@@ -15,8 +15,8 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
         .card { display: grid; grid-template-columns: 1fr 1fr; border-radius: 10px; overflow: hidden; border: 1px solid #d0d5de; }
         .tile { display: flex; align-items: center; justify-content: space-around; padding: 14px 8px; }
-        .light { background: #fff; color: #0f6b46; }
-        .dark { background: #16231d; color: #fff; }
+        .light { background: #fff; color: #006c5e; }
+        .dark { background: #142421; color: #fff; }
         .name { grid-column: 1 / -1; padding: 8px 10px; background: #fff; border-top: 1px solid #d0d5de; }
         .name code { color: #647084; }
         .review { color: #b45309; font-weight: 600; }

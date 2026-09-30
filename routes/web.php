@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\BlogController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\ServiceController;
@@ -26,6 +27,12 @@ foreach (Locales::all() as $locale) {
             Route::get('/'.config("site.locales.{$locale}.segments.services", 'services').'/{slug}', ServiceController::class)
                 ->where('slug', '[a-z0-9-]+')
                 ->name('services.show');
+            // Blog post detail: /blog/{slug}, /id/blog/{slug}. The blog itself has
+            // no index page — it's the #blog section on the home page (one-page
+            // site); this route only opens a single article's full content.
+            Route::get('/'.config("site.locales.{$locale}.segments.blog", 'blog').'/{slug}', BlogController::class)
+                ->where('slug', '[a-z0-9-]+')
+                ->name('blog.show');
         });
 }
 

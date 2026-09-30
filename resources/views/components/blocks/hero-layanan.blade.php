@@ -9,7 +9,7 @@
     $image = $block['image'];
     $home = Locales::path(Locales::current());
 @endphp
-<section id="{{ $block['id'] }}" class="on-dark relative isolate flex min-h-[560px] flex-col justify-end overflow-hidden bg-dark text-white sm:min-h-[620px] lg:min-h-[min(760px,82vh)]" aria-labelledby="{{ $block['id'] }}-title">
+<section id="{{ $block['id'] }}" class="on-dark relative isolate flex min-h-[max(100svh,640px)] flex-col justify-end overflow-hidden bg-dark text-white" aria-labelledby="{{ $block['id'] }}-title">
     @if ($image)
         <img
             src="{{ $image['large']['url'] }}"

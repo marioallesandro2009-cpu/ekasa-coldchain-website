@@ -16,6 +16,22 @@
                 <x-sections.locations :section="$section" :locations="$locations" :settings="$settings" />
                 @continue
             @endif
+            @if ($section['id'] === \App\Models\PageSection::ABOUT)
+                <x-sections.about :section="$section" :about="$about" />
+                @continue
+            @endif
+            @if ($section['id'] === \App\Models\PageSection::BLOG)
+                <x-sections.blog :section="$section" :posts="$recentPosts" />
+                @continue
+            @endif
+            @if ($section['id'] === \App\Models\PageSection::CLIENTS)
+                <x-sections.clients :section="$section" :client-logos="$clientLogos" />
+                @continue
+            @endif
+            @if ($section['id'] === \App\Models\PageSection::CONTACT)
+                <x-sections.contact :section="$section" :settings="$settings" :locations="$locations" :services="$services" />
+                @continue
+            @endif
             <x-ui.section :id="$section['id']" :variant="$section['background']" class="flex min-h-screen items-center" aria-labelledby="{{ $section['id'] }}-title" x-ignore data-alpine-defer>
                 <x-ui.section-heading
                     :id="$section['id'].'-title'"
@@ -29,5 +45,5 @@
         @endforeach
     </main>
 
-    <x-layout.footer :settings="$settings" />
+    <x-layout.footer :settings="$settings" :sections="$sections" />
 </x-layouts::app>

@@ -86,14 +86,14 @@ it('shows no third-party brand in the public pages and uses the legal name for t
     expect($this->get('/')->getContent())->toContain('&copy; '.now()->year.' Ekasa.');
 });
 
-it('serves a web app manifest with the brand green and the favicon', function () {
+it('serves a web app manifest with the brand color and the favicon', function () {
     $response = $this->get('/site.webmanifest')->assertOk();
     $manifest = $response->json();
 
     expect($response->headers->get('Content-Type'))->toContain('application/manifest+json')
         ->and($manifest['name'])->toBe('PT Ekasa Cold Chain')
-        ->and($manifest['theme_color'])->toBe('#0F6B46')
-        ->and($manifest['background_color'])->toBe('#0F6B46')
+        ->and($manifest['theme_color'])->toBe('#006C5E')
+        ->and($manifest['background_color'])->toBe('#006C5E')
         ->and($manifest['icons'][0])->toMatchArray(['type' => 'image/png', 'sizes' => '192x192'])
         ->and($manifest['icons'][0]['src'])->toContain('favicon_192')
         ->and($manifest['icons'][1]['sizes'])->toBe('512x512');

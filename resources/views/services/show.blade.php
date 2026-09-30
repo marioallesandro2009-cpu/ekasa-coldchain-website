@@ -21,5 +21,5 @@
         @endforeach
     </main>
 
-    <x-layout.footer :settings="$settings" />
+    <x-layout.footer :settings="$settings" :sections="$sections" />
 </x-layouts::app>

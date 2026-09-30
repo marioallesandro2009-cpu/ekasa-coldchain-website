@@ -8,9 +8,9 @@ namespace App\Support;
  */
 final class PlaceholderImage
 {
-    private const FROM = [0x0F, 0x6B, 0x46];
+    private const FROM = [0x00, 0x6C, 0x5E];
 
-    private const TO = [0x38, 0xA1, 0x69];
+    private const TO = [0x00, 0xA3, 0x90];
 
     /**
      * 5x7 bitmap glyphs, one string of 5 bits per row (digit keys become integers).

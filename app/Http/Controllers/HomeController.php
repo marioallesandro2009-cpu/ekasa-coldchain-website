@@ -21,7 +21,10 @@ class HomeController extends Controller
             'heroSlides' => $data['heroSlides'],
             'heroStats' => $data['heroStats'],
             'trustLogos' => $data['trustLogos'],
+            'clientLogos' => $data['clientLogos'],
             'sections' => $data['sections'],
+            'recentPosts' => $data['recentPosts'],
+            'about' => $data['about'],
             'seo' => Seo::home($data),
             'jsonLd' => StructuredData::home($data),
         ]);

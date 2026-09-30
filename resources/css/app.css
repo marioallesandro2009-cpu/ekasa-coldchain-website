@@ -61,29 +61,33 @@
      * The editable semantic tokens (admin › Pengaturan Situs › Warna) mirror
      * SiteSetting::COLOR_DEFAULTS; keep both in sync.
      */
-    --color-brand-50: oklch(97.50% 0.0127 159.89); /* #F0FAF4 */
-    --color-brand-100: oklch(94.60% 0.0212 159.89); /* #E2F2E8 */
-    --color-brand-200: oklch(89.29% 0.0403 159.89); /* #C6E4D3 */
-    --color-brand-300: oklch(82.05% 0.0658 159.89); /* #A0D2B6 */
-    --color-brand-400: oklch(72.39% 0.0902 159.89); /* #71B892 */
-    --color-brand-500: oklch(63.21% 0.1061 159.89); /* #479D73 */
-    --color-brand-600: oklch(54.52% 0.1061 159.89); /* #29835A */
-    --color-brand-700: #0f6b46; /* client */
-    --color-brand-800: oklch(38.22% 0.086 159.89); /* #015032 */
-    --color-brand-900: oklch(28.57% 0.0641 159.89); /* #01341F */
-    --color-brand-950: oklch(20.00% 0.0451 159.89); /* #001C0F */
+    /* Hue nudged from 159.89 (pure green) to 182 (teal) — same lightness/chroma
+       steps as before, just cooler — so the site's tone sits closer to the
+       real logo's blue/cyan without becoming a full rebrand (no navy, no
+       lime): every L/C pair is unchanged, only H moved. */
+    --color-brand-50: oklch(97.50% 0.0127 182); /* #EEFAF7 */
+    --color-brand-100: oklch(94.60% 0.0212 182); /* #DFF2EE */
+    --color-brand-200: oklch(89.29% 0.0403 182); /* #C0E5DE */
+    --color-brand-300: oklch(82.05% 0.0658 182); /* #94D3C7 */
+    --color-brand-400: oklch(72.39% 0.0902 182); /* #5EB8AA */
+    --color-brand-500: oklch(63.21% 0.1061 182); /* #219E8F */
+    --color-brand-600: oklch(54.52% 0.1061 182); /* #008475 */
+    --color-brand-700: #006c5e; /* was #0f6b46 (H159.89), same L/C at H182 */
+    --color-brand-800: oklch(38.22% 0.086 182); /* #005146 */
+    --color-brand-900: oklch(28.57% 0.0641 182); /* #00342D */
+    --color-brand-950: oklch(20.00% 0.0451 182); /* #001C18 */
 
-    --color-brand-soft-50: oklch(97.50% 0.0154 156.2); /* #EFFAF2 */
-    --color-brand-soft-100: oklch(94.62% 0.0257 156.2); /* #E0F3E6 */
-    --color-brand-soft-200: oklch(89.34% 0.0488 156.2); /* #C3E6CF */
-    --color-brand-soft-300: oklch(82.14% 0.0795 156.2); /* #9AD5AF */
-    --color-brand-soft-400: oklch(72.54% 0.1091 156.2); /* #68BB8A */
-    --color-brand-soft-500: #38a169; /* client */
-    --color-brand-soft-600: oklch(54.11% 0.1283 156.2); /* #09844E */
-    --color-brand-soft-700: oklch(45.84% 0.1099 156.2); /* #02693D */
-    --color-brand-soft-800: oklch(37.57% 0.0902 156.2); /* #014F2C */
-    --color-brand-soft-900: oklch(28.27% 0.0677 156.2); /* #01331B */
-    --color-brand-soft-950: oklch(20.00% 0.0482 156.2); /* #001C0C */
+    --color-brand-soft-50: oklch(97.50% 0.0154 182); /* #ECFAF7 */
+    --color-brand-soft-100: oklch(94.62% 0.0257 182); /* #DBF3EE */
+    --color-brand-soft-200: oklch(89.34% 0.0488 182); /* #B9E7DE */
+    --color-brand-soft-300: oklch(82.14% 0.0795 182); /* #88D6C8 */
+    --color-brand-soft-400: oklch(72.54% 0.1091 182); /* #44BCAB */
+    --color-brand-soft-500: #00a390; /* was #38a169 (H156.2), same L/C at H182 */
+    --color-brand-soft-600: oklch(54.11% 0.1283 182); /* #008675 */
+    --color-brand-soft-700: oklch(45.84% 0.1099 182); /* #006A5C */
+    --color-brand-soft-800: oklch(37.57% 0.0902 182); /* #005045 */
+    --color-brand-soft-900: oklch(28.27% 0.0677 182); /* #00342C */
+    --color-brand-soft-950: oklch(20.00% 0.0482 182); /* #001D18 */
 
     --color-neutral-50: oklch(97.50% 0.0042 260.91); /* #F5F7FA */
     --color-neutral-100: oklch(93.84% 0.007 260.91); /* #E8EBEF */
@@ -101,7 +105,7 @@
     --color-ink: var(--color-neutral-700);
     --color-ink-muted: var(--color-neutral-500); /* 5.0:1 on white, 4.7:1 on surface */
     --color-surface: var(--color-neutral-50);
-    --color-dark: oklch(24.32% 0.022 165); /* #16231D: neutral 900 with a green tint */
+    --color-dark: oklch(24.32% 0.022 182); /* #142421: neutral 900 with a teal tint (was H165) */
     --color-brand: var(--color-brand-700);
     --color-brand-soft: var(--color-brand-soft-500);
     /* Text and accents on dark backgrounds (9.7:1 on dark). */
@@ -1175,4 +1179,88 @@ html:not(.js) .mobile-menu:target,
         animation: none !important;
         transform: none !important;
     }
+
+    .logo-loop__track {
+        transform: none !important;
+    }
+}
+
+/* Blog article body (no Tailwind Typography plugin): minimal, matches the
+   site's own vertical rhythm and link/heading treatment. */
+.blog-content {
+    color: var(--color-ink);
+    line-height: 1.75;
+}
+.blog-content > * + * {
+    margin-top: 1.25em;
+}
+.blog-content h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-top: 2em;
+}
+.blog-content h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-top: 1.75em;
+}
+.blog-content a {
+    color: var(--color-brand);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+.blog-content ul,
+.blog-content ol {
+    padding-left: 1.5em;
+}
+.blog-content ul {
+    list-style: disc;
+}
+.blog-content ol {
+    list-style: decimal;
+}
+.blog-content blockquote {
+    border-left: 3px solid var(--color-brand);
+    padding-left: 1em;
+    color: var(--color-ink-muted);
+    font-style: italic;
+}
+.blog-content img {
+    border-radius: var(--radius-card);
+}
+
+/* #clients logo loop (ported from React Bits' LogoLoop): a continuously
+   scrolling strip, edges faded to the section's own background rather than
+   clipped, so a logo never looks cut in half mid-scroll. Grayscale by
+   default (this section sits on a light background, unlike the hero's own
+   capped trust row, which forces every logo to solid white instead — see
+   hero.blade.php) and returns to full color on hover, the same "quiet until
+   you look closer" treatment as .spotlight-card elsewhere on the page. */
+.logo-loop {
+    position: relative;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 clamp(24px, 8%, 96px), #000 calc(100% - clamp(24px, 8%, 96px)), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 clamp(24px, 8%, 96px), #000 calc(100% - clamp(24px, 8%, 96px)), transparent 100%);
+}
+
+.logo-loop__track {
+    display: flex;
+    width: max-content;
+    will-change: transform;
+}
+
+.logo-loop__list {
+    display: flex;
+    align-items: center;
+}
+
+.logo-loop__item {
+    flex: 0 0 auto;
+    filter: grayscale(1) opacity(0.55);
+    transition: filter 0.25s ease;
+}
+
+.logo-loop__item:hover {
+    filter: grayscale(0) opacity(1);
 }

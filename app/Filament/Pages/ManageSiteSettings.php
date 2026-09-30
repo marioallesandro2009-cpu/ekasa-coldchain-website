@@ -236,7 +236,7 @@ class ManageSiteSettings extends Page
                     Tab::make('Warna')
                         ->icon(Heroicon::OutlinedSwatch)
                         ->schema([
-                            Text::make('Ketik kode hex 6 digit (misalnya #0F6B46) atau pilih lewat kotak warna. Perubahan langsung berlaku di website setelah disimpan. Setelah menyimpan, sistem memeriksa kontras teks dan memberi peringatan jika ada teks yang sulit dibaca (di bawah standar WCAG AA 4,5:1).')
+                            Text::make('Ketik kode hex 6 digit (misalnya #006C5E) atau pilih lewat kotak warna. Perubahan langsung berlaku di website setelah disimpan. Setelah menyimpan, sistem memeriksa kontras teks dan memberi peringatan jika ada teks yang sulit dibaca (di bawah standar WCAG AA 4,5:1).')
                                 ->color('gray'),
                             Grid::make(3)->schema([
                                 self::color('brand', 'Hijau brand (primary)', 'Tombol CTA di latar terang, eyebrow dan ikon di latar terang, fokus keyboard di latar terang, admin.'),
@@ -377,7 +377,7 @@ class ManageSiteSettings extends Page
             ->hex()
             ->required()
             ->regex(SiteSetting::HEX_PATTERN)
-            ->validationMessages(['regex' => 'Gunakan kode hex 6 digit, misalnya #0F6B46.'])
+            ->validationMessages(['regex' => 'Gunakan kode hex 6 digit, misalnya #006C5E.'])
             ->placeholder(SiteSetting::COLOR_DEFAULTS[$key])
             ->helperText($usage.' Bawaan: '.SiteSetting::COLOR_DEFAULTS[$key]);
     }

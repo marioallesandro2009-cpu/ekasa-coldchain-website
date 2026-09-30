@@ -55,8 +55,8 @@ class LibraryIconResource extends Resource
             .$sized($large).$sized($small).'</span>';
 
         return new HtmlString('<span style="display:inline-flex;gap:6px">'
-            .$tile('background:#fff;color:#0F6B46;box-shadow:inset 0 0 0 1px #D0D5DE')
-            .$tile('background:#16231D;color:#fff')
+            .$tile('background:#fff;color:#006C5E;box-shadow:inset 0 0 0 1px #D0D5DE')
+            .$tile('background:#142421;color:#fff')
             .'</span>');
     }
 

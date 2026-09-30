@@ -6,6 +6,7 @@ use App\Models\HeroSlide;
 use App\Models\HeroStat;
 use App\Models\Location;
 use App\Models\PageSection;
+use App\Models\Post;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Models\TrustLogo;
@@ -46,9 +47,12 @@ class SeoController extends Controller
             HeroStat::query()->max('updated_at'),
             PageSection::query()->max('updated_at'),
             TrustLogo::query()->max('updated_at'),
+            Post::query()->max('updated_at'),
         ])->filter()->map(fn ($date) => Carbon::parse($date))->max() ?? now();
 
         // Every page in every language, each listing all its language versions.
+        // The home page's own entry covers #blog too (one-page site: no separate
+        // blog index route) — only a post's own detail page gets its own entry.
         $pages = ['/' => '1.0'];
         $urls = [];
 
@@ -86,6 +90,19 @@ class SeoController extends Controller
             }
         }
 
+        // Published blog posts: their own slug in each language, their own lastmod.
+        foreach (Post::query()->active()->where('status', Post::PUBLISHED)->get() as $post) {
+            $alternates = [];
+
+            foreach (Locales::all() as $locale) {
+                $alternates[$locale] = Seo::baseUrl().$post->detailPath($locale);
+            }
+
+            foreach ($alternates as $url) {
+                $urls[] = ['loc' => $url, 'lastmod' => ($post->updated_at ?? now())->toAtomString(), 'priority' => '0.6', 'alternates' => $alternates];
+            }
+        }
+
         $xml = view('seo.sitemap', ['urls' => $urls, 'defaultLocale' => Locales::default()])->render();
 
         return response($xml, 200, ['Content-Type' => 'application/xml; charset=UTF-8']);
@@ -101,6 +118,8 @@ class SeoController extends Controller
         return $this->text(view('seo.llms', [
             'settings' => $data['settings'],
             'services' => $data['services'],
+            'posts' => Post::query()->active()->where('status', Post::PUBLISHED)->orderByDesc('published_at')->take(20)->get()
+                ->map->toFrontend()->values()->all(),
             'baseUrl' => Seo::baseUrl(),
             'alternates' => Locales::alternates(),
         ])->render());

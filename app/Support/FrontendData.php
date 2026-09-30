@@ -2,10 +2,14 @@
 
 namespace App\Support;
 
+use App\Models\AboutContent;
+use App\Models\AboutStat;
+use App\Models\AboutValue;
 use App\Models\HeroSlide;
 use App\Models\HeroStat;
 use App\Models\Location;
 use App\Models\PageSection;
+use App\Models\Post;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Models\TrustLogo;
@@ -18,7 +22,7 @@ use Illuminate\Support\Facades\Cache;
 final class FrontendData
 {
     /**
-     * @return array{settings: array<string, mixed>, services: list<array<string, mixed>>, locations: list<array<string, mixed>>, featuredServices: list<array<string, mixed>>, heroSlides: list<array<string, mixed>>, heroStats: list<array<string, mixed>>, sections: list<array<string, mixed>>, trustLogos: list<array<string, mixed>>}
+     * @return array{settings: array<string, mixed>, services: list<array<string, mixed>>, locations: list<array<string, mixed>>, featuredServices: list<array<string, mixed>>, heroSlides: list<array<string, mixed>>, heroStats: list<array<string, mixed>>, sections: list<array<string, mixed>>, recentPosts: list<array<string, mixed>>, about: array{content: array<string, mixed>, stats: list<array<string, mixed>>, values: list<array<string, mixed>>}, trustLogos: list<array<string, mixed>>, clientLogos: list<array<string, mixed>>}
      */
     public static function all(?string $locale = null): array
     {
@@ -30,7 +34,7 @@ final class FrontendData
     /**
      * The data in one language (texts use that language, falling back to English).
      *
-     * @return array{settings: array<string, mixed>, services: list<array<string, mixed>>, locations: list<array<string, mixed>>, featuredServices: list<array<string, mixed>>, heroSlides: list<array<string, mixed>>, heroStats: list<array<string, mixed>>, sections: list<array<string, mixed>>, trustLogos: list<array<string, mixed>>}
+     * @return array{settings: array<string, mixed>, services: list<array<string, mixed>>, locations: list<array<string, mixed>>, featuredServices: list<array<string, mixed>>, heroSlides: list<array<string, mixed>>, heroStats: list<array<string, mixed>>, sections: list<array<string, mixed>>, recentPosts: list<array<string, mixed>>, about: array{content: array<string, mixed>, stats: list<array<string, mixed>>, values: list<array<string, mixed>>}, trustLogos: list<array<string, mixed>>, clientLogos: list<array<string, mixed>>}
      */
     private static function build(string $locale): array
     {
@@ -51,8 +55,23 @@ final class FrontendData
                     ->map->toFrontend()->filter()->all()),
                 'heroStats' => array_values(HeroStat::query()->active()->ordered()->get()->map->toFrontend()->all()),
                 'sections' => array_values(PageSection::query()->active()->ordered()->get()->map->toFrontend()->all()),
-                'trustLogos' => array_slice(array_values(TrustLogo::query()->active()->ordered()->with('media')->get()
+                // The home page's #blog section teaser — same "single capped source"
+                // pattern as featuredServices above, so nothing else has to re-filter.
+                'recentPosts' => array_values(Post::query()->active()->published()->ordered()->with('media')->take(Post::MAX_RECENT)->get()->map->toFrontend()->all()),
+                // The #about section: story + photo (singleton), stats and value
+                // cards — each a single capped/ordered source, same pattern as above.
+                'about' => [
+                    'content' => AboutContent::current()->toFrontend(),
+                    'stats' => array_values(AboutStat::query()->active()->ordered()->get()->map->toFrontend()->all()),
+                    'values' => array_values(AboutValue::query()->active()->ordered()->get()->map->toFrontend()->all()),
+                ],
+                // Single source, capped two different ways: the hero's own small
+                // trust row (trustLogos, MAX_VISIBLE) and the full #clients section
+                // logo loop (clientLogos, every active one) — same underlying query,
+                // never two different orderings of "who our clients are".
+                'trustLogos' => array_slice($clientLogos = array_values(TrustLogo::query()->active()->ordered()->with('media')->get()
                     ->map->toFrontend()->filter()->all()), 0, TrustLogo::MAX_VISIBLE),
+                'clientLogos' => $clientLogos,
             ];
         } finally {
             app()->setLocale($previous);

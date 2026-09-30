@@ -51,7 +51,7 @@ export default ({ locations, labels }) => ({
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             }).addTo(this.map);
             // A brand-coloured dot instead of Leaflet's default marker images.
-            const brand = getComputedStyle(document.documentElement).getPropertyValue('--color-brand').trim() || '#0f6b46';
+            const brand = getComputedStyle(document.documentElement).getPropertyValue('--color-brand').trim() || '#006c5e';
             this.marker = L.circleMarker(point, { radius: 9, color: '#fff', weight: 3, fillColor: brand, fillOpacity: 1 }).addTo(this.map);
         } else {
             this.map.setView(point, 14);

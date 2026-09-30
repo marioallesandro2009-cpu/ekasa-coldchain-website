@@ -18,7 +18,7 @@
 <x-ui.section
     :id="$section['id']"
     :variant="$section['background']"
-    class="hex-dot-field relative isolate"
+    class="hex-dot-field relative isolate flex min-h-screen flex-col justify-center"
     aria-labelledby="{{ $section['id'] }}-title"
     x-ignore
     data-alpine-defer

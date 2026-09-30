@@ -6,21 +6,18 @@ use App\Models\PageSection;
 use Illuminate\Support\Str;
 
 /**
- * Meta tag values for public pages (title, description, canonical, Open Graph, preload).
+ * @phpstan-type SeoMeta array{title: string, description: string, canonical: string, alternates: array<string, string>, ogLocale: string, ogAlternates: list<string>, siteName: string, image: array<string, mixed>|null, imageAlt: string, preload: array<string, mixed>|null, themeColor: string}
  */
 final class Seo
 {
-    /**
-     * Canonical site root from APP_URL (not from the request host).
-     */
     public static function baseUrl(): string
     {
         return rtrim((string) config('app.url'), '/');
     }
 
     /**
-     * @param  array{settings: array<string, mixed>, heroSlides: list<array<string, mixed>>}  $data
-     * @return array{title: string, description: string, canonical: string, alternates: array<string, string>, ogLocale: string, ogAlternates: list<string>, siteName: string, image: array{url: string, width: int, height: int}|null, imageAlt: string, preload: array<string, mixed>|null, themeColor: string}
+     * @param  array<string, mixed>  $data
+     * @return SeoMeta
      */
     public static function home(array $data): array
     {
@@ -28,7 +25,6 @@ final class Seo
         $locale = Locales::current();
         $firstSlide = $data['heroSlides'][0]['image'] ?? null;
 
-        // Share image: dedicated OG image, else the first hero photo, else the logo.
         $image = $settings['seo']['image']
             ?? ($firstSlide['large'] ?? null)
             ?? ($settings['logoColor'] ? self::logoSize($settings['logoColor']) : null);
@@ -36,7 +32,6 @@ final class Seo
         return [
             'title' => (string) $settings['seo']['title'],
             'description' => Str::limit(trim(strip_tags((string) $settings['seo']['description'])), 300, ''),
-            // Each language is canonical to itself; hreflang links the versions.
             'canonical' => Locales::url($locale),
             'alternates' => Locales::alternates(),
             'ogLocale' => Locales::ogLocale($locale),
@@ -45,19 +40,14 @@ final class Seo
             'image' => $image,
             'imageAlt' => (string) ($firstSlide['alt'] ?? $settings['companyName']),
             'preload' => $firstSlide,
-            // Browser UI color on phones: the brand green.
             'themeColor' => (string) $settings['colors']['brand'],
         ];
     }
 
     /**
-     * The services index page (/services, /id/layanan): copy from the "Section
-     * Beranda" services entry (the same one the home page teaser uses), so there
-     * is no separate admin field to keep in sync.
-     *
      * @param  array{settings: array<string, mixed>, sections: list<array<string, mixed>>}  $data
-     * @param  array<string, string>  $paths  locale => path, from Service::indexPath()
-     * @return array<string, mixed>
+     * @param  array<string, string>  $paths
+     * @return SeoMeta
      */
     public static function servicesIndex(array $data, array $paths): array
     {
@@ -85,13 +75,9 @@ final class Seo
     }
 
     /**
-     * A service detail page: its own title/description (else "<service> | <company>"
-     * and the intro), canonical and hreflang from the slug in each language, the
-     * hero photo as share image and preload.
-     *
-     * @param  array{service: array<string, mixed>, paths: array<string, string>}  $page
+     * @param  array<string, mixed>  $page
      * @param  array<string, mixed>  $settings
-     * @return array<string, mixed>
+     * @return SeoMeta
      */
     public static function service(array $page, array $settings): array
     {
@@ -112,6 +98,33 @@ final class Seo
             'image' => $hero['large'] ?? $settings['seo']['image'],
             'imageAlt' => (string) ($hero['alt'] ?? $service['title']),
             'preload' => $hero,
+            'themeColor' => (string) $settings['colors']['brand'],
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $page
+     * @param  array<string, mixed>  $settings
+     * @param  array<string, string>  $paths
+     * @return SeoMeta
+     */
+    public static function blogPost(array $page, array $settings, array $paths): array
+    {
+        $locale = Locales::current();
+        $alternates = array_map(fn (string $path): string => self::baseUrl().$path, $paths);
+        $description = $page['seoDescription'] ?? $page['excerpt'] ?? $settings['seo']['description'];
+
+        return [
+            'title' => (string) ($page['seoTitle'] ?? $page['title'].' | '.$settings['companyName']),
+            'description' => Str::limit(trim(strip_tags((string) $description)), 300, ''),
+            'canonical' => $alternates[$locale],
+            'alternates' => $alternates,
+            'ogLocale' => Locales::ogLocale($locale),
+            'ogAlternates' => array_values(array_map(Locales::ogLocale(...), array_diff(Locales::all(), [$locale]))),
+            'siteName' => (string) $settings['companyName'],
+            'image' => $page['image']['large'] ?? $settings['seo']['image'],
+            'imageAlt' => (string) ($page['image']['alt'] ?? $page['title']),
+            'preload' => $page['image'],
             'themeColor' => (string) $settings['colors']['brand'],
         ];
     }

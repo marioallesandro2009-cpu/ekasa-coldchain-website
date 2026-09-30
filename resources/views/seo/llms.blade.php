@@ -10,6 +10,14 @@
 - [{!! $service['title'] !!}]({!! $baseUrl !!}{!! $service['url'] ?? '/#'.$service['anchor'] !!}){!! $service['description'] ? ': '.$service['description'] : '' !!}
 @endforeach
 
+@if ($posts)
+## Blog
+
+@foreach ($posts as $post)
+- [{!! $post['title'] !!}]({!! $baseUrl !!}{!! $post['url'] !!}){!! $post['excerpt'] ? ': '.$post['excerpt'] : '' !!}
+@endforeach
+
+@endif
 ## Languages
 
 @foreach ($alternates as $locale => $url)
