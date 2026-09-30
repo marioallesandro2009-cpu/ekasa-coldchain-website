@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreContactMessageRequest;
 use App\Mail\ContactMessageReceived;
 use App\Models\ContactMessage;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Support\Links;
 use App\Support\SecurityLog;
-use App\Support\Turnstile;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Validator;
 use Throwable;
 
 /**
@@ -25,64 +24,11 @@ use Throwable;
  */
 class ContactController extends Controller
 {
-    /** Hidden field that only bots fill in. */
-    public const HONEYPOT = 'website';
-
-    public function __invoke(Request $request): JsonResponse|RedirectResponse
+    public function __invoke(StoreContactMessageRequest $request): JsonResponse|RedirectResponse
     {
         $success = SiteSetting::current()->uiTexts(app()->getLocale())['contact_success'];
 
-        // Bot: pretend it worked, tell it nothing, store nothing.
-        if (filled($request->input(self::HONEYPOT))) {
-            SecurityLog::event('contact.blocked', ['reason' => 'honeypot']);
-
-            return $this->respond($request, $success);
-        }
-
-        // Optional Cloudflare Turnstile (off by default; see App\Support\Turnstile).
-        if (! Turnstile::passes($request->input(Turnstile::RESPONSE_FIELD), $request->ip())) {
-            SecurityLog::event('contact.blocked', ['reason' => 'turnstile']);
-            $failed = __('Security check failed. Reload the page and try again.');
-
-            if ($request->expectsJson()) {
-                return response()->json(['message' => $failed], 422);
-            }
-
-            return redirect(Links::section('contact'))
-                ->with('contact_error', $failed)
-                ->withInput($request->except(self::HONEYPOT));
-        }
-
-        $validator = Validator::make($request->all(), [
-            'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'string', 'email:rfc', 'max:190'],
-            'phone' => ['nullable', 'string', 'max:40', 'regex:/^[0-9+\-().\s]{5,40}$/'],
-            'company' => ['nullable', 'string', 'max:150'],
-            'service_id' => ['nullable', 'integer'],
-            'message' => ['required', 'string', 'min:10', 'max:3000'],
-        ], [
-            'name.required' => __('Please enter your name.'),
-            'email.required' => __('Please enter your email address.'),
-            'email.email' => __('Please enter a valid email address.'),
-            'phone.regex' => __('Please enter a valid phone number.'),
-            'message.required' => __('Please write your message.'),
-            'message.min' => __('Your message is too short.'),
-            '*.max' => __('This field is too long.'),
-        ]);
-
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-
-            if ($request->expectsJson()) {
-                return response()->json(['message' => __('Please check the form.'), 'errors' => $errors], 422);
-            }
-
-            return redirect(Links::section('contact'))
-                ->withErrors($errors, 'contact')
-                ->withInput($request->except(self::HONEYPOT));
-        }
-
-        $data = $validator->validated();
+        $data = $request->validated();
         $service = filled($data['service_id'] ?? null) ? Service::query()->active()->whereKey((int) $data['service_id'])->first() : null;
 
         $message = ContactMessage::query()->create([

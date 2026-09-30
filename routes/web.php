@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SeoController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\ServiceIndexController;
+use App\Http\Middleware\GuardContactForm;
 use App\Http\Middleware\SetLocale;
 use App\Support\Locales;
 use Illuminate\Support\Facades\Route;
@@ -37,7 +38,7 @@ foreach (Locales::all() as $locale) {
             // Contact form submit: /contact, /id/kontak. Limited to 5 per 15 minutes per IP
             // (limiter "contact", AppServiceProvider); works as plain POST and as fetch.
             Route::post('/'.config("site.locales.{$locale}.segments.contact", 'contact'), ContactController::class)
-                ->middleware('throttle:contact')
+                ->middleware(['throttle:contact', GuardContactForm::class])
                 ->name('contact.store');
         });
 }

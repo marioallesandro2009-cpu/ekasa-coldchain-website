@@ -17,6 +17,15 @@ return [
 
     'whatsapp_number' => env('WHATSAPP_NUMBER'),
 
+    /*
+     * Retention of the contact form leads (personal data); see App\Console\Commands\PruneLeads.
+     * 0 switches a step off.
+     */
+    'leads' => [
+        'anonymize_after_days' => (int) env('LEADS_ANONYMIZE_AFTER_DAYS', 60),
+        'delete_after_months' => (int) env('LEADS_DELETE_AFTER_MONTHS', 12),
+    ],
+
     'admin' => [
         'name' => env('ADMIN_NAME', 'Administrator'),
         'email' => env('ADMIN_EMAIL'),
