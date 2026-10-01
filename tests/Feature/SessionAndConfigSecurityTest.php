@@ -48,7 +48,8 @@ it('keeps the production template on shared-hosting-safe drivers with safe defau
 
     expect($line('APP_ENV'))->toBe('production')
         ->and($line('APP_DEBUG'))->toBe('false')
-        ->and($line('APP_URL'))->toStartWith('https://')
+        // http until SSL exists: media URLs are built from it (GO_LIVE_CHECKLIST.md switches it to https with FORCE_HTTPS).
+        ->and($line('APP_URL'))->toBe('http://ekasacoldchain.com')
         ->and($line('LOG_LEVEL'))->toBe('error')
         ->and($line('SESSION_DRIVER'))->toBe('database')
         ->and($line('CACHE_STORE'))->toBe('database')

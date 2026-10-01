@@ -1,5 +1,7 @@
 # Panduan Deploy: PT Ekasa Cold Chain ke cPanel Rumahweb
 
+> **Deploy pertama: ikuti `GO_LIVE_CHECKLIST.md`** (lima langkah dengan urutan yang tidak boleh dibalik: http dulu, SSL, baru HTTPS paksa, cron, uji `deploy.sh` per langkah). Dokumen ini adalah penjelasan lengkapnya.
+
 Alur: **laptop → GitHub → `git pull` di server** lewat Terminal cPanel.
 
 - Stack: Laravel 13, PHP 8.3, Blade + Alpine.js, asset Vite
@@ -127,7 +129,7 @@ Yang harus diisi/dicek:
 
 | Variabel | Isi |
 |---|---|
-| `APP_URL` | `https://ekasacoldchain.com` (tanpa `/` di akhir; menentukan domain kanonik www/non-www) |
+| `APP_URL` | **deploy pertama: `http://ekasacoldchain.com`** (alamat gambar unggahan dibangun dari nilai ini, jadi `https://` sebelum SSL aktif membuat gambar rusak); diubah ke `https://ekasacoldchain.com` pada A10. Tanpa `/` di akhir; menentukan domain kanonik www/non-www |
 | `APP_ENV` / `APP_DEBUG` | `production` / `false` |
 | `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | dari langkah A5; `DB_HOST=localhost` |
 | `FORCE_HTTPS`, `HSTS_MAX_AGE` | **biarkan `false` / `300` dulu**; dinyalakan setelah SSL aktif (A10) |
