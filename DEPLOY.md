@@ -206,7 +206,7 @@ Direktori `~/ekasa` dan `~` sendiri sebaiknya `755` (bukan `777`), agar Apache b
    HSTS_MAX_AGE=300
    ```
 
-   `SESSION_SECURE_COOKIE` mengikuti `FORCE_HTTPS` (jangan di-set sendiri), lalu `php artisan config:clear && php artisan config:cache`. Efeknya: semua alamat `http://` dialihkan ke `https://`, cookie session hanya lewat https, dan header HSTS dikirim 300 detik.
+   `SESSION_SECURE_COOKIE` mengikuti `FORCE_HTTPS` (jangan di-set sendiri), lalu `php artisan config:clear && php artisan cache:clear && php artisan config:cache`. **`cache:clear` wajib** setiap kali `APP_URL` berubah: alamat gambar tersimpan di cache konten, dan tanpa dikosongkan gambar tetap beralamat `http://` (mixed content, gambar rusak di halaman https). Efeknya: semua alamat `http://` dialihkan ke `https://`, cookie session hanya lewat https, dan header HSTS dikirim 300 detik.
 3. **Jangan menyalakan `FORCE_HTTPS` sebelum SSL aktif**: situs tidak bisa dibuka, dan cookie secure lewat http tidak tersimpan sehingga login dan form gagal (419). Bila terlanjur: ubah kembali `FORCE_HTTPS=false` di `.env` dan `config:cache`.
 4. Naikkan `HSTS_MAX_AGE` bertahap setelah beberapa hari tanpa masalah: 300, 86400 (1 hari), 2592000 (30 hari), 31536000 (1 tahun). Tanpa `preload`. Browser mengingat nilai terakhir sepanjang durasinya, jadi jangan melompat terlalu cepat.
 5. `CSP_MODE=report-only` mencatat pelanggaran kebijakan konten di konsol browser (F12) tanpa memblokir apa pun. Jelajahi beranda, halaman layanan, peta, dan form Kontak; bila konsol bersih, ganti ke `CSP_MODE=enforce` dan `config:cache`.

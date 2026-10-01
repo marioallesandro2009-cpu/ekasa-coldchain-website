@@ -118,10 +118,11 @@ Hanya setelah langkah 2 lolos penuh.
 
    Cookie session otomatis menjadi secure karena mengikuti `FORCE_HTTPS` (tidak perlu menulis `SESSION_SECURE_COOKIE`).
 
-2. Terapkan:
+2. Terapkan. **`cache:clear` wajib**: daftar konten beranda (termasuk alamat semua gambar) tersimpan di cache database dan dibangun saat `APP_URL` masih `http://`; tanpa dikosongkan, gambar tetap berupa alamat `http://` dan rusak di halaman https (mixed content):
 
    ```bash
    $PHP artisan config:clear
+   $PHP artisan cache:clear
    $PHP artisan config:cache
    ```
 
@@ -130,6 +131,7 @@ Hanya setelah langkah 2 lolos penuh.
    ```bash
    curl -sI http://ekasacoldchain.com/ | head -3        # harus 301 dan Location: https://ekasacoldchain.com/
    curl -sI https://ekasacoldchain.com/ | grep -i strict-transport   # harus: max-age=300
+   curl -s https://ekasacoldchain.com/ | grep -o 'http://[^" ]*storage[^" ]*' | head -3   # harus KOSONG (tidak ada gambar beralamat http://)
    ```
 
 **Lolos bila:**
@@ -142,6 +144,7 @@ Hanya setelah langkah 2 lolos penuh.
 
 ```bash
 nano .env        # FORCE_HTTPS=false  dan  APP_URL=http://ekasacoldchain.com
+$PHP artisan cache:clear
 $PHP artisan config:cache
 ```
 
