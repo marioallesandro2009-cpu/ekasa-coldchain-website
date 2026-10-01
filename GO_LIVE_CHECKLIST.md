@@ -45,7 +45,7 @@ Prasyarat (sudah dikerjakan sesuai `DEPLOY.md` A1 sampai A5): PHP 8.3, SSH key +
    $PHP ~/composer.phar install --no-dev --optimize-autoloader --no-interaction
    $PHP artisan migrate --force
    $PHP artisan db:seed --force
-   $PHP artisan storage:link
+   ln -s "$HOME/ekasa/storage/app/public" public/storage     # BUKAN artisan storage:link (di Rumahweb symlink()/exec() PHP dinonaktifkan)
    $PHP artisan filament:assets
    $PHP artisan admin:create
    ```
@@ -186,7 +186,7 @@ mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessi
 chmod -R ug+rwX storage bootstrap/cache                                     # 3. folder writable
 ls -l storage/app/public/.htaccess                                          # 4. HARUS ada; kalau tidak: git checkout -- storage/app/public/.htaccess
 $PHP artisan migrate --force                                                # 5. migrasi
-[ -e public/storage ] || $PHP artisan storage:link                          # 6. symlink upload (dilewati bila sudah ada)
+[ -e public/storage ] || ln -s "$HOME/ekasa/storage/app/public" public/storage   # 6. symlink upload (dilewati bila sudah ada)
 $PHP artisan filament:assets                                                # 7. aset admin
 $PHP artisan optimize:clear                                                 # 8. bersihkan cache
 $PHP artisan config:cache                                                   # 9. cache config

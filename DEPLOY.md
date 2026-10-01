@@ -163,7 +163,7 @@ PHP=/opt/cpanel/ea-php83/root/usr/bin/php
 $PHP ~/composer.phar install --no-dev --optimize-autoloader --no-interaction   # atau: composer install ...
 $PHP artisan migrate --force
 $PHP artisan db:seed --force      # data awal: pengaturan situs, konten, layanan, dll. (TIDAK membuat admin di production)
-$PHP artisan storage:link
+ln -s "$HOME/ekasa/storage/app/public" public/storage   # bukan artisan storage:link: PHP di sini menonaktifkan symlink()/exec()
 $PHP artisan filament:assets
 $PHP artisan admin:create          # admin pertama: tanya email, nama, lalu password (input tersembunyi)
 ```
@@ -287,7 +287,7 @@ $PHP artisan route:cache
 $PHP artisan view:cache
 ```
 
-(Langkah `composer install`, `migrate`, `storage:link`, dan `filament:assets` sudah dijalankan manual di A7.)
+(Langkah `composer install`, `migrate`, symlink `public/storage`, dan `filament:assets` sudah dijalankan manual di A7.)
 
 Buka `https://ekasacoldchain.com`, lalu `https://ekasacoldchain.com/admin` dan login dengan akun dari `admin:create`. Cek juga `https://ekasacoldchain.com/up` (health check, harus 200).
 
@@ -326,7 +326,7 @@ git push origin main
 cd ~/ekasa && bash deploy.sh
 ```
 
-`deploy.sh` akan: `git pull --ff-only`, `composer install --no-dev`, `migrate --force`, `storage:link` (jika belum ada), `filament:assets`, `optimize:clear`, lalu `config:cache`, `route:cache`, `view:cache`, dan mengatur permission `storage`/`bootstrap/cache`. Aman dijalankan berulang dan berhenti di error pertama.
+`deploy.sh` akan: `git pull --ff-only`, `composer install --no-dev`, `migrate --force`, symlink `public/storage` (`ln -s`, jika belum ada), `filament:assets`, `optimize:clear`, lalu `config:cache`, `route:cache`, `view:cache`, dan mengatur permission `storage`/`bootstrap/cache`. Aman dijalankan berulang dan berhenti di error pertama.
 
 Jika path PHP/Composer di server berbeda:
 
@@ -370,7 +370,7 @@ Catatan:
 - Kelas Tailwind baru tidak tampil: kamu lupa `npm run build` sebelum commit.
 
 **Gambar upload CMS tidak tampil**
-- Pastikan `public/storage` ada: `ls -l ~/ekasa/public/storage` (symlink ke `storage/app/public`). Jika tidak: `php artisan storage:link`.
+- Pastikan `public/storage` ada: `ls -l ~/ekasa/public/storage` (symlink ke `storage/app/public`). Jika tidak: `ln -s ~/ekasa/storage/app/public ~/ekasa/public/storage` (bukan `artisan storage:link`: di Rumahweb `symlink()` dan `exec()` PHP dinonaktifkan sehingga errornya `Call to undefined function exec()``.
 - Pastikan `MEDIA_DISK=public` di `.env`, lalu `php artisan config:cache`.
 - Upload gagal untuk file besar: naikkan `upload_max_filesize` dan `post_max_size` di MultiPHP INI Editor.
 
@@ -474,7 +474,7 @@ Bila database kosong/baru, buat dulu database dan user di cPanel (bagian A5), la
 ```bash
 tar -xzf ~/backups/storage-YYYYMMDD-HHMM.tar.gz -C ~/ekasa/storage/app
 chmod -R ug+rwX ~/ekasa/storage
-ls -l ~/ekasa/public/storage        # jika hilang: php artisan storage:link
+ls -l ~/ekasa/public/storage        # jika hilang: ln -s ~/ekasa/storage/app/public ~/ekasa/public/storage
 ```
 
 **Server hilang total** (akun baru): ikuti bagian A dari awal (PHP, SSH key, clone, `.env` dari backup, database), **lewati `db:seed`**, impor dump database (D3), ekstrak arsip upload, lalu `bash deploy.sh`.

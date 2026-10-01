@@ -84,8 +84,10 @@ step "Migrasi database"
 $ARTISAN migrate --force
 
 step "Symlink public/storage"
+# Plain shell "ln -s", not "artisan storage:link": some hosts (Rumahweb) disable PHP's symlink()
+# and exec(), and storage:link then fails with "Call to undefined function exec()".
 if [ ! -e public/storage ] && [ ! -L public/storage ]; then
-    $ARTISAN storage:link
+    ln -s "$(pwd)/storage/app/public" public/storage
 else
     echo "public/storage sudah ada, dilewati."
 fi
