@@ -237,12 +237,13 @@
     transform: translateY(12%);
 }
 
-/* Thin white outline on the lettering only: over the hero (transparent navbar) and on dark
-   surfaces (footer, mobile menu: logo-outline--always), so the navy lettering stays readable. */
+/* On dark surfaces (transparent navbar over the hero, footer and mobile menu: logo-outline--always) the
+   colour icon stays as it is and the navy lettering turns plain white: no outline, no glow, just readable. */
 .site-header:not(.is-solid) .logo-part--text,
 .logo-outline--always {
-    filter: drop-shadow(0.75px 0 0 #fff) drop-shadow(-0.75px 0 0 #fff) drop-shadow(0 0.75px 0 #fff) drop-shadow(0 -0.75px 0 #fff);
+    filter: brightness(0) invert(1);
 }
+
 .site-header:not(.is-solid) .nav-link {
     color: color-mix(in srgb, var(--color-white) 80%, transparent);
 }
