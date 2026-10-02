@@ -19,17 +19,19 @@ use Illuminate\Support\Carbon;
  * @property string $email
  * @property string|null $phone
  * @property string|null $company
+ * @property string|null $country
  * @property int|null $service_id
  * @property string|null $service_title
  * @property string $message
  * @property string $locale
  * @property string $status
  * @property bool $email_failed
+ * @property Carbon|null $sheet_synced_at
  * @property string|null $ip
  * @property string|null $user_agent
  * @property Carbon|null $created_at
  */
-#[Fillable(['name', 'email', 'phone', 'company', 'service_id', 'service_title', 'message', 'locale', 'status', 'email_failed', 'ip', 'user_agent'])]
+#[Fillable(['name', 'email', 'phone', 'company', 'country', 'service_id', 'service_title', 'message', 'locale', 'status', 'email_failed', 'sheet_synced_at', 'ip', 'user_agent'])]
 class ContactMessage extends Model
 {
     public const NEW = 'new';
@@ -40,7 +42,7 @@ class ContactMessage extends Model
 
     protected function casts(): array
     {
-        return ['email_failed' => 'boolean'];
+        return ['email_failed' => 'boolean', 'sheet_synced_at' => 'datetime'];
     }
 
     /**

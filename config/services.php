@@ -29,6 +29,15 @@ return [
     ],
 
     /*
+    | Google Sheet for new leads (form Kontak), through an Apps Script web app: docs/google-sheet-leads.md.
+    | Empty URL = off. The secret must match SECRET in the Apps Script.
+    */
+    'google_sheets' => [
+        'url' => env('GOOGLE_SHEETS_WEBHOOK_URL'),
+        'secret' => env('GOOGLE_SHEETS_SECRET'),
+    ],
+
+    /*
     | Drafts of translations in the admin ("Buat draf terjemahan"). Driver: deepl
     | or google; empty = the button is hidden. TRANSLATION_API_URL is optional
     | (e.g. a DeepL Pro endpoint or a proxy).

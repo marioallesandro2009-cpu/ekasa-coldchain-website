@@ -31,6 +31,7 @@ class StoreContactMessageRequest extends FormRequest
             'email' => ['required', 'string', 'email:rfc', 'max:190'],
             'phone' => ['nullable', 'string', 'max:40', 'regex:/^[0-9+\-().\s]{5,40}$/'],
             'company' => ['nullable', 'string', 'max:150'],
+            'country' => ['nullable', 'string', 'max:80'],
             'service_id' => ['nullable', 'integer'],
             'message' => ['required', 'string', 'min:10', 'max:3000'],
         ];

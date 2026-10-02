@@ -94,7 +94,7 @@
 
             @if ($wa)
                 <div class="mt-8 rounded-card border border-white/15 bg-white/[0.04] p-5">
-                    <p class="text-sm font-semibold text-white">{{ __('Prefer a quick answer?') }}</p>
+                    <p class="text-sm font-semibold text-white">{{ __('Business Development') }}</p>
                     <p class="mt-1 text-sm text-white/70">{{ __('Fastest way to reach us') }}</p>
                     <a
                         href="{{ $wa }}?text={{ rawurlencode($waMessage) }}"
@@ -169,6 +169,11 @@
                         </div>
                     </div>
 
+                    <div class="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label for="contact-country" class="text-sm font-medium text-white/80">{{ __('Country (optional)') }}</label>
+                        <input id="contact-country" name="country" value="{{ old('country') }}" maxlength="80" autocomplete="country-name" type="text" placeholder="{{ __('Your country') }}" class="{{ $input }} {{ $border('country') }}">
+                    </div>
                     @if (count($services) > 0)
                         <div>
                             <label for="contact-service" class="text-sm font-medium text-white/80">{{ __('Service of interest (optional)') }}</label>
@@ -180,6 +185,7 @@
                             </select>
                         </div>
                     @endif
+                    </div>
 
                     <div>
                         <label for="contact-message" class="text-sm font-medium text-white/80">{{ __('Message') }} <span aria-hidden="true">*</span></label>

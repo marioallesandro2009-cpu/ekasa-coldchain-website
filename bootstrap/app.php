@@ -17,6 +17,8 @@ return Application::configure(basePath: dirname(__DIR__))
     // Needs one cron entry on the server: * * * * * php artisan schedule:run (DEPLOY.md, A13).
     ->withSchedule(function (Schedule $schedule): void {
         $schedule->command('leads:prune')->dailyAt('03:15')->withoutOverlapping();
+        // Retry leads that did not reach the Google Sheet (does nothing while GOOGLE_SHEETS_WEBHOOK_URL is empty).
+        $schedule->command('leads:sync-sheet')->everyFifteenMinutes()->withoutOverlapping();
     })
     ->withMiddleware(function (Middleware $middleware): void {
         // Redirects to the scheme + host of APP_URL (https, www or non-www) in production.

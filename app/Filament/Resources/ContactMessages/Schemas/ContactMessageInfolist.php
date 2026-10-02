@@ -19,6 +19,7 @@ class ContactMessageInfolist
                     TextEntry::make('email')->label('Email')->copyable()->url(fn (ContactMessage $record): string => 'mailto:'.$record->email),
                     TextEntry::make('phone')->label('Telepon')->default('-'),
                     TextEntry::make('company')->label('Perusahaan')->default('-'),
+                    TextEntry::make('country')->label('Negara')->default('-'),
                     TextEntry::make('service_title')->label('Layanan diminati')->default('-'),
                     TextEntry::make('locale')->label('Bahasa asal')->formatStateUsing(fn (string $state): string => strtoupper($state)),
                 ]),

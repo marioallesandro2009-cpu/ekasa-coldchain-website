@@ -10,6 +10,7 @@ use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Support\FrontendData;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Livewire;
@@ -222,4 +223,57 @@ it('keeps every column, filter and action of the leads table', function () {
 
     $table->filterTable('status', 'new')->assertCanNotSeeTableRecords([$lead]);
     $table->filterTable('status', 'read')->assertCanSeeTableRecords([$lead]);
+});
+
+it('stores the country and shows it in the form, the email and the admin', function () {
+    $html = $this->get('/')->getContent();
+    expect($html)->toContain('name="country"');
+
+    $this->postJson('/contact', validLead(['country' => ' Singapore ']))->assertOk();
+
+    $lead = ContactMessage::query()->latest('id')->first();
+    expect($lead->country)->toBe('Singapore');
+
+    Mail::assertSent(ContactMessageReceived::class, fn (ContactMessageReceived $mail): bool => str_contains($mail->render(), 'Singapore'));
+});
+
+it('adds the lead to the Google Sheet when configured, and only marks it synced on success', function () {
+    config(['services.google_sheets.url' => 'https://script.google.test/exec', 'services.google_sheets.secret' => 's3cret']);
+    Http::fake(['script.google.test/*' => Http::response(['ok' => true])]);
+
+    $this->postJson('/contact', validLead(['country' => 'Malaysia']))->assertOk();
+
+    Http::assertSent(fn ($request): bool => $request->url() === 'https://script.google.test/exec'
+        && $request['secret'] === 's3cret'
+        && $request['country'] === 'Malaysia'
+        && $request['email'] === 'budi@klien.test'
+        && ! array_key_exists('ip', $request->data()));
+
+    expect(ContactMessage::query()->latest('id')->first()->sheet_synced_at)->not->toBeNull();
+});
+
+it('keeps the lead and answers the visitor when the Google Sheet fails, then retries with leads:sync-sheet', function () {
+    config(['services.google_sheets.url' => 'https://script.google.test/exec']);
+    // A second Http::fake() would not replace the first stub, so the answers go in one sequence.
+    Http::fake(['script.google.test/*' => Http::sequence()->push('<html>login</html>', 200)->push(['ok' => true])]);
+
+    $this->postJson('/contact', validLead())->assertOk()->assertJson(['ok' => true]);
+
+    $lead = ContactMessage::query()->latest('id')->first();
+    expect($lead->sheet_synced_at)->toBeNull();
+    Mail::assertSent(ContactMessageReceived::class);
+
+    $this->artisan('leads:sync-sheet')->assertSuccessful();
+
+    expect($lead->fresh()->sheet_synced_at)->not->toBeNull();
+});
+
+it('does nothing for the Google Sheet when no URL is set', function () {
+    config(['services.google_sheets.url' => null]);
+    Http::fake();
+
+    $this->postJson('/contact', validLead())->assertOk();
+
+    Http::assertNothingSent();
+    $this->artisan('leads:sync-sheet')->assertSuccessful();
 });

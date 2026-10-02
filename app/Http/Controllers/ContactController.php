@@ -7,6 +7,7 @@ use App\Mail\ContactMessageReceived;
 use App\Models\ContactMessage;
 use App\Models\Service;
 use App\Models\SiteSetting;
+use App\Support\GoogleSheet;
 use App\Support\Links;
 use App\Support\SecurityLog;
 use Illuminate\Http\JsonResponse;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Mail;
 use Throwable;
 
 /**
- * #contact form: validate, save the lead, email the team after the response.
+ * #contact form: validate, save the lead, email the team and add it to the Google Sheet after the response.
  *
  * The lead is saved BEFORE any email is attempted and a mail failure never reaches
  * the visitor (it only flags the lead as email_failed for the admin). Works as a
@@ -36,6 +37,7 @@ class ContactController extends Controller
             'email' => $data['email'],
             'phone' => $this->clean($data['phone'] ?? null),
             'company' => $this->clean($data['company'] ?? null),
+            'country' => $this->clean($data['country'] ?? null),
             'service_id' => $service?->id,
             'service_title' => $service ? ($service->translate('title', 'id') ?: $service->translate('title')) : null,
             'message' => trim($data['message']),
@@ -71,6 +73,9 @@ class ContactController extends Controller
         if ($failed) {
             $message->forceFill(['email_failed' => true])->save();
         }
+
+        // Google Sheet (when configured): independent of the email result; a failure is retried by leads:sync-sheet.
+        GoogleSheet::send($message);
     }
 
     private function respond(Request $request, string $text): JsonResponse|RedirectResponse
