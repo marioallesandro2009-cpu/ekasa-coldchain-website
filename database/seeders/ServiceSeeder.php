@@ -19,14 +19,14 @@ class ServiceSeeder extends Seeder
 
     public function run(): void
     {
-        // slug, title [en, id], short description [en, id] (max. 60 characters), icon
+        // Urutan = urutan tampil (Revisi 1: Logistic Partnership kartu besar). slug, title [en, id], short description [en, id] (max. 60 characters), icon
         // DUMMY - daftar dan deskripsi layanan harus dikonfirmasi klien (including the
         // temperature range of Cold Storage).
         $services = [
-            ['cold-storage', ['Cold Storage', 'Cold Storage'], ['Chilled and frozen rooms from -25°C to 6°C', 'Ruang chiller dan frozen, -25°C hingga 6°C'], 'snowflake'],
+            ['logistic-partnership', ['Logistic Partnership', 'Kemitraan Logistik'], ['One team for storage, transport and delivery', 'Satu tim untuk gudang, transportasi, dan pengiriman'], 'chain-link'],
             ['linehaul-transport', ['Linehaul Transport', 'Transportasi Linehaul'], ['Refrigerated and dry trucks between cities', 'Truk berpendingin dan non-pendingin antarkota'], 'reefer-truck'],
             ['hyperlocal-fulfilment', ['Hyperlocal Fulfilment', 'Hyperlocal Fulfilment'], ['Quick drop-offs from hubs inside the city', 'Antar cepat dari hub di dalam kota'], 'map-pin'],
-            ['logistic-partnership', ['Logistic Partnership', 'Kemitraan Logistik'], ['One team for storage, transport and delivery', 'Satu tim untuk gudang, transportasi, dan pengiriman'], 'chain-link'],
+            ['cold-storage', ['Cold Storage', 'Cold Storage'], ['Chilled and frozen rooms from -25°C to 6°C', 'Ruang chiller dan frozen, -25°C hingga 6°C'], 'snowflake'],
             ['omnichannel-integration', ['Omnichannel Integration', 'Integrasi Omnichannel'], ['Orders from every sales channel in one flow', 'Pesanan dari semua kanal penjualan dalam satu alur'], 'network'],
         ];
 
@@ -41,6 +41,7 @@ class ServiceSeeder extends Seeder
                 'anchor' => $slug,
                 // Main grid of the mega menu; Omnichannel sits in the row below.
                 'is_featured' => $slug !== 'omnichannel-integration',
+                'is_coming_soon' => $slug !== 'omnichannel-integration',
                 'sort_order' => $index + 1,
                 'is_active' => true,
                 ...$detail['fields'],

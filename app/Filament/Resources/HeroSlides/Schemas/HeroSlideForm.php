@@ -42,6 +42,10 @@ class HeroSlideForm
                             ->required()
                             ->helperText('Ukuran ideal 1920 x 1080 px (landscape). JPG, PNG, atau WebP, maks. 5 MB dan sisi terpanjang maks. 4000 px.')
                             ->columnSpanFull(),
+                        Toggle::make('is_coming_soon')
+                            ->label('Tandai Segera hadir (Coming soon)')
+                            ->helperText('Menampilkan label kecil "Coming soon" di indikator slide beranda.')
+                            ->default(false),
                         Toggle::make('is_active')
                             ->label('Aktif')
                             ->default(true),

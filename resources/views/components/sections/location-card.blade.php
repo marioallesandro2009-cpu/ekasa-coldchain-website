@@ -35,7 +35,7 @@
                 >
             @else
                 <span class="grid size-full place-items-center text-ink-muted" aria-hidden="true">
-                    <x-ui.icon :name="$location['kind'] === 'hub' ? 'map-pin' : 'warehouse'" class="size-8" />
+                    <x-ui.icon :name="$location['kind'] === 'warehouse' ? 'warehouse' : 'map-pin'" class="size-8" />
                 </span>
             @endif
         </div>

@@ -36,7 +36,8 @@
                 :logo="$settings['logoColor'] ?? $settings['logoWhite']"
                 :name="$settings['companyName']"
                 :height="48"
-                class="justify-self-start"
+                text-outline
+                class="translate-y-[3px] justify-self-start"
             />
 
             <nav class="hidden lg:block" aria-label="{{ $texts['nav_main'] }}">

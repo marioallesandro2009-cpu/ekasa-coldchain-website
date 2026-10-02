@@ -136,6 +136,7 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
         'contact_email_subject' => 'New inquiry from :name',
         'trust_label' => 'Trusted by',
         'service_card_link' => 'Learn more',
+        'coming_soon' => 'Coming soon',
         'service_supporting_label' => 'Also available',
         'footer_copyright' => 'All rights reserved.',
         'skip_link' => 'Skip to content',

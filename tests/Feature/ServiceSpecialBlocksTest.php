@@ -22,6 +22,32 @@ function useLayout(string $slug, string $type, array $changes): void
     })->all()]);
 }
 
+/** The seeder no longer ships example warehouses (only the real office), so these tests create their own. */
+function makeSites(): void
+{
+    foreach ([
+        ['Cakung', 'warehouse', 'Jakarta Timur', -6.1795, 106.9430, ['frozen', 'chiller']],
+        ['Pulo Gadung', 'hub', 'Jakarta Timur', -6.1985, 106.9050, ['chiller', 'cool']],
+        ['Tanjung Priok', 'warehouse', 'Jakarta Utara', -6.1105, 106.8830, ['frozen', 'chiller', 'ambient']],
+    ] as $index => [$name, $kind, $area, $lat, $lng, $zones]) {
+        Location::query()->create([
+            'name' => $name,
+            'kind' => $kind,
+            'city' => 'Jakarta',
+            'area' => $area,
+            'address' => "Kawasan contoh {$name}, {$area}",
+            'lat' => $lat,
+            'lng' => $lng,
+            'temperature_zones' => $zones,
+            'commodities' => ['en' => 'Frozen goods', 'id' => 'Barang beku'],
+            'capacity' => ['en' => '1,000 pallets', 'id' => '1.000 palet'],
+            'opening_hours' => ['en' => 'Open 24 hours', 'id' => 'Buka 24 jam'],
+            'sort_order' => $index + 1,
+            'is_active' => true,
+        ]);
+    }
+}
+
 it('draws the temperature zones on a thermometer that is complete without JS', function () {
     $html = $this->get('/services/cold-storage')->assertOk()->getContent();
     $section = substr($html, (int) strpos($html, 'id="zona-suhu"'));
@@ -36,6 +62,7 @@ it('draws the temperature zones on a thermometer that is complete without JS', f
 });
 
 it('shows the warehouse map, cards and Google Maps links, and loads Leaflet only on demand', function () {
+    makeSites();
     $html = $this->get('/services/cold-storage')->getContent();
     $section = substr($html, (int) strpos($html, 'id="lokasi-gudang"'), 20000);
 
@@ -53,6 +80,7 @@ it('shows the warehouse map, cards and Google Maps links, and loads Leaflet only
 });
 
 it('drops the locations block when no location matches', function () {
+    makeSites();
     Location::query()->where('kind', 'hub')->update(['is_active' => false]);
 
     $this->get('/services/hyperlocal-fulfilment')->assertOk()->assertDontSee('id="lokasi-gudang"', false);

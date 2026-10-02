@@ -23,7 +23,7 @@
 <footer class="on-dark bg-dark text-white/75">
     <x-ui.container class="grid gap-10 py-14 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)_minmax(0,1fr)] lg:gap-8 lg:py-16">
         <div class="sm:col-span-2 lg:col-span-1">
-            <x-layout.logo :logo="$settings['logoWhite']" :name="$settings['companyName']" :height="40" />
+            <x-layout.logo :logo="$settings['logoColor'] ?? $settings['logoWhite']" :name="$settings['companyName']" :height="56" text-outline outlined />
             @if ($settings['companyDescription'])
                 <p class="mt-4 max-w-sm text-sm leading-relaxed text-white/60">{{ $settings['companyDescription'] }}</p>
             @endif

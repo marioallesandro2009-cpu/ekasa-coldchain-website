@@ -17,7 +17,7 @@ class HeroSlideSeeder extends Seeder
             [['Cold Storage', 'Cold Storage'], 'hero-truck', ['Refrigerated truck on a mountain highway', 'Truk berpendingin di jalan raya pegunungan']],
             [['Linehaul Transport', 'Transportasi Linehaul'], 'hero-linehaul', ['Refrigerated truck on an intercity route', 'Truk berpendingin di jalur antarkota']],
             [['Hyperlocal Fulfilment', 'Hyperlocal Fulfilment'], 'hero-hyperlocal', ['Fast delivery from a city fulfilment hub', 'Pengiriman cepat dari hub fulfilment dalam kota']],
-            [['Logistic Partnership', 'Kemitraan Logistik'], 'hero-partnership', ['Logistics partners reviewing a supply chain plan', 'Mitra logistik meninjau rencana rantai pasok']],
+            [['Logistic Partnership', 'Kemitraan Logistik'], 'hero-partnership', ['White freight truck on a highway', 'Truk angkutan putih di jalan raya']],
         ];
 
         foreach ($slides as $index => [$label, $image, $alt]) {
@@ -26,6 +26,7 @@ class HeroSlideSeeder extends Seeder
             $slide->fill([
                 'label' => ['en' => $label[0], 'id' => $label[1]],
                 'image_alt' => ['en' => $alt[0], 'id' => $alt[1]],
+                'is_coming_soon' => true,
                 'sort_order' => $index + 1,
                 'is_active' => true,
             ])->markTranslationsReviewed('id')->save();

@@ -64,7 +64,7 @@
              matches — an empty tab shows the empty-state message below, it is
              never hidden (kind counts can change any time admin edits data). --}}
         <div class="flex flex-wrap gap-2" role="tablist" aria-label="{{ __('Filter') }}">
-            @foreach ([['all', __('All')], ['warehouse', __('Warehouse')], ['hub', __('City hub')]] as [$kind, $label])
+            @foreach ([['all', __('All')], ['office', __('Office')], ['pool', __('Pool')]] as [$kind, $label])
                 <button
                     type="button"
                     role="tab"

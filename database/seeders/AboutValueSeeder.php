@@ -21,27 +21,27 @@ class AboutValueSeeder extends Seeder
                 ],
             ],
             [
-                'network',
-                ['Nationwide Network', 'Jaringan Nasional'],
+                'reefer-truck',
+                ['Latest Fleet', 'Armada Terbaru'],
                 [
-                    'Warehouses and city hubs positioned where your customers already are.',
-                    'Gudang dan hub kota yang ditempatkan di lokasi yang sudah dekat dengan pelanggan Anda.',
+                    'Newest vehicles and engines, with insulated boxes on a full frame so every product stays protected.',
+                    'Kendaraan dan mesin paling baru, dengan boks berrangka dan berinsulasi agar setiap produk tetap aman.',
                 ],
             ],
             [
-                'monitor-pulse',
-                ['Real-Time Monitoring', 'Pemantauan Real-Time'],
+                'thermometer',
+                ['Temperature Control Tower', 'Temperature Control Tower'],
                 [
-                    'Every shipment tracked and temperature-logged, so you always know where things stand.',
-                    'Setiap pengiriman terlacak dan suhunya tercatat, jadi Anda selalu tahu posisinya.',
+                    'Every shipment watched from our control tower, reaching the target temperature faster.',
+                    'Setiap pengiriman dipantau dari control tower kami, dengan waktu mencapai suhu target yang lebih cepat.',
                 ],
             ],
             [
-                'headset',
-                ['Customer-First Team', 'Tim yang Mengutamakan Pelanggan'],
+                'service-24h',
+                ['24-Hour Operation', 'Operasional 24 Jam'],
                 [
-                    'A responsive team that treats your deadlines and your product with the same urgency you do.',
-                    'Tim yang responsif dan memperlakukan tenggat waktu serta produk Anda dengan urgensi yang sama seperti Anda.',
+                    'Our team and fleet run around the clock, so your goods keep moving at any hour.',
+                    'Tim dan armada kami beroperasi sepanjang waktu, jadi barang Anda terus bergerak kapan saja.',
                 ],
             ],
         ];

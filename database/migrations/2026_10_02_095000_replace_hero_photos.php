@@ -1,0 +1,49 @@
+<?php
+
+use App\Models\HeroSlide;
+use App\Models\SiteSetting;
+use Illuminate\Database\Migrations\Migration;
+
+return new class extends Migration
+{
+    /**
+     * Revisi 1 (klien): foto slide beranda diganti foto truk (tanpa foto orang). Seeder tidak
+     * berjalan di produksi dan tidak menimpa foto yang sudah ada, jadi penggantiannya dilakukan di
+     * sini, dari file yang ikut di repo (database/seeders/images). Bisa diulang tanpa efek ganda.
+     * Selanjutnya foto bisa diganti lewat admin (Slide Beranda).
+     */
+    public function up(): void
+    {
+        $slides = [
+            'Cold Storage' => ['hero-truck', ['en' => 'Refrigerated truck on a mountain highway', 'id' => 'Truk berpendingin di jalan raya pegunungan']],
+            'Logistic Partnership' => ['hero-partnership', ['en' => 'White freight truck on a highway', 'id' => 'Truk angkutan putih di jalan raya']],
+        ];
+
+        foreach ($slides as $label => [$file, $alt]) {
+            $slide = HeroSlide::query()->where('label->en', $label)->first();
+            $path = database_path("seeders/images/{$file}.jpg");
+
+            if (! $slide || ! is_file($path) || $slide->getFirstMedia('image')?->name === $file) {
+                continue;
+            }
+
+            $slide->clearMediaCollection('image');
+            $slide->forceFill(['image_alt' => $alt])->save();
+            $slide->addMedia($path)->preservingOriginal()->usingName($file)->toMediaCollection('image');
+        }
+
+        // Gambar Open Graph (pratinjau saat tautan dibagikan) memakai foto truk, bukan foto gudang lama.
+        $settings = SiteSetting::query()->first();
+        $truck = database_path('seeders/images/hero-truck.jpg');
+
+        if ($settings && is_file($truck) && $settings->getFirstMedia('og_image')?->name !== 'hero-truck') {
+            $settings->clearMediaCollection('og_image');
+            $settings->addMedia($truck)->preservingOriginal()->usingName('hero-truck')->toMediaCollection('og_image');
+        }
+    }
+
+    public function down(): void
+    {
+        // Foto bisa diganti dari admin; tidak dikembalikan otomatis.
+    }
+};

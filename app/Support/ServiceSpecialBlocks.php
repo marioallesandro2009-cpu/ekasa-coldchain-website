@@ -182,7 +182,7 @@ final class ServiceSpecialBlocks
             return [
                 'id' => $location->id,
                 'name' => $location->name,
-                'kind' => __($location->kind === 'hub' ? 'City hub' : 'Warehouse', [], $locale),
+                'kind' => Location::kindLabel($location->kind, $locale),
                 'city' => trim($location->city.($location->area ? ', '.$location->area : '')),
                 'address' => $location->address,
                 'zones' => $zoneLabels($location),

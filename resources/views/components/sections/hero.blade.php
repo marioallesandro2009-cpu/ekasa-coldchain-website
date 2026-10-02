@@ -157,7 +157,7 @@
 
             {{-- 6. Slide indicators (JS only; hidden with a single slide) --}}
             @if ($isSlideshow)
-                <div class="js-only mt-6 sm:mt-8 lg:short:mt-4 lg:shorter:mt-3" x-data="animatedContent" x-intersect.once="show()" data-animate data-delay="0.4">
+                <div class="js-only mt-4 sm:mt-5 lg:short:mt-3 lg:shorter:mt-2" x-data="animatedContent" x-intersect.once="show()" data-animate data-delay="0.4">
                     <div
                         class="grid gap-3 sm:gap-5"
                         style="grid-template-columns: repeat({{ $count }}, minmax(0, 1fr))"
@@ -171,7 +171,7 @@
                         @foreach ($slides as $i => $slide)
                             <button
                                 type="button"
-                                class="group min-w-0 py-3 text-left"
+                                class="group min-w-0 py-2 text-left"
                                 aria-label="{{ $settings['texts']['slide_show'] }} {{ $slide['label'] }}"
                                 :aria-current="index === {{ $i }} ? 'true' : null"
                                 @click="hover = false; goTo({{ $i }})"
@@ -187,6 +187,9 @@
                                     class="mt-2.5 hidden truncate text-sm font-semibold transition-colors duration-200 sm:block"
                                     :class="index === {{ $i }} ? 'text-highlight' : 'text-white/70 group-hover:text-white/90'"
                                 >{{ $slide['label'] }}</span>
+                                @if ($slide['comingSoon'] ?? false)
+                                    <span class="mt-1 hidden w-fit rounded-full border border-white/30 px-2 py-px text-[10px] font-bold tracking-wider text-white/70 uppercase sm:block">{{ $settings['texts']['coming_soon'] }}</span>
+                                @endif
                             </button>
                         @endforeach
                     </div>
@@ -233,7 +236,7 @@
                         'md:border-r-0' => $i === $statCount - 1,
                         'md:border-r' => $i !== $statCount - 1,
                     ])>
-                        <dt class="order-2 mt-1 text-sm leading-snug text-white/75">{{ $stat['label'] }}</dt>
+                        <dt class="order-2 mt-1 text-sm leading-snug text-white/75">{{ $stat['label'] }}@if ($stat['note'] ?? null)<span class="mt-0.5 block text-xs text-white/60">{{ $stat['note'] }}</span>@endif</dt>
                         <dd
                             class="order-1 font-extrabold tracking-tight tabular-nums"
                             style="font-size: clamp(20px, calc(100cqi / ({{ $valueChars }} * 0.62)), 32px)"

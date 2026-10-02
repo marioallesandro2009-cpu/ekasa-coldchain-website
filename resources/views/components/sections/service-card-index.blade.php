@@ -57,6 +57,12 @@
             aria-hidden="true"
         >{{ $ordinal }}</span>
 
+        @if ($service['comingSoon'] ?? false)
+            {{-- "Coming soon" watermark: a tilted outlined stamp over the photo (Revisi 1). --}}
+            <span class="pointer-events-none absolute inset-0 z-0 grid place-items-center">
+                <span class="-rotate-12 rounded-md border-2 border-white/70 bg-overlay/40 px-4 py-1.5 text-sm font-extrabold tracking-[0.22em] text-white/90 uppercase sm:text-base {{ $large ? 'lg:text-2xl lg:px-6 lg:py-2.5' : '' }}">{{ $texts['coming_soon'] }}</span>
+            </span>
+        @endif
         {{-- Text shade: dark from the bottom up, enough for white text (AA). --}}
         <div @class([
             'absolute inset-x-0 bottom-0 -z-10 bg-linear-to-t from-overlay via-overlay/85 to-overlay/0',

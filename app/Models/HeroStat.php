@@ -17,18 +17,19 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $suffix
  * @property array<string, string|null>|null $text_value
  * @property array<string, string|null>|null $label
+ * @property array<string, string|null>|null $note
  * @property string|null $icon
  * @property bool $use_count_up
  * @property int $sort_order
  * @property bool $is_active
  * @property array<string, array<string, string>>|null $translation_status
  */
-#[Fillable(['value', 'prefix', 'suffix', 'text_value', 'label', 'icon', 'use_count_up', 'sort_order', 'is_active', 'translation_status'])]
+#[Fillable(['value', 'prefix', 'suffix', 'text_value', 'label', 'note', 'icon', 'use_count_up', 'sort_order', 'is_active', 'translation_status'])]
 class HeroStat extends Model implements HasTranslatableFields
 {
     use FlushesFrontendCache, HasTranslations, Sortable;
 
-    public const TRANSLATABLE = ['label', 'text_value'];
+    public const TRANSLATABLE = ['label', 'note', 'text_value'];
 
     protected function casts(): array
     {
@@ -61,6 +62,7 @@ class HeroStat extends Model implements HasTranslatableFields
             'suffix' => $this->suffix,
             'textValue' => $this->translate('text_value'),
             'label' => $this->translate('label'),
+            'note' => $this->translate('note'),
             'icon' => ServiceIcons::has($this->icon) ? $this->icon : null,
             // Count up needs a numeric value; otherwise the static text is shown.
             'useCountUp' => $this->use_count_up && $value !== null,

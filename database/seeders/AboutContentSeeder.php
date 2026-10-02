@@ -18,6 +18,10 @@ class AboutContentSeeder extends Seeder
             'id' => '<p>Didirikan untuk menjawab masalah yang sederhana namun berdampak besar — produk sensitif suhu yang rusak di antara gudang dan pelanggan — kami telah lebih dari satu dekade membangun jaringan cold chain yang bisa diandalkan bisnis.</p><p>Dari satu gudang pertama, kami tumbuh menjadi jaringan fasilitas penyimpanan dan armada berpendingin yang mencakup berbagai kota, dibangun di atas satu prinsip: setiap derajat penting, begitu juga setiap menit.</p><p>Kini, produsen makanan, distributor farmasi, dan peritel memercayakan produk mereka aman di tangan kami dari awal hingga akhir perjalanan — didukung teknologi dan tim yang terbukti.</p>',
         ];
 
+        // Revisi 1 (klien): paragraf kualitas, teknologi dan armada terbaru, operasi 24 jam.
+        $story['en'] .= '<p>We put quality first, backed by the most up-to-date logistics technology and fleet: a temperature control tower, boxes built on a full frame so products stay safe, the newest vehicles and engines, and the fastest time to reach the target temperature. We operate 24 hours.</p>';
+        $story['id'] .= '<p>Kami mengutamakan kualitas dengan teknologi logistik dan armada paling mutakhir: temperature control tower, boks berrangka agar produk pasti aman, kendaraan dan mesin terbaru, serta waktu mencapai suhu target tercepat. Kami beroperasi 24 jam.</p>';
+
         $content = AboutContent::current();
         $content->fill(['story' => $story])->markTranslationsReviewed('id')->save();
 

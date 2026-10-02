@@ -1,7 +1,7 @@
 {{-- Site logo linking to the top of the page; the box is reserved from the intrinsic ratio.
      A parent can resize it responsively through the --logo-h custom property.
      A wide logo (e.g. a text-only wordmark) is capped at $maxWidth and gets shorter. --}}
-@props(['logo' => null, 'name', 'height' => 36, 'maxWidth' => 200])
+@props(['logo' => null, 'name', 'height' => 36, 'maxWidth' => 200, 'textOutline' => false, 'outlined' => false])
 @php
     $width = null;
 
@@ -11,8 +11,9 @@
         $height = (int) round($width / $ratio);
     }
 @endphp
-<a href="{{ \App\Support\Links::section('home') }}" {{ $attributes->class('inline-flex shrink-0 items-center rounded-md') }}>
+<a href="{{ \App\Support\Links::section('home') }}" {{ $attributes->class('site-logo inline-flex shrink-0 items-center rounded-md') }}>
     @if ($logo)
+        <span class="relative inline-flex">
         <picture>
             @if ($logo['webp'])
                 <source srcset="{{ $logo['webp'] }}" type="image/webp">
@@ -27,6 +28,12 @@
                 decoding="async"
             >
         </picture>
+        @if ($textOutline)
+            {{-- Same image again, clipped to the lettering (right of the icon): CSS gives it a thin white
+                 outline while the navbar is transparent over the hero (see .logo-outline in app.css). --}}
+            <img src="{{ $logo['url'] }}" alt="" aria-hidden="true" @class(['logo-outline pointer-events-none absolute inset-0 size-full', 'logo-outline--always' => $outlined]) decoding="async">
+        @endif
+        </span>
     @else
         <span class="text-xl font-extrabold tracking-tight text-white">{{ $name }}</span>
     @endif

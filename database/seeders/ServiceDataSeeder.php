@@ -65,38 +65,21 @@ class ServiceDataSeeder extends Seeder
 
     private function locations(): void
     {
-        // DUMMY: generic example sites with approximate coordinates in Jabodetabek.
-        // The photos are generic illustrations, NOT Ekasa's real warehouses.
-        $locations = [
-            ['Cakung', 'warehouse', 'Jakarta', 'Jakarta Timur', -6.1795, 106.9430, ['frozen', 'chiller'],
-                ['Frozen meat, seafood, dairy', 'Daging beku, hasil laut, produk susu'], ['3,000 pallets', '3.000 palet'], 'location-cakung'],
-            ['Pulo Gadung', 'hub', 'Jakarta', 'Jakarta Timur', -6.1985, 106.9050, ['chiller', 'cool'],
-                ['Fresh produce, dairy, ready meals', 'Buah dan sayur, produk susu, makanan siap saji'], ['600 pallets', '600 palet'], 'location-pulo-gadung'],
-            ['Tanjung Priok', 'warehouse', 'Jakarta', 'Jakarta Utara', -6.1105, 106.8830, ['frozen', 'chiller', 'ambient'],
-                ['Imported frozen goods, seafood', 'Barang impor beku, hasil laut'], ['4,500 pallets', '4.500 palet'], 'location-tanjung-priok'],
-        ];
-
-        foreach ($locations as $index => [$name, $kind, $city, $area, $lat, $lng, $zones, $commodities, $capacity, $image]) {
-            $location = Location::query()->updateOrCreate(['name' => $name], [
-                'kind' => $kind,
-                'city' => $city,
-                'area' => $area,
-                'address' => "Kawasan contoh {$name}, {$area}",
-                'lat' => $lat,
-                'lng' => $lng,
-                'temperature_zones' => $zones,
-                'commodities' => ['en' => $commodities[0], 'id' => $commodities[1]],
-                'capacity' => ['en' => $capacity[0], 'id' => $capacity[1]],
-                'opening_hours' => $kind === 'hub'
-                    ? ['en' => 'Every day, 6am-10pm', 'id' => 'Setiap hari, 06.00-22.00']
-                    : ['en' => 'Open 24 hours', 'id' => 'Buka 24 jam'],
-                'sort_order' => $index + 1,
-                'is_active' => true,
-                'is_sample' => true,
-            ]);
-            $location->markTranslationsReviewed('id')->save();
-            $this->attachServiceImage($location, 'photo', $image, 1600, 1067);
-        }
+        // Revisi 1: titik kantor Ekasa (Meruya). alamat dari klien; titik peta diperkirakan dari OpenStreetMap, geser dari admin bila kurang pas.
+        // Pool: sengaja belum ada isinya.
+        Location::query()->updateOrCreate(['name' => 'Kantor Pusat'], [
+            'kind' => 'office',
+            'city' => 'Jakarta',
+            'area' => 'Meruya Utara, Jakarta Barat',
+            'address' => 'Jl. Penyelesaian Tomang III Jl. Kav. DKI No.1 Blk 10A, RT.8/RW.10, Meruya Utara, Kec. Kembangan, Kota Jakarta Barat, DKI Jakarta 11620',
+            'lat' => -6.1998,
+            'lng' => 106.7287,
+            'temperature_zones' => [],
+            'opening_hours' => ['en' => '8am - 6pm', 'id' => '08.00 - 18.00'],
+            'sort_order' => 0,
+            'is_active' => true,
+            'is_sample' => false,
+        ])->markTranslationsReviewed('id')->save();
     }
 
     private function rentalSchemes(): void

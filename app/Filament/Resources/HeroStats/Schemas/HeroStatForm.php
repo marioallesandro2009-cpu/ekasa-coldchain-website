@@ -13,7 +13,7 @@ use Filament\Schemas\Schema;
 class HeroStatForm
 {
     /** Admin labels of the translatable fields (also used by the table). */
-    public const LABELS = ['label' => 'Label', 'text_value' => 'Nilai teks'];
+    public const LABELS = ['label' => 'Label', 'note' => 'Catatan', 'text_value' => 'Nilai teks'];
 
     public static function configure(Schema $schema): Schema
     {
@@ -28,6 +28,10 @@ class HeroStatForm
                             ->helperText('Contoh: "Delivery Points".')
                             ->required(Translatable::isRequired($locale))
                             ->maxLength(60)),
+                        Translatable::fields(fn (string $locale): TextInput => TextInput::make("note.{$locale}")
+                            ->label(Translatable::label('Catatan kecil', $locale))
+                            ->helperText('Opsional, tampil kecil di bawah label. Contoh: "Dapat disesuaikan dengan vendor".')
+                            ->maxLength(80)),
                         Select::make('icon')
                             ->label('Ikon')
                             ->options(fn (): array => IconLibrary::htmlOptions())

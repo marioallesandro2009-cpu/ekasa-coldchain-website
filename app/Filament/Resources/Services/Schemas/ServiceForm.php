@@ -113,6 +113,10 @@ class ServiceForm
                         ->inline()
                         ->grouped()
                         ->helperText('Utama: kartu besar di beranda dan grid mega menu (maks. '.Service::MAX_FEATURED.', diambil dari Urutan Tampil terkecil kalau lebih dari itu ditandai Utama). Pendukung: pita di bawahnya. Halaman /services sendiri selalu menampilkan semua layanan aktif, tanpa batas.'),
+                    Toggle::make('is_coming_soon')
+                        ->label('Tandai Segera hadir (Coming soon)')
+                        ->helperText('Menampilkan watermark "Coming soon" di kartu layanan (beranda dan halaman Layanan).')
+                        ->default(false),
                     Select::make('icon')
                         ->label('Ikon')
                         ->options(fn (): array => IconLibrary::htmlOptions())

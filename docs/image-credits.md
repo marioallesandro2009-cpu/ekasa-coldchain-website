@@ -13,7 +13,7 @@ dipublikasikan**.
 | hero-truck.jpg | 2400 x 1952 | 563 KB | Slide hero 1 (Cold Storage), gambar Open Graph | Pexels License (kanvas diperpanjang 22% ke bawah agar truk tidak tertutup bar statistik), [#93398](https://www.pexels.com/photo/white-dump-truck-near-pine-tress-during-daytime-93398/), fotografer 500photos.com (nama diambil dari daftar pencarian Pexels, **cek ulang di halaman foto**) |
 | hero-linehaul.jpg | 5900 x 3933 | 4.365 KB | Slide hero 2 | **PERLU DICEK** (sumber tidak diketahui) |
 | hero-hyperlocal.jpg | 7008 x 4672 | 6.866 KB | Slide hero 3 | **PERLU DICEK** (sumber tidak diketahui) |
-| hero-partnership.jpg | 4608 x 3456 | 3.064 KB | Slide hero 4 | **PERLU DICEK** (sumber tidak diketahui) |
+| hero-partnership.jpg | 2400 x 1600 | ~480 KB | Slide hero 4 (Logistic Partnership) | Pexels License, [#8994766](https://www.pexels.com/photo/8994766/), fotografer Braeson Holland (nama dari daftar pencarian Pexels, **cek ulang di halaman foto**) |
 | menu-services.jpg | 6240 x 4160 | 5.336 KB | Kartu mega menu | **PERLU DICEK** (sumber tidak diketahui) |
 
 ### Foto untuk Tahap 3 (belum dipakai seeder, belum di-commit)

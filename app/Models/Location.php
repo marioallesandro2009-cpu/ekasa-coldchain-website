@@ -46,7 +46,18 @@ class Location extends Model implements HasMedia, HasTranslatableFields
 
     public const TRANSLATABLE = ['commodities', 'capacity', 'opening_hours'];
 
-    public const KINDS = ['warehouse' => 'Gudang', 'hub' => 'Hub kota'];
+    public const KINDS = ['office' => 'Kantor', 'pool' => 'Pool', 'warehouse' => 'Gudang', 'hub' => 'Hub kota'];
+
+    /** Public (translated) name of a kind. */
+    public static function kindLabel(string $kind, ?string $locale = null): string
+    {
+        return __(match ($kind) {
+            'office' => 'Office',
+            'pool' => 'Pool',
+            'hub' => 'City hub',
+            default => 'Warehouse',
+        }, [], $locale);
+    }
 
     protected function casts(): array
     {
@@ -91,7 +102,7 @@ class Location extends Model implements HasMedia, HasTranslatableFields
             'id' => $this->id,
             'name' => $this->name,
             'kind' => $this->kind,
-            'kindLabel' => __($this->kind === 'hub' ? 'City hub' : 'Warehouse'),
+            'kindLabel' => self::kindLabel($this->kind),
             'city' => trim($this->city.($this->area ? ', '.$this->area : '')),
             'address' => $this->address,
             'zones' => array_values(array_filter(array_map(

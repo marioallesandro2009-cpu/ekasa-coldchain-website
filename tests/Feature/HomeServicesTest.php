@@ -103,12 +103,12 @@ it('makes the first main service in the admin order the large card', function ()
     // in the markup; the next "lg:col-span-5" starts the first side card.
     $largeSlice = fn (string $html): string => substr($html, (int) strpos($html, 'lg:col-span-7'), (int) strpos($html, 'lg:col-span-5') - (int) strpos($html, 'lg:col-span-7'));
 
-    expect($largeSlice($section()))->toContain('Cold Storage')->not->toContain('Linehaul Transport');
+    expect($largeSlice($section()))->toContain('Logistic Partnership')->not->toContain('Linehaul Transport');
 
     // Through the model, like the admin (a query update would skip the cache flush).
     Service::query()->where('slug', 'linehaul-transport')->firstOrFail()->update(['sort_order' => 0]);
 
     $html = $section();
-    expect(strpos($html, 'Linehaul Transport'))->toBeLessThan(strpos($html, 'Cold Storage'))
-        ->and($largeSlice($html))->toContain('Linehaul Transport')->not->toContain('Cold Storage');
+    expect(strpos($html, 'Linehaul Transport'))->toBeLessThan(strpos($html, 'Logistic Partnership'))
+        ->and($largeSlice($html))->toContain('Linehaul Transport')->not->toContain('Logistic Partnership');
 });

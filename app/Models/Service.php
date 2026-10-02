@@ -45,13 +45,14 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
  * @property string|null $icon
  * @property string|null $anchor
  * @property bool $is_featured
+ * @property bool $is_coming_soon
  * @property int $sort_order
  * @property bool $is_active
  * @property bool $is_sample
  * @property array<string, array<string, string>>|null $translation_status
  * @property-read FleetVehicle|null $cardFleetVehicle
  */
-#[Fillable(['title', 'slug', 'slugs', 'short_description', 'intro', 'key_points', 'seo_title', 'seo_description', 'detail_status', 'blocks', 'card_fleet_vehicle_id', 'card_focus_x', 'card_focus_y', 'card_photo_light', 'icon', 'anchor', 'is_featured', 'sort_order', 'is_active', 'is_sample', 'translation_status'])]
+#[Fillable(['title', 'slug', 'slugs', 'short_description', 'intro', 'key_points', 'seo_title', 'seo_description', 'detail_status', 'blocks', 'card_fleet_vehicle_id', 'card_focus_x', 'card_focus_y', 'card_photo_light', 'icon', 'anchor', 'is_featured', 'is_coming_soon', 'sort_order', 'is_active', 'is_sample', 'translation_status'])]
 class Service extends Model implements HasMedia, HasTranslatableFields
 {
     use FlushesFrontendCache, HasSampleFlag, HasTranslations, InteractsWithMedia, RegistersWebpConversions, Sortable;
@@ -77,6 +78,7 @@ class Service extends Model implements HasMedia, HasTranslatableFields
     {
         return [
             'slugs' => 'array',
+            'is_coming_soon' => 'boolean',
             'blocks' => 'array',
             'card_focus_x' => 'integer',
             'card_focus_y' => 'integer',
@@ -217,6 +219,7 @@ class Service extends Model implements HasMedia, HasTranslatableFields
             'icon' => ServiceIcons::has($this->icon) ? $this->icon : ServiceIcons::DEFAULT,
             'anchor' => ltrim((string) ($this->anchor ?: $this->slug), '#'),
             'featured' => $this->is_featured,
+            'comingSoon' => $this->is_coming_soon,
             'keyPoints' => $this->keyPoints(),
             'image' => $this->cardImage(),
             // Whether the card photo is bright/busy: the /services index card's

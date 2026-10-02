@@ -40,7 +40,10 @@ it('puts the navbar, mega menu links, final statistics and a single h1 in the HT
         // Published services link to their detail page; drafts to their home anchor.
         ->toContain('href="/services/cold-storage"')
         ->toContain('href="#omnichannel-integration"')
-        ->toContain('600+')
+        // Revisi 1: Delivery Points is "Multi", Warehouses "Coming soon", Trusted Brands 20+.
+        ->toContain('Multi')
+        ->toContain('Coming soon')
+        ->toContain('20+')
         ->toContain('-25°C to 6°C')
         ->and(substr_count($html, '<h1'))->toBe(1);
 
@@ -111,13 +114,13 @@ it('leaves empty contact fields out of the JSON-LD and adds them once filled', f
 it('shows only active slides and services, in their sort order', function () {
     Service::query()->where('slug', 'omnichannel-integration')->update(['is_active' => false]);
     HeroSlide::query()->where('label->en', 'Linehaul Transport')->firstOrFail()->update(['is_active' => false]);
-    Service::query()->where('slug', 'logistic-partnership')->firstOrFail()->update(['sort_order' => 0]);
+    Service::query()->where('slug', 'cold-storage')->firstOrFail()->update(['sort_order' => 0]);
     FrontendData::flush();
 
     $data = FrontendData::all('en');
 
     expect(array_column($data['services'], 'title'))
-        ->toBe(['Logistic Partnership', 'Cold Storage', 'Linehaul Transport', 'Hyperlocal Fulfilment'])
+        ->toBe(['Cold Storage', 'Logistic Partnership', 'Linehaul Transport', 'Hyperlocal Fulfilment'])
         ->and(array_column($data['heroSlides'], 'label'))
         ->toBe(['Cold Storage', 'Hyperlocal Fulfilment', 'Logistic Partnership']);
 
