@@ -9,7 +9,7 @@ return new class extends Migration
     /**
      * Revisi 1 (klien): foto slide beranda diganti foto truk (tanpa foto orang). Seeder tidak
      * berjalan di produksi dan tidak menimpa foto yang sudah ada, jadi penggantiannya dilakukan di
-     * sini, dari file yang ikut di repo (database/seeders/images). Bisa diulang tanpa efek ganda.
+     * sini, dari file yang ikut di repo (database/seeders/images). Bisa diulang tanpa efek ganda (foto yang ukurannya sama dengan file di repo dilewati).
      * Selanjutnya foto bisa diganti lewat admin (Slide Beranda).
      */
     public function up(): void
@@ -23,7 +23,8 @@ return new class extends Migration
             $slide = HeroSlide::query()->where('label->en', $label)->first();
             $path = database_path("seeders/images/{$file}.jpg");
 
-            if (! $slide || ! is_file($path) || $slide->getFirstMedia('image')?->name === $file) {
+            // Same file name is not proof of the same photo (the old Logistic Partnership photo had it too): compare sizes.
+            if (! $slide || ! is_file($path) || $slide->getFirstMedia('image')?->size === filesize($path)) {
                 continue;
             }
 
@@ -36,7 +37,7 @@ return new class extends Migration
         $settings = SiteSetting::query()->first();
         $truck = database_path('seeders/images/hero-truck.jpg');
 
-        if ($settings && is_file($truck) && $settings->getFirstMedia('og_image')?->name !== 'hero-truck') {
+        if ($settings && is_file($truck) && $settings->getFirstMedia('og_image')?->size !== filesize($truck)) {
             $settings->clearMediaCollection('og_image');
             $settings->addMedia($truck)->preservingOriginal()->usingName('hero-truck')->toMediaCollection('og_image');
         }
