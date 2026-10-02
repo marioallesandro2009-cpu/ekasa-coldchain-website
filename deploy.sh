@@ -65,8 +65,11 @@ step "Ambil kode terbaru (origin/$BRANCH)"
 git pull --ff-only origin "$BRANCH"
 
 step "Install dependency PHP (tanpa dev)"
+# --no-scripts: PHP CLI di hosting ini (ea-php83) menonaktifkan proc_open, yang dibutuhkan composer untuk
+# menjalankan skrip pasca-install (@php artisan package:discover). Skrip itu dijalankan langsung di bawah.
 # shellcheck disable=SC2086
-$COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+$COMPOSER_BIN install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+$ARTISAN package:discover --ansi
 
 step "Siapkan folder writable"
 mkdir -p storage/app/public storage/framework/cache/data storage/framework/sessions \
