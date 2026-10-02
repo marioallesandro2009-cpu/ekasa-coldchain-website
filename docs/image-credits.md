@@ -10,7 +10,7 @@ dipublikasikan**.
 
 | File | Dimensi asli | Ukuran asli | Dipakai untuk | Sumber / lisensi |
 |---|---|---|---|---|
-| hero-cold-storage.jpg | 7491 x 5618 | 10.063 KB | Slide hero 1, gambar Open Graph | **PERLU DICEK** (sumber tidak diketahui) |
+| hero-truck.jpg | 2400 x 1952 | 563 KB | Slide hero 1 (Cold Storage), gambar Open Graph | Pexels License (kanvas diperpanjang 22% ke bawah agar truk tidak tertutup bar statistik), [#93398](https://www.pexels.com/photo/white-dump-truck-near-pine-tress-during-daytime-93398/), fotografer 500photos.com (nama diambil dari daftar pencarian Pexels, **cek ulang di halaman foto**) |
 | hero-linehaul.jpg | 5900 x 3933 | 4.365 KB | Slide hero 2 | **PERLU DICEK** (sumber tidak diketahui) |
 | hero-hyperlocal.jpg | 7008 x 4672 | 6.866 KB | Slide hero 3 | **PERLU DICEK** (sumber tidak diketahui) |
 | hero-partnership.jpg | 4608 x 3456 | 3.064 KB | Slide hero 4 | **PERLU DICEK** (sumber tidak diketahui) |

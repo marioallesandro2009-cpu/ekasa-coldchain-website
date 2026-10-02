@@ -14,7 +14,7 @@ class HeroSlideSeeder extends Seeder
     {
         // label [en, id], image, alt text [en, id]
         $slides = [
-            [['Cold Storage', 'Cold Storage'], 'hero-cold-storage', ['Temperature-controlled cold storage warehouse', 'Gudang cold storage bersuhu terkendali']],
+            [['Cold Storage', 'Cold Storage'], 'hero-truck', ['Refrigerated truck on a mountain highway', 'Truk berpendingin di jalan raya pegunungan']],
             [['Linehaul Transport', 'Transportasi Linehaul'], 'hero-linehaul', ['Refrigerated truck on an intercity route', 'Truk berpendingin di jalur antarkota']],
             [['Hyperlocal Fulfilment', 'Hyperlocal Fulfilment'], 'hero-hyperlocal', ['Fast delivery from a city fulfilment hub', 'Pengiriman cepat dari hub fulfilment dalam kota']],
             [['Logistic Partnership', 'Kemitraan Logistik'], 'hero-partnership', ['Logistics partners reviewing a supply chain plan', 'Mitra logistik meninjau rencana rantai pasok']],

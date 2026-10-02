@@ -68,6 +68,6 @@ class SiteSettingSeeder extends Seeder
         $this->attachSeedImage($settings, 'logo_color', 'logo-color', 597, 229);
         $this->attachSeedImage($settings, 'favicon', 'favicon', 512, 512);
         $this->attachSeedImage($settings, 'mega_menu_image', 'menu-services', 800, 600);
-        $this->attachSeedImage($settings, 'og_image', 'hero-cold-storage', 1920, 1080);
+        $this->attachSeedImage($settings, 'og_image', 'hero-truck', 1920, 1080);
     }
 }

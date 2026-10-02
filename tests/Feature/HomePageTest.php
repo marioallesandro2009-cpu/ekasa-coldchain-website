@@ -55,8 +55,8 @@ it('puts the navbar, mega menu links, final statistics and a single h1 in the HT
 it('preloads the first hero photo with the same srcset/sizes as the image', function () {
     $html = $this->get('/')->getContent();
 
-    expect($html)->toMatch('#<link rel="preload" as="image" href="[^"]+hero-cold-storage[^"]*" imagesrcset="[^"]+" imagesizes="100vw" fetchpriority="high">#')
-        ->toMatch('#<img\s+src="[^"]+hero-cold-storage[^"]*"\s+srcset="[^"]+"\s+sizes="100vw"#');
+    expect($html)->toMatch('#<link rel="preload" as="image" href="[^"]+hero-truck[^"]*" imagesrcset="[^"]+" imagesizes="100vw" fetchpriority="high">#')
+        ->toMatch('#<img\s+src="[^"]+hero-truck[^"]*"\s+srcset="[^"]+"\s+sizes="100vw"#');
 });
 
 it('outputs valid JSON-LD with the organization and the services', function () {
