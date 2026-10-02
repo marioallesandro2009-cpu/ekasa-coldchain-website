@@ -35,6 +35,9 @@ return [
     'google_sheets' => [
         'url' => env('GOOGLE_SHEETS_WEBHOOK_URL'),
         'secret' => env('GOOGLE_SHEETS_SECRET'),
+        // Address of the sheet itself (docs.google.com/spreadsheets/...), only for the "Buka Google Sheet"
+        // button in the lead email. Empty = no button. Not secret: only accounts with access can open it.
+        'view_url' => env('GOOGLE_SHEETS_VIEW_URL'),
     ],
 
     /*

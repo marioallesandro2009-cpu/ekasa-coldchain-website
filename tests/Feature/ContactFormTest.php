@@ -325,3 +325,19 @@ it('still sends the email when the Excel file cannot be built', function () {
     expect($mail->attachments())->toBeArray();
     expect($mail->render())->toContain('Halo, mau tanya tarif.');
 });
+
+it('puts a "Buka Google Sheet" button in the email only for a Google Sheets address', function () {
+    $lead = ContactMessage::query()->create(['name' => 'Budi', 'email' => 'budi@klien.test', 'message' => 'Mau tanya tarif cold storage.', 'locale' => 'id']);
+
+    config(['services.google_sheets.view_url' => null]);
+    expect((new ContactMessageReceived($lead))->render())->not->toContain('Buka Google Sheet');
+
+    config(['services.google_sheets.view_url' => 'https://docs.google.com/spreadsheets/d/ABC123_-xyz/edit?gid=0#gid=0']);
+    expect((new ContactMessageReceived($lead))->render())->toContain('Buka Google Sheet')->toContain('docs.google.com/spreadsheets/d/ABC123_-xyz/edit');
+
+    // Anything else (another site, a script) is ignored.
+    foreach (['https://evil.test/spreadsheets/d/x', 'javascript:alert(1)', 'http://docs.google.com/spreadsheets/d/x', 'https://docs.google.com/spreadsheets/d/x" onclick="y'] as $bad) {
+        config(['services.google_sheets.view_url' => $bad]);
+        expect((new ContactMessageReceived($lead))->render())->not->toContain('Buka Google Sheet');
+    }
+});

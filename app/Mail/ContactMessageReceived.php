@@ -37,6 +37,16 @@ class ContactMessageReceived extends Mailable
     }
 
     /**
+     * The Google Sheet link for the email button; only a plain https Google Sheets address is accepted.
+     */
+    public static function sheetUrl(): ?string
+    {
+        $url = trim((string) config('services.google_sheets.view_url'));
+
+        return preg_match('~^https://docs\.google\.com/spreadsheets/[A-Za-z0-9_\-/.?=&%#]+$~', $url) === 1 ? $url : null;
+    }
+
+    /**
      * @return list<Attachment>
      */
     public function attachments(): array
@@ -56,7 +66,7 @@ class ContactMessageReceived extends Mailable
     {
         return new Content(
             markdown: 'mail.contact-message',
-            with: ['lead' => $this->lead, 'localeName' => strtoupper($this->lead->locale)],
+            with: ['lead' => $this->lead, 'localeName' => strtoupper($this->lead->locale), 'sheetUrl' => self::sheetUrl()],
         );
     }
 }

@@ -76,6 +76,8 @@ Isi di `.env` server (nano), lalu `php artisan config:cache`:
 ```
 GOOGLE_SHEETS_WEBHOOK_URL=https://script.google.com/macros/s/XXXXXXXX/exec
 GOOGLE_SHEETS_SECRET=kata-sandi-yang-sama-dengan-SECRET-di-Apps-Script
+# Opsional: alamat Sheet-nya, untuk tombol "Buka Google Sheet" di email pemberitahuan
+GOOGLE_SHEETS_VIEW_URL=https://docs.google.com/spreadsheets/d/ID-SHEET-ANDA/edit
 ```
 
 Uji: kirim satu pesan lewat form Kontak; satu baris baru muncul di Sheet dan satu email berisi tabel masuk ke Gmail `NOTIFY_TO` dalam beberapa detik. Uji manual dari terminal:

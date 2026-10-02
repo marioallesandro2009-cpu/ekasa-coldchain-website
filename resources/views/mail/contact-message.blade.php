@@ -27,4 +27,10 @@
 {{ __('You can also press Reply on this email: it goes straight to the sender.') }}
 
 {{ __('The same data is attached as an Excel file.') }}
+
+@if ($sheetUrl)
+<x-mail::button :url="$sheetUrl">
+{{ __('Open Google Sheet') }}
+</x-mail::button>
+@endif
 </x-mail::message>
