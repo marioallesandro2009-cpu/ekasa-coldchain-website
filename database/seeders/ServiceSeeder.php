@@ -41,7 +41,7 @@ class ServiceSeeder extends Seeder
                 'anchor' => $slug,
                 // Main grid of the mega menu; Omnichannel sits in the row below.
                 'is_featured' => $slug !== 'omnichannel-integration',
-                'is_coming_soon' => $slug !== 'omnichannel-integration',
+                'is_coming_soon' => $slug === 'cold-storage',
                 'sort_order' => $index + 1,
                 'is_active' => true,
                 ...$detail['fields'],

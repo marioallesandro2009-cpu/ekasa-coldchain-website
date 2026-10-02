@@ -21,7 +21,7 @@
     <article
         x-data="spotlightCard"
         @class([
-            'spotlight-card card-notch group relative isolate flex h-full min-h-56 flex-col justify-end overflow-hidden bg-dark text-white',
+            'spotlight-card card-notch group relative isolate flex h-full min-h-56 w-full min-w-0 flex-col justify-end overflow-hidden bg-dark text-white',
             'has-[a:focus-visible]:outline-2 has-[a:focus-visible]:outline-offset-2 has-[a:focus-visible]:outline-brand',
             'aspect-[4/5] sm:aspect-[4/3] lg:aspect-auto lg:min-h-full' => $large,
             'aspect-[16/9] lg:aspect-auto' => ! $large,

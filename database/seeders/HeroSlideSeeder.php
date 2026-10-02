@@ -26,7 +26,7 @@ class HeroSlideSeeder extends Seeder
             $slide->fill([
                 'label' => ['en' => $label[0], 'id' => $label[1]],
                 'image_alt' => ['en' => $alt[0], 'id' => $alt[1]],
-                'is_coming_soon' => true,
+                'is_coming_soon' => $label[0] === 'Cold Storage',
                 'sort_order' => $index + 1,
                 'is_active' => true,
             ])->markTranslationsReviewed('id')->save();

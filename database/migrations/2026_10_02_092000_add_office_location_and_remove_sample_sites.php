@@ -20,8 +20,8 @@ return new class extends Migration
             DB::table('locations')->insert([
                 'name' => 'Kantor Pusat',
                 'kind' => 'office',
-                'city' => 'Jakarta',
-                'area' => 'Meruya Utara, Jakarta Barat',
+                'city' => 'Jakarta Barat',
+                'area' => 'Meruya Utara, Kembangan',
                 'address' => 'Jl. Penyelesaian Tomang III Jl. Kav. DKI No.1 Blk 10A, RT.8/RW.10, Meruya Utara, Kec. Kembangan, Kota Jakarta Barat, DKI Jakarta 11620',
                 'lat' => -6.1998,
                 'lng' => 106.7287,

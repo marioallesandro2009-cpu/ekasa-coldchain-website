@@ -212,19 +212,37 @@
     color: var(--color-white);
 }
 
-.logo-outline {
-    display: none;
+/* Logo in three layers (see layout/logo.blade.php): icon, EKASA, COLD CHAIN. The clip rows and columns
+   belong to the current logo file: the icon ends at about 30.6% of its width, and the two lines of
+   lettering are separated at about 58.8% of its height. COLD CHAIN is nudged down 6% of the logo
+   height so the lines do not touch. */
+.logo-part {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
 }
 
-/* On dark surfaces (footer, mobile menu: logo-outline--always) the colour logo is used too. Only the lettering gets the white outline, not the round icon: the clip starts right of the icon
-   (the icon ends at about 30% of the logo file's width; adjust if the logo file changes). */
-.site-header:not(.is-solid) .logo-outline,
+.logo-part--icon {
+    clip-path: inset(0 69.4% 0 0);
+}
+
+.logo-part--line1 {
+    clip-path: inset(0 0 41.2% 30.6%);
+}
+
+.logo-part--line2 {
+    clip-path: inset(58.8% 0 0 30.6%);
+    transform: translateY(6%);
+}
+
+/* Thin white outline on the lettering only: over the hero (transparent navbar) and on dark
+   surfaces (footer, mobile menu: logo-outline--always), so the navy lettering stays readable. */
+.site-header:not(.is-solid) .logo-part--text,
 .logo-outline--always {
-    display: block;
-    clip-path: inset(0 0 0 30.6%);
     filter: drop-shadow(0.75px 0 0 #fff) drop-shadow(-0.75px 0 0 #fff) drop-shadow(0 0.75px 0 #fff) drop-shadow(0 -0.75px 0 #fff);
 }
-
 .site-header:not(.is-solid) .nav-link {
     color: color-mix(in srgb, var(--color-white) 80%, transparent);
 }

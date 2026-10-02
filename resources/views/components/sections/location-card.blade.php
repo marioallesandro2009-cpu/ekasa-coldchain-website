@@ -47,6 +47,12 @@
                 </div>
                 <span class="shrink-0 rounded-full bg-brand/10 px-2.5 py-0.5 text-xs font-semibold text-brand">{{ $location['kindLabel'] }}</span>
             </div>
+            @if ($location['address'])
+                <p class="mt-2 flex items-start gap-1.5 text-sm leading-snug break-words text-ink-muted">
+                    <x-ui.icon name="map-pin" class="mt-0.5 size-4 shrink-0" />
+                    <span>{{ $location['address'] }}</span>
+                </p>
+            @endif
             @if ($location['zones'])
                 <ul class="mt-2 flex flex-wrap gap-1.5" role="list" aria-label="{{ __('Temperature zones') }}">
                     @foreach ($location['zones'] as $zone)

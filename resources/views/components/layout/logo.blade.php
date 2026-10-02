@@ -24,14 +24,18 @@
                 @if ($width) width="{{ $width }}" @endif
                 height="{{ $height }}"
                 style="height: var(--logo-h, {{ $height }}px)"
-                class="w-auto"
+                @class(['w-auto', 'opacity-0' => $textOutline])
                 decoding="async"
             >
         </picture>
         @if ($textOutline)
-            {{-- Same image again, clipped to the lettering (right of the icon): CSS gives it a thin white
-                 outline while the navbar is transparent over the hero (see .logo-outline in app.css). --}}
-            <img src="{{ $logo['url'] }}" alt="" aria-hidden="true" @class(['logo-outline pointer-events-none absolute inset-0 size-full', 'logo-outline--always' => $outlined]) decoding="async">
+            {{-- The logo drawn in three clipped layers over the (invisible) sizing image: the round icon, the
+                 EKASA line and the COLD CHAIN line. The last one is nudged down a little so the two lines of
+                 lettering do not touch, and the two text layers can take a thin white outline (see
+                 .logo-part in app.css). The clip positions belong to the current logo file. --}}
+            <img src="{{ $logo['url'] }}" alt="" aria-hidden="true" class="logo-part logo-part--icon" decoding="async">
+            <img src="{{ $logo['url'] }}" alt="" aria-hidden="true" @class(['logo-part logo-part--line1 logo-part--text', 'logo-outline--always' => $outlined]) decoding="async">
+            <img src="{{ $logo['url'] }}" alt="" aria-hidden="true" @class(['logo-part logo-part--line2 logo-part--text', 'logo-outline--always' => $outlined]) decoding="async">
         @endif
         </span>
     @else

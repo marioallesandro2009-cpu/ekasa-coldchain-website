@@ -76,7 +76,7 @@
             @endforeach
         </div>
 
-        <div class="mt-8 grid gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start">
+        <div class="mt-8 grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start">
             {{-- Cards: scrollable side. --}}
             <div class="order-2 lg:order-1">
                 @if (count($locations) === 0)
