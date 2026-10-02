@@ -18,6 +18,9 @@ cron `schedule:run` yang sudah terpasang).
 
 ```javascript
 const SECRET = 'GANTI-DENGAN-KATA-SANDI-ACAK-PANJANG';
+// Email pemberitahuan: setiap pesan baru dikirim ke Gmail ini dalam bentuk tabel + tautan ke Sheet.
+// Kosongkan ('') bila tidak mau email dari Apps Script.
+const NOTIFY_TO = 'GANTI@gmail.com';
 
 function doPost(e) {
   try {
@@ -32,10 +35,25 @@ function doPost(e) {
       const t = (v) => (v == null ? '' : "'" + String(v));
       sheet.appendRow([d.id, d.received_at, t(d.name), t(d.email), t(d.phone), t(d.company), t(d.country), t(d.service), t(d.message), d.language]);
     }
+    if (NOTIFY_TO && !ids.includes(d.id)) notify(d);
     return out({ ok: true });
   } catch (err) {
     return out({ ok: false });
   }
+}
+
+// Gmail menerima satu email per pesan baru: tabel isi pesan + tombol ke Sheet-nya.
+function notify(d) {
+  const esc = (v) => String(v == null || v === '' ? '-' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
+  const rows = [['Nama', d.name], ['Email', d.email], ['Telepon', d.phone], ['Perusahaan', d.company], ['Negara', d.country], ['Layanan', d.service], ['Pesan', d.message], ['Diterima (WIB)', d.received_at], ['Bahasa', d.language]];
+  const table = rows.map(([k, v]) => '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f6f8f9"><b>' + k + '</b></td><td style="padding:6px 12px;border:1px solid #ddd">' + esc(v) + '</td></tr>').join('');
+  const url = SpreadsheetApp.getActiveSpreadsheet().getUrl();
+  MailApp.sendEmail({
+    to: NOTIFY_TO,
+    replyTo: d.email,
+    subject: 'Pesan baru dari website: ' + d.name,
+    htmlBody: '<p>Ada pesan baru dari form Kontak ekasacoldchain.com.</p><table style="border-collapse:collapse">' + table + '</table><p><a href="' + url + '">Buka Google Sheet</a></p>',
+  });
 }
 
 function out(obj) {
@@ -43,6 +61,9 @@ function out(obj) {
 }
 ```
 
+3b. Ganti `NOTIFY_TO` dengan alamat Gmail yang menerima pemberitahuan. Saat pertama kali diterapkan, Google meminta izin
+   mengirim email atas nama Anda (`MailApp`); izinkan. Batas kiriman Apps Script: sekitar 100 email per hari untuk Gmail biasa,
+   sekitar 1.500 untuk Google Workspace.
 4. **Terapkan → Deployment baru → jenis: Aplikasi web.** Jalankan sebagai: **Saya**. Yang memiliki akses: **Siapa saja**
    (alamat web app-nya yang panjang dan acak, ditambah `SECRET`, yang menjaga). Klik **Terapkan**, izinkan akses, lalu
    salin **URL aplikasi web** (berakhiran `/exec`).
@@ -57,9 +78,10 @@ GOOGLE_SHEETS_WEBHOOK_URL=https://script.google.com/macros/s/XXXXXXXX/exec
 GOOGLE_SHEETS_SECRET=kata-sandi-yang-sama-dengan-SECRET-di-Apps-Script
 ```
 
-Uji: kirim satu pesan lewat form Kontak; satu baris baru muncul di Sheet dalam beberapa detik. Uji manual dari terminal:
+Uji: kirim satu pesan lewat form Kontak; satu baris baru muncul di Sheet dan satu email berisi tabel masuk ke Gmail `NOTIFY_TO` dalam beberapa detik. Uji manual dari terminal:
 `php artisan leads:sync-sheet` (mengirim pesan yang belum ada di Sheet; **menyalakan fitur ini pertama kali akan mengirim
-semua pesan lama yang sudah ada di database**).
+semua pesan lama yang sudah ada di database**, dan tiap pesan lama juga memicu satu email ke `NOTIFY_TO`. Bila sudah ada banyak pesan,
+kosongkan `NOTIFY_TO` dulu (`''`) sampai sinkronisasi pertama selesai, lalu isi lagi dan buat deployment baru).
 
 ## C. Catatan privasi
 
