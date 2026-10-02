@@ -214,7 +214,7 @@
 
 /* Logo in three layers (see layout/logo.blade.php): icon, EKASA, COLD CHAIN. The clip rows and columns
    belong to the current logo file: the icon ends at about 30.6% of its width, and the two lines of
-   lettering are separated at about 58.8% of its height. COLD CHAIN is nudged down 6% of the logo
+   lettering are separated at about 58.8% of its height. COLD CHAIN is nudged down 12% of the logo
    height so the lines do not touch. */
 .logo-part {
     position: absolute;
@@ -234,7 +234,7 @@
 
 .logo-part--line2 {
     clip-path: inset(58.8% 0 0 30.6%);
-    transform: translateY(6%);
+    transform: translateY(12%);
 }
 
 /* Thin white outline on the lettering only: over the hero (transparent navbar) and on dark
