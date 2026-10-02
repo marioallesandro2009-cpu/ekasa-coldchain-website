@@ -73,3 +73,26 @@ it('is on the scheduler, and the periods come from .env with the agreed defaults
     $site = require base_path('config/site.php');
     expect($site['leads'])->toBe(['anonymize_after_days' => 60, 'delete_after_months' => 12]);
 });
+
+it('clears leads only after confirmation, with a dry run and a date limit', function () {
+    $old = ContactMessage::query()->create(['name' => 'Lama', 'email' => 'lama@klien.test', 'message' => 'Pesan uji lama sekali.', 'locale' => 'id']);
+    $old->forceFill(['created_at' => now()->subDays(10)])->save();
+    ContactMessage::query()->create(['name' => 'Baru', 'email' => 'baru@klien.test', 'message' => 'Pesan uji yang baru.', 'locale' => 'id']);
+
+    $this->artisan('leads:clear', ['--dry-run' => true])->expectsOutputToContain('2 pesan akan dihapus')->assertSuccessful();
+    expect(ContactMessage::query()->count())->toBe(2);
+
+    // Answering "no" deletes nothing.
+    $this->artisan('leads:clear')->expectsConfirmation('Hapus 2 pesan dari Pesan Masuk? Tidak bisa dibatalkan, dan baris di Google Sheet tidak ikut terhapus.', 'no')->assertFailed();
+    expect(ContactMessage::query()->count())->toBe(2);
+
+    // Only what is older than the date.
+    $this->artisan('leads:clear', ['--before' => now()->subDays(5)->toDateString(), '--force' => true])->expectsOutputToContain('Dihapus: 1 pesan')->assertSuccessful();
+    expect(ContactMessage::query()->pluck('name')->all())->toBe(['Baru']);
+
+    $this->artisan('leads:clear', ['--force' => true])->expectsOutputToContain('Dihapus: 1 pesan')->assertSuccessful();
+    expect(ContactMessage::query()->count())->toBe(0);
+
+    $this->artisan('leads:clear', ['--force' => true])->expectsOutputToContain('Tidak ada pesan')->assertSuccessful();
+    $this->artisan('leads:clear', ['--before' => 'kemarin'])->assertExitCode(2);
+});
