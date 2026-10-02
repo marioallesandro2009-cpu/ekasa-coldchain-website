@@ -25,4 +25,6 @@
 </x-mail::button>
 
 {{ __('You can also press Reply on this email: it goes straight to the sender.') }}
+
+{{ __('The same data is attached as an Excel file.') }}
 </x-mail::message>

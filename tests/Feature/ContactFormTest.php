@@ -10,10 +10,12 @@ use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Models\User;
 use App\Support\FrontendData;
+use App\Support\LeadSpreadsheet;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Livewire;
+use OpenSpout\Reader\XLSX\Reader;
 
 beforeEach(function () {
     seedSite();
@@ -276,4 +278,50 @@ it('does nothing for the Google Sheet when no URL is set', function () {
 
     Http::assertNothingSent();
     $this->artisan('leads:sync-sheet')->assertSuccessful();
+});
+
+it('attaches the lead to the notification email as an Excel file, with text kept as text', function () {
+    $this->postJson('/contact', validLead(['message' => '=HYPERLINK("http://evil.test","klik") dan butuh 20 pallet', 'country' => 'Singapore']))->assertOk();
+
+    $lead = ContactMessage::query()->latest('id')->first();
+
+    Mail::assertSent(ContactMessageReceived::class, function (ContactMessageReceived $mail): bool {
+        $attachments = $mail->attachments();
+
+        return count($attachments) === 1 && $mail->render() !== '' && str_contains($mail->render(), 'Excel');
+    });
+
+    // The file itself: a real .xlsx (zip) whose rows are the headings and the lead.
+    $path = tempnam(sys_get_temp_dir(), 'xl').'.xlsx';
+    file_put_contents($path, LeadSpreadsheet::xlsx($lead));
+    expect(file_get_contents($path, false, null, 0, 2))->toBe('PK');
+
+    $reader = new Reader;
+    $reader->open($path);
+    $rows = [];
+    foreach ($reader->getSheetIterator() as $sheet) {
+        foreach ($sheet->getRowIterator() as $row) {
+            $rows[] = array_map(fn ($cell) => $cell->getValue(), $row->getCells());
+        }
+    }
+    $reader->close();
+    @unlink($path);
+
+    expect($rows)->toHaveCount(2)
+        ->and($rows[0])->toBe(LeadSpreadsheet::HEADINGS)
+        ->and($rows[1][2])->toBe('Budi Santoso')
+        ->and($rows[1][3])->toBe('budi@klien.test')
+        ->and($rows[1][6])->toBe('Singapore')
+        // Not a formula: the text is stored as is.
+        ->and($rows[1][8])->toStartWith('=HYPERLINK(');
+});
+
+it('still sends the email when the Excel file cannot be built', function () {
+    $lead = ContactMessage::query()->create(['name' => 'X', 'email' => 'x@klien.test', 'message' => 'Halo, mau tanya tarif.', 'locale' => 'id']);
+    $lead->created_at = null;
+
+    $mail = new ContactMessageReceived($lead);
+
+    expect($mail->attachments())->toBeArray();
+    expect($mail->render())->toContain('Halo, mau tanya tarif.');
 });
