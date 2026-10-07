@@ -93,7 +93,7 @@ class AppServiceProvider extends ServiceProvider
 
         User::created(fn (User $user) => SecurityLog::event('user.created', ['user' => $user->id, 'is_admin' => $user->is_admin]));
         User::updated(function (User $user): void {
-            $fields = array_values(array_intersect(array_keys($user->getChanges()), ['name', 'email', 'password', 'is_admin']));
+            $fields = array_values(array_intersect(array_keys($user->getChanges()), ['name', 'email', 'password', 'is_admin', 'access_revoked_at', 'access_expires_at']));
 
             if ($fields !== []) {
                 SecurityLog::event('user.updated', ['user' => $user->id, 'fields' => $fields]);

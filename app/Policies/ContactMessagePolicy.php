@@ -14,12 +14,12 @@ class ContactMessagePolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->is_admin;
+        return $user->hasAdminAccess();
     }
 
     public function view(User $user, ContactMessage $message): bool
     {
-        return $user->is_admin;
+        return $user->hasAdminAccess();
     }
 
     public function create(User $user): bool
@@ -30,16 +30,16 @@ class ContactMessagePolicy
     public function update(User $user, ContactMessage $message): bool
     {
         // "Tandai dibaca" changes only the status; it is an administrator action.
-        return $user->is_admin;
+        return $user->hasAdminAccess();
     }
 
     public function delete(User $user, ContactMessage $message): bool
     {
-        return $user->is_admin;
+        return $user->hasAdminAccess();
     }
 
     public function deleteAny(User $user): bool
     {
-        return $user->is_admin;
+        return $user->hasAdminAccess();
     }
 }

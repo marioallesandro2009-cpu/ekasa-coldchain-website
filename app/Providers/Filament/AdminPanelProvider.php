@@ -53,7 +53,7 @@ class AdminPanelProvider extends PanelProvider
                     950 => '#00120F',
                 ],
             ])
-            ->navigationGroups(['Konten Beranda', 'Data Layanan'])
+            ->navigationGroups(['Konten Beranda', 'Data Layanan', 'Akses'])
             // Small AA fix for Filament's placeholder colour (see the view).
             ->renderHook(PanelsRenderHook::HEAD_END, fn (): string => view('filament.admin-styles')->render())
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
