@@ -69,7 +69,14 @@ class RevokeAdmin extends Command
         }
 
         $removed = $user->revokeAccess();
+        $sheet = $user->revokeSheetAccess();
         $this->components->info("Akses {$email} dicabut.".($removed ? ' Emailnya juga dihapus dari daftar penerima pesan.' : ''));
+
+        if ($sheet === true) {
+            $this->components->info('Akses Google Sheet juga dicabut.');
+        } elseif ($sheet === false) {
+            $this->components->warn('Akses Google Sheet GAGAL dicabut otomatis: cabut manual lewat tombol Bagikan di Google Sheet.');
+        }
 
         return self::SUCCESS;
     }

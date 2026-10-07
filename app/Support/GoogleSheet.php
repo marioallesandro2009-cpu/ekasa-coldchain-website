@@ -51,7 +51,41 @@ class GoogleSheet
     }
 
     /**
-     * @return array<string, string|int|null>
+     * Takes the Google Sheet away from one person: the Apps Script (it runs as the owner of the sheet)
+     * removes the address from the sharing list. Only a script that answers revoked=true counts: an
+     * older script without this action answers ok but did nothing. Never throws.
+     */
+    public static function revokeAccess(string $email): bool
+    {
+        $email = mb_strtolower(trim($email));
+
+        if (! self::enabled() || filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            return false;
+        }
+
+        try {
+            $response = Http::timeout(20)
+                ->acceptJson()
+                ->post((string) config('services.google_sheets.url'), [
+                    'secret' => (string) config('services.google_sheets.secret'),
+                    'action' => 'revoke',
+                    'email' => $email,
+                ]);
+
+            $done = $response->successful() && $response->json('ok') === true && $response->json('revoked') === true;
+
+            SecurityLog::event($done ? 'sheet.access_revoked' : 'sheet.access_revoke_failed', ['email' => SecurityLog::maskEmail($email), 'status' => $response->status()]);
+
+            return $done;
+        } catch (Throwable $e) {
+            SecurityLog::event('sheet.access_revoke_failed', ['email' => SecurityLog::maskEmail($email), 'error' => $e::class]);
+
+            return false;
+        }
+    }
+
+    /**
+     * @return array<string, string|int|float|null>
      */
     public static function payload(ContactMessage $lead): array
     {
@@ -67,6 +101,10 @@ class GoogleSheet
             'service' => $lead->service_title,
             'message' => $lead->message,
             'language' => $lead->locale,
+            'category' => LeadOptions::categoryLabel($lead->category),
+            'quantity_tons' => $lead->quantity_tons === null ? null : (float) $lead->quantity_tons,
+            'container' => LeadOptions::containerLabel($lead->container_size),
+            'destination_country' => $lead->destination_country,
         ];
     }
 }

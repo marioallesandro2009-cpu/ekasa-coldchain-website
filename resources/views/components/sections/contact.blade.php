@@ -171,7 +171,7 @@
 
                     <div class="grid gap-4 sm:grid-cols-2">
                     <div>
-                        <label for="contact-country" class="text-sm font-medium text-white/80">{{ __('Country (optional)') }}</label>
+                        <label for="contact-country" class="text-sm font-medium text-white/80">{{ __('Your country (optional)') }}</label>
                         <input id="contact-country" name="country" value="{{ old('country') }}" maxlength="80" autocomplete="country-name" type="text" placeholder="{{ __('Your country') }}" class="{{ $input }} {{ $border('country') }}">
                     </div>
                     @if (count($services) > 0)
@@ -185,6 +185,42 @@
                             </select>
                         </div>
                     @endif
+                    </div>
+
+                    {{-- Shipment details (all optional): goods category, quantity in tons, container size, destination. --}}
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="contact-category" class="text-sm font-medium text-white/80">{{ __('Category (optional)') }}</label>
+                            <select id="contact-category" name="category" class="{{ $input }} {{ $border('category') }}" :class="errors.category && 'border-red-300!'" :aria-invalid="errors.category ? 'true' : null" aria-describedby="contact-category-error" @if ($errors->has('category')) aria-invalid="true" @endif>
+                                <option value="" class="bg-dark">{{ __('Select a category') }}</option>
+                                @foreach (\App\Support\LeadOptions::categories() as $key => $label)
+                                    <option value="{{ $key }}" class="bg-dark" @selected(old('category') === $key)>{{ __($label) }}</option>
+                                @endforeach
+                            </select>
+                            <p id="contact-category-error" class="mt-1 text-sm text-red-300" x-text="errors.category">{{ $errors->first('category') }}</p>
+                        </div>
+                        <div>
+                            <label for="contact-container" class="text-sm font-medium text-white/80">{{ __('Container size (optional)') }}</label>
+                            <select id="contact-container" name="container_size" class="{{ $input }} {{ $border('container_size') }}" :class="errors.container_size && 'border-red-300!'" :aria-invalid="errors.container_size ? 'true' : null" aria-describedby="contact-container-error" @if ($errors->has('container_size')) aria-invalid="true" @endif>
+                                <option value="" class="bg-dark">{{ __('Select container size') }}</option>
+                                @foreach (\App\Support\LeadOptions::containers() as $key => $label)
+                                    <option value="{{ $key }}" class="bg-dark" @selected(old('container_size') === $key)>{{ __($label) }}</option>
+                                @endforeach
+                            </select>
+                            <p id="contact-container-error" class="mt-1 text-sm text-red-300" x-text="errors.container_size">{{ $errors->first('container_size') }}</p>
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label for="contact-quantity" class="text-sm font-medium text-white/80">{{ __('Quantity in tons (optional)') }}</label>
+                            <input id="contact-quantity" name="quantity_tons" value="{{ old('quantity_tons') }}" maxlength="12" inputmode="decimal" autocomplete="off" type="text" placeholder="{{ __('For example 12.5') }}" class="{{ $input }} {{ $border('quantity_tons') }}" :class="errors.quantity_tons && 'border-red-300!'" :aria-invalid="errors.quantity_tons ? 'true' : null" aria-describedby="contact-quantity-error" @if ($errors->has('quantity_tons')) aria-invalid="true" @endif>
+                            <p id="contact-quantity-error" class="mt-1 text-sm text-red-300" x-text="errors.quantity_tons">{{ $errors->first('quantity_tons') }}</p>
+                        </div>
+                        <div>
+                            <label for="contact-destination" class="text-sm font-medium text-white/80">{{ __('Destination country (optional)') }}</label>
+                            <input id="contact-destination" name="destination_country" value="{{ old('destination_country') }}" maxlength="80" autocomplete="off" type="text" placeholder="{{ __('Country the goods are shipped to') }}" class="{{ $input }} {{ $border('destination_country') }}">
+                        </div>
                     </div>
 
                     <div>

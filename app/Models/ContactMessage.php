@@ -22,6 +22,10 @@ use Illuminate\Support\Carbon;
  * @property string|null $country
  * @property int|null $service_id
  * @property string|null $service_title
+ * @property string|null $category
+ * @property string|null $quantity_tons
+ * @property string|null $container_size
+ * @property string|null $destination_country
  * @property string $message
  * @property string $locale
  * @property string $status
@@ -31,7 +35,7 @@ use Illuminate\Support\Carbon;
  * @property string|null $user_agent
  * @property Carbon|null $created_at
  */
-#[Fillable(['name', 'email', 'phone', 'company', 'country', 'service_id', 'service_title', 'message', 'locale', 'status', 'email_failed', 'sheet_synced_at', 'ip', 'user_agent'])]
+#[Fillable(['name', 'email', 'phone', 'company', 'country', 'service_id', 'service_title', 'category', 'quantity_tons', 'container_size', 'destination_country', 'message', 'locale', 'status', 'email_failed', 'sheet_synced_at', 'ip', 'user_agent'])]
 class ContactMessage extends Model
 {
     public const NEW = 'new';
@@ -42,7 +46,21 @@ class ContactMessage extends Model
 
     protected function casts(): array
     {
-        return ['email_failed' => 'boolean', 'sheet_synced_at' => 'datetime'];
+        return ['email_failed' => 'boolean', 'sheet_synced_at' => 'datetime', 'quantity_tons' => 'decimal:2'];
+    }
+
+    /**
+     * The quantity as the team reads it: "12,5 ton" (Indonesian number style), or null.
+     */
+    public function quantityLabel(): ?string
+    {
+        if ($this->quantity_tons === null) {
+            return null;
+        }
+
+        $tons = rtrim(rtrim(number_format((float) $this->quantity_tons, 2, ',', '.'), '0'), ',');
+
+        return $tons.' ton';
     }
 
     /**

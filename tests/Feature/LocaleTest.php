@@ -63,13 +63,13 @@ it('shows the admin content in Indonesian under /id', function () {
     $this->get('/id')
         ->assertOk()
         ->assertSee('<title>PT Ekasa Cold Chain | Logistik Rantai Dingin di Indonesia</title>', false)
-        ->assertSee('Jaga produk Anda tetap segar dengan')
+        ->assertSee('Jaga Produk Anda Tetap Segar Dengan')
         ->assertSee('Segar Hari Esok, Melangkah Bersama')
         ->assertSee('Minta Penawaran')
         ->assertSee('Transportasi Linehaul')
         ->assertSee('Rentang Suhu')
         ->assertSee('-25°C hingga 6°C')
-        ->assertDontSee('Keep your products fresh with');
+        ->assertDontSee('Keep Your Products Fresh With');
 });
 
 it('falls back to English when the Indonesian text is empty', function () {

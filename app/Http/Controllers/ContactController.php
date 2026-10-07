@@ -8,6 +8,7 @@ use App\Models\ContactMessage;
 use App\Models\Service;
 use App\Models\SiteSetting;
 use App\Support\GoogleSheet;
+use App\Support\LeadOptions;
 use App\Support\Links;
 use App\Support\SecurityLog;
 use Illuminate\Http\JsonResponse;
@@ -38,6 +39,10 @@ class ContactController extends Controller
             'phone' => $this->clean($data['phone'] ?? null),
             'company' => $this->clean($data['company'] ?? null),
             'country' => $this->clean($data['country'] ?? null),
+            'category' => $data['category'] ?? null,
+            'quantity_tons' => LeadOptions::parseTons($data['quantity_tons'] ?? null),
+            'container_size' => $data['container_size'] ?? null,
+            'destination_country' => $this->clean($data['destination_country'] ?? null),
             'service_id' => $service?->id,
             'service_title' => $service ? ($service->translate('title', 'id') ?: $service->translate('title')) : null,
             'message' => trim($data['message']),

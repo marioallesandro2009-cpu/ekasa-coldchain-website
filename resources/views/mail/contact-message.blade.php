@@ -10,6 +10,10 @@
 | **{{ __('Company') }}** | {{ str_replace('|', '¦', (string) $lead->company) ?: '-' }} |
 | **{{ __('Country') }}** | {{ str_replace('|', '¦', (string) $lead->country) ?: '-' }} |
 | **{{ __('Service of interest') }}** | {{ str_replace('|', '¦', (string) $lead->service_title) ?: '-' }} |
+| **{{ __('Category') }}** | {{ str_replace('|', '¦', (string) \App\Support\LeadOptions::categoryLabel($lead->category)) ?: '-' }} |
+| **{{ __('Quantity') }}** | {{ $lead->quantityLabel() ?: '-' }} |
+| **{{ __('Container') }}** | {{ \App\Support\LeadOptions::containerLabel($lead->container_size) ?: '-' }} |
+| **{{ __('Destination country') }}** | {{ str_replace('|', '¦', (string) $lead->destination_country) ?: '-' }} |
 | **{{ __('Received') }}** | {{ $lead->created_at?->timezone('Asia/Jakarta')->format('d M Y H:i') }} WIB |
 | **{{ __('Language') }}** | {{ $localeName }} |
 </x-mail::table>

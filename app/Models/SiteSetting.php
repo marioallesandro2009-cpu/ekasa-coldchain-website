@@ -93,7 +93,7 @@ class SiteSetting extends Model implements HasMedia, HasTranslatableFields
     protected $attributes = [
         'cta_label' => '{"en":"Get a Quote"}',
         'hero_badge' => '{"en":"Temperature-Controlled Logistics"}',
-        'hero_headline' => '{"en":"Keep your products fresh with"}',
+        'hero_headline' => '{"en":"Keep Your Products Fresh With"}',
         'mega_menu_title' => '{"en":"Need a custom solution?"}',
         'mega_menu_link_label' => '{"en":"Talk to our team"}',
         'seo_title' => '{"en":"Company Name"}',

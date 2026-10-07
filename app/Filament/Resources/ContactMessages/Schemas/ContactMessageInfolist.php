@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ContactMessages\Schemas;
 
 use App\Models\ContactMessage;
+use App\Support\LeadOptions;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -21,6 +22,10 @@ class ContactMessageInfolist
                     TextEntry::make('company')->label('Perusahaan')->default('-'),
                     TextEntry::make('country')->label('Negara')->default('-'),
                     TextEntry::make('service_title')->label('Layanan diminati')->default('-'),
+                    TextEntry::make('category')->label('Kategori barang')->formatStateUsing(fn (?string $state): string => LeadOptions::categoryLabel($state) ?? '-')->default('-'),
+                    TextEntry::make('quantity_tons')->label('Jumlah')->state(fn (ContactMessage $record): string => $record->quantityLabel() ?? '-'),
+                    TextEntry::make('container_size')->label('Kontainer')->formatStateUsing(fn (?string $state): string => LeadOptions::containerLabel($state) ?? '-')->default('-'),
+                    TextEntry::make('destination_country')->label('Negara tujuan')->default('-'),
                     TextEntry::make('locale')->label('Bahasa asal')->formatStateUsing(fn (string $state): string => strtoupper($state)),
                 ]),
             Section::make('Pesan')

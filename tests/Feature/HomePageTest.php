@@ -19,7 +19,7 @@ it('renders the home page with title, meta description and headline in the raw H
         ->assertSee('<html lang="en">', false)
         ->assertSee('<meta property="og:locale" content="en_US">', false)
         ->assertSee('<link rel="canonical"', false)
-        ->assertSee('Keep your products fresh with')
+        ->assertSee('Keep Your Products Fresh With')
         ->assertSee('Fresher Tomorrow, Further Together');
 });
 
@@ -153,7 +153,7 @@ it('renders without errors when no slide is active', function () {
 
     $this->get('/')
         ->assertOk()
-        ->assertSee('Keep your products fresh with')
+        ->assertSee('Keep Your Products Fresh With')
         ->assertDontSee('rel="preload" as="image"', false)
         ->assertDontSee('class="hero-photo', false);
 });

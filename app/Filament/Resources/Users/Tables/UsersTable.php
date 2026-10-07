@@ -57,10 +57,19 @@ class UsersTable
                         }
 
                         $removed = $record->revokeAccess($by);
+                        $sheet = $record->revokeSheetAccess();
 
                         Notification::make()
                             ->title('Akses dicabut')
-                            ->body($removed ? 'Emailnya juga dihapus dari daftar penerima pesan.' : 'Emailnya tidak ada di daftar penerima pesan.')
+                            ->body(implode(' ', [
+                                $removed ? 'Emailnya dihapus dari daftar penerima pesan.' : 'Emailnya tidak ada di daftar penerima pesan.',
+                                match ($sheet) {
+                                    true => 'Akses Google Sheet juga dicabut.',
+                                    false => 'Akses Google Sheet GAGAL dicabut otomatis: cabut manual lewat tombol Bagikan di Google Sheet.',
+                                    null => '',
+                                },
+                            ]))
+                            ->color($sheet === false ? 'warning' : 'success')
                             ->success()
                             ->send();
                     }),

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\GoogleSheet;
 use App\Support\SecurityLog;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -141,6 +142,14 @@ class User extends Authenticatable implements FilamentUser
         SecurityLog::event('admin.access_revoked', ['user' => $this->getKey(), 'by' => $by?->getKey(), 'recipient_removed' => $removed]);
 
         return $removed;
+    }
+
+    /**
+     * Also closes the Google Sheet to this account's email. Null when the Sheet link is not set up.
+     */
+    public function revokeSheetAccess(): ?bool
+    {
+        return GoogleSheet::enabled() ? GoogleSheet::revokeAccess($this->email) : null;
     }
 
     public function restoreAccess(?User $by = null): void

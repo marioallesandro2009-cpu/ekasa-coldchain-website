@@ -12,7 +12,8 @@ cron `schedule:run` yang sudah terpasang).
 
 1. Buka <https://sheets.new> dengan akun Google perusahaan, beri nama mis. **Leads Website Ekasa**.
 2. Baris 1 (judul kolom), persis urutan ini:
-   `ID | Diterima (WIB) | Nama | Email | Telepon | Perusahaan | Negara | Layanan | Pesan | Bahasa`
+   `ID | Diterima (WIB) | Nama | Email | Telepon | Perusahaan | Negara | Layanan | Pesan | Bahasa | Kategori | Jumlah (ton) | Kontainer | Negara tujuan`
+   (14 kolom, A sampai N. Empat kolom terakhir adalah pertanyaan pengiriman di form Kontak; Sheet lama cukup menambahkan K sampai N di baris 1.)
 3. Menu **Ekstensi → Apps Script**. Hapus isi bawaan, tempel kode ini, ganti `SECRET` dengan kata sandi acak panjang
    (mis. 32 karakter; simpan di password manager):
 
@@ -27,13 +28,16 @@ function doPost(e) {
     const d = JSON.parse(e.postData.contents);
     if (d.secret !== SECRET) return out({ ok: false });
 
+    // Dari panel admin: orang yang dihapus dari daftar penerima juga dicabut aksesnya ke Sheet ini.
+    if (d.action === 'revoke') return out(revoke(d.email));
+
     const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
     // Cegah baris ganda bila pengiriman diulang: kolom A berisi ID pesan.
     const ids = sheet.getRange(2, 1, Math.max(sheet.getLastRow() - 1, 1), 1).getValues().flat();
     if (!ids.includes(d.id)) {
       // Awali sel teks dengan ' agar rumus (=, +, -, @) dari pengunjung tidak dijalankan Sheets.
       const t = (v) => (v == null ? '' : "'" + String(v));
-      sheet.appendRow([d.id, d.received_at, t(d.name), t(d.email), t(d.phone), t(d.company), t(d.country), t(d.service), t(d.message), d.language]);
+      sheet.appendRow([d.id, d.received_at, t(d.name), t(d.email), t(d.phone), t(d.company), t(d.country), t(d.service), t(d.message), d.language, t(d.category), d.quantity_tons == null ? '' : d.quantity_tons, t(d.container), t(d.destination_country)]);
     }
     if (NOTIFY_TO && !ids.includes(d.id)) notify(d);
     return out({ ok: true });
@@ -45,7 +49,7 @@ function doPost(e) {
 // Gmail menerima satu email per pesan baru: tabel isi pesan + tombol ke Sheet-nya.
 function notify(d) {
   const esc = (v) => String(v == null || v === '' ? '-' : v).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\n/g, '<br>');
-  const rows = [['Nama', d.name], ['Email', d.email], ['Telepon', d.phone], ['Perusahaan', d.company], ['Negara', d.country], ['Layanan', d.service], ['Pesan', d.message], ['Diterima (WIB)', d.received_at], ['Bahasa', d.language]];
+  const rows = [['Nama', d.name], ['Email', d.email], ['Telepon', d.phone], ['Perusahaan', d.company], ['Negara', d.country], ['Layanan', d.service], ['Pesan', d.message], ['Kategori', d.category], ['Jumlah (ton)', d.quantity_tons], ['Kontainer', d.container], ['Negara tujuan', d.destination_country], ['Diterima (WIB)', d.received_at], ['Bahasa', d.language]];
   const table = rows.map(([k, v]) => '<tr><td style="padding:6px 12px;border:1px solid #ddd;background:#f6f8f9"><b>' + k + '</b></td><td style="padding:6px 12px;border:1px solid #ddd">' + esc(v) + '</td></tr>').join('');
   const url = SpreadsheetApp.getActiveSpreadsheet().getUrl();
   MailApp.sendEmail({
@@ -54,6 +58,17 @@ function notify(d) {
     subject: 'Pesan baru dari website: ' + d.name,
     htmlBody: '<p>Ada pesan baru dari form Kontak ekasacoldchain.com.</p><table style="border-collapse:collapse">' + table + '</table><p><a href="' + url + '">Buka Google Sheet</a></p>',
   });
+}
+
+// Menghapus satu alamat dari daftar Bagikan (editor, pemberi komentar, pembaca). Pemilik Sheet tidak pernah dicabut.
+function revoke(email) {
+  const target = String(email || '').trim().toLowerCase();
+  const file = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId());
+  let owner = '';
+  try { owner = file.getOwner().getEmail().toLowerCase(); } catch (err) {}
+  if (!target || target === owner) return { ok: true, revoked: false };
+  [() => file.removeEditor(target), () => file.removeCommenter(target), () => file.removeViewer(target)].forEach((fn) => { try { fn(); } catch (err) {} });
+  return { ok: true, revoked: true };
 }
 
 function out(obj) {
@@ -68,6 +83,23 @@ function out(obj) {
    (alamat web app-nya yang panjang dan acak, ditambah `SECRET`, yang menjaga). Klik **Terapkan**, izinkan akses, lalu
    salin **URL aplikasi web** (berakhiran `/exec`).
 5. Setiap kali kode Apps Script diubah, buat deployment versi baru (URL tetap sama bila memilih "Kelola deployment → edit").
+
+### Mencabut akses seseorang dari panel admin
+
+Kode di atas sudah memuat fungsi `revoke`. Saat sebuah alamat **dihapus dari daftar penerima** di Pengaturan Situs (tab Kontak), atau saat
+akun admin seseorang **dicabut** di menu Akses, situs memanggil fungsi itu dan orang tersebut otomatis dihapus dari daftar **Bagikan** Sheet.
+
+Syarat supaya berhasil:
+
+1. **Perbarui kode Apps Script** ke versi terbaru di atas, lalu **Terapkan, Kelola deployment, ikon pensil, Versi baru, Terapkan**.
+   Google akan meminta izin tambahan (akses ke Google Drive, untuk mengubah daftar Bagikan): klik **Beri akses**, **Lanjutan**, **Buka ... (tidak aman)**, **Izinkan**.
+2. Di Google Sheet, klik **Bagikan** dan pastikan **Akses umum = Dibatasi** (bukan "Siapa saja yang memiliki link"). Kalau Sheet bisa dibuka
+   lewat link oleh siapa saja, menghapus nama seseorang tidak menutup aksesnya.
+3. Orang yang dicabut hanya kehilangan akses ke Sheet. **Email dan Excel yang sudah ia terima di kotak suratnya sendiri tidak bisa ditarik kembali.**
+4. Pemilik Sheet (akun `leads@`) tidak pernah dicabut. Kalau sebuah alamat tidak bisa dicabut otomatis, panel admin memberi peringatan dan Anda
+   mencabutnya manual lewat tombol **Bagikan**.
+
+Jika kode Apps Script belum diperbarui, panel admin memberi peringatan bahwa akses Sheet "belum bisa dicabut otomatis", dan daftar penerima tetap tersimpan.
 
 ## B. Hubungkan ke situs (di server)
 

@@ -1,11 +1,14 @@
 <?php
 
+use App\Filament\Pages\ManageSiteSettings;
 use App\Filament\Resources\Users\Pages\ListUsers;
 use App\Models\ContactMessage;
 use App\Models\SiteSetting;
 use App\Models\User;
+use App\Support\GoogleSheet;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Http;
 use Livewire\Livewire;
 
 /**
@@ -176,4 +179,82 @@ it('revokes and restores from the command line, with a confirmation', function (
     $this->artisan('admin:revoke', ['email' => 'koko@perusahaan.test', '--restore' => true])->expectsOutputToContain('dipulihkan')->assertSuccessful();
     expect($leaver->fresh()->hasAdminAccess())->toBeTrue()
         ->and($admin->fresh()->hasAdminAccess())->toBeTrue();
+});
+
+it('takes the Google Sheet away from whoever is removed from the recipient list in Pengaturan Situs', function () {
+    config(['services.google_sheets.url' => 'https://script.google.test/exec', 'services.google_sheets.secret' => 's3cret']);
+    Http::fake(['script.google.test/*' => Http::response(['ok' => true, 'revoked' => true])]);
+
+    $this->actingAs(anAdmin());
+    SiteSetting::current()->update(['contact_recipients' => ['leads@perusahaan.test', 'Koko@Gmail.test', 'cs@perusahaan.test']]);
+
+    // Koko is removed (the list is edited with another case); a new address is added; the others stay.
+    Livewire::test(ManageSiteSettings::class)
+        ->fillForm(['contact_recipients' => "leads@perusahaan.test\ncs@perusahaan.test\nbaru@perusahaan.test"])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect(SiteSetting::current()->contactRecipients())->toBe(['leads@perusahaan.test', 'cs@perusahaan.test', 'baru@perusahaan.test']);
+
+    Http::assertSentCount(1);
+    Http::assertSent(fn ($request): bool => $request->url() === 'https://script.google.test/exec'
+        && $request['action'] === 'revoke'
+        && $request['email'] === 'koko@gmail.test'
+        && $request['secret'] === 's3cret');
+
+    // Saving without removing anyone sends nothing.
+    Http::fake();
+    Livewire::test(ManageSiteSettings::class)
+        ->fillForm(['contact_recipients' => "LEADS@perusahaan.test\ncs@perusahaan.test\nbaru@perusahaan.test\ntambahan@perusahaan.test"])
+        ->call('save');
+    Http::assertNothingSent();
+});
+
+it('saves the recipient list even when the Google Sheet cannot be reached or runs an old script', function () {
+    config(['services.google_sheets.url' => 'https://script.google.test/exec']);
+    // One sequence (a second Http::fake() would not replace the first): old script, server error, old script, new script.
+    Http::fake(['script.google.test/*' => Http::sequence()
+        ->push(['ok' => true])
+        ->push('<html>error</html>', 500)
+        ->push(['ok' => true])
+        ->push(['ok' => true, 'revoked' => true])]);
+
+    $this->actingAs(anAdmin());
+    SiteSetting::current()->update(['contact_recipients' => ['a@perusahaan.test', 'b@perusahaan.test', 'c@perusahaan.test']]);
+
+    Livewire::test(ManageSiteSettings::class)->fillForm(['contact_recipients' => 'a@perusahaan.test'])->call('save')->assertHasNoFormErrors();
+
+    expect(SiteSetting::current()->contactRecipients())->toBe(['a@perusahaan.test']);
+
+    // An old script answers ok but without revoked=true: that is not a success.
+    expect(GoogleSheet::revokeAccess('x@perusahaan.test'))->toBeFalse()
+        ->and(GoogleSheet::revokeAccess('x@perusahaan.test'))->toBeTrue()
+        ->and(GoogleSheet::revokeAccess('bukan-email'))->toBeFalse();
+});
+
+it('does not call Google when the Sheet is not connected', function () {
+    config(['services.google_sheets.url' => null]);
+    Http::fake();
+
+    $this->actingAs(anAdmin());
+    SiteSetting::current()->update(['contact_recipients' => ['a@perusahaan.test', 'b@perusahaan.test']]);
+
+    Livewire::test(ManageSiteSettings::class)->fillForm(['contact_recipients' => 'a@perusahaan.test'])->call('save')->assertHasNoFormErrors();
+
+    Http::assertNothingSent();
+    expect(anAdmin()->revokeSheetAccess())->toBeNull();
+});
+
+it('also closes the Google Sheet when an administrator account is revoked from the panel', function () {
+    config(['services.google_sheets.url' => 'https://script.google.test/exec', 'services.google_sheets.secret' => 's3cret']);
+    Http::fake(['script.google.test/*' => Http::response(['ok' => true, 'revoked' => true])]);
+
+    $admin = anAdmin();
+    $leaver = anAdmin(['email' => 'koko@perusahaan.test']);
+
+    $this->actingAs($admin);
+    Livewire::test(ListUsers::class)->callTableAction('revoke', $leaver);
+
+    expect($leaver->fresh()->accessStatus())->toBe(User::ACCESS_REVOKED);
+    Http::assertSent(fn ($request): bool => $request['action'] === 'revoke' && $request['email'] === 'koko@perusahaan.test');
 });

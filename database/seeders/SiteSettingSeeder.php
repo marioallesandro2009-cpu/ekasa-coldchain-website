@@ -25,7 +25,7 @@ class SiteSettingSeeder extends Seeder
             'cta_label' => ['en' => 'Get a Quote', 'id' => 'Minta Penawaran'],
             // Brand tagline. The Indonesian translation must be confirmed by the client.
             'hero_badge' => ['en' => 'Fresher Tomorrow, Further Together', 'id' => 'Segar Hari Esok, Melangkah Bersama'],
-            'hero_headline' => ['en' => 'Keep your products fresh with', 'id' => 'Jaga produk Anda tetap segar dengan'],
+            'hero_headline' => ['en' => 'Keep Your Products Fresh With', 'id' => 'Jaga Produk Anda Tetap Segar Dengan'],
             'hero_subtext' => [
                 'en' => 'Temperature-controlled storage, transport, and fulfilment across Indonesia, keeping every shipment at the right temperature from origin to shelf.',
                 'id' => 'Penyimpanan, transportasi, dan fulfilment bersuhu terkendali di seluruh Indonesia, menjaga setiap kiriman pada suhu yang tepat dari gudang asal hingga ke rak toko.',

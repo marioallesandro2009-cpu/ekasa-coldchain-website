@@ -6,6 +6,7 @@ use App\Filament\Support\Translatable;
 use App\Models\SiteSetting;
 use App\Support\ColorContrast;
 use App\Support\FrontendData;
+use App\Support\GoogleSheet;
 use App\Support\ImageConversions;
 use App\Support\ImageUpload;
 use App\Support\Locales;
@@ -186,7 +187,7 @@ class ManageSiteSettings extends Page
                                 ->rows(4)
                                 ->placeholder("nama@gmail.com\nmarketing@perusahaan.co.id")
                                 ->live(debounce: 600)
-                                ->helperText('Satu alamat email per baris (maks. 10). Setiap pesan dari form Kontak dikirim ke semua alamat ini; bisa Gmail pribadi dan bisa diganti kapan saja. Balas email langsung ke pengunjung karena Reply-To sudah berisi email mereka. Pengirim (From) diatur di server, bukan di sini.')
+                                ->helperText('Satu alamat email per baris (maks. 10). Setiap pesan dari form Kontak dikirim ke semua alamat ini. Menghapus sebuah alamat dari daftar ini berarti ia berhenti menerima pesan baru DAN aksesnya ke Google Sheet leads dicabut (bila Sheet sudah disambungkan). Email yang sudah ia terima di kotak suratnya sendiri tidak bisa ditarik kembali. Balas email langsung ke pengunjung karena Reply-To sudah berisi email mereka. Pengirim (From) diatur di server, bukan di sini.')
                                 ->rules([fn (): Closure => self::validateRecipients()]),
                             Text::make('Nomor WhatsApp (tombol WhatsApp di section Kontak) diatur di tab Umum. Kosongkan nomornya untuk menyembunyikan tombol.')
                                 ->color('gray'),
@@ -378,6 +379,9 @@ class ManageSiteSettings extends Page
         $state = $this->form->getState();
         $state['contact_recipients'] = self::parseRecipients((string) ($state['contact_recipients'] ?? ''));
 
+        // Whoever is taken off the list also loses the Google Sheet (when it is connected).
+        $removed = self::removedRecipients((array) $record->contact_recipients, $state['contact_recipients']);
+
         $record->update($state);
 
         FrontendData::flush();
@@ -386,6 +390,28 @@ class ManageSiteSettings extends Page
             ->success()
             ->title('Pengaturan disimpan')
             ->send();
+
+        if ($removed !== [] && GoogleSheet::enabled()) {
+            $done = [];
+            $failed = [];
+
+            foreach ($removed as $email) {
+                GoogleSheet::revokeAccess($email) ? $done[] = $email : $failed[] = $email;
+            }
+
+            if ($done !== []) {
+                Notification::make()->success()->title('Akses Google Sheet dicabut')->body(implode(', ', $done))->send();
+            }
+
+            if ($failed !== []) {
+                Notification::make()
+                    ->warning()
+                    ->title('Akses Google Sheet belum bisa dicabut otomatis')
+                    ->body(implode(', ', $failed).'. Cabut manual lewat tombol Bagikan di Google Sheet (atau perbarui kode Apps Script, lihat panduan).')
+                    ->persistent()
+                    ->send();
+            }
+        }
 
         // Colors are saved anyway; the admin decides whether to adjust them.
         $failures = ColorContrast::failures($record->brandColors());
@@ -449,6 +475,21 @@ class ManageSiteSettings extends Page
                 }
             }
         };
+    }
+
+    /**
+     * @param  array<mixed>  $before
+     * @param  array<mixed>  $after
+     * @return list<string> the addresses that were on the list and are not any more (compared ignoring case)
+     */
+    private static function removedRecipients(array $before, array $after): array
+    {
+        $kept = array_map(fn (mixed $email): string => mb_strtolower(trim((string) $email)), $after);
+
+        return array_values(array_filter(
+            array_map(fn (mixed $email): string => trim((string) $email), $before),
+            fn (string $email): bool => $email !== '' && ! in_array(mb_strtolower($email), $kept, true),
+        ));
     }
 
     /**

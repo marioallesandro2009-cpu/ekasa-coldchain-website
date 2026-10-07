@@ -19,7 +19,7 @@ use OpenSpout\Writer\XLSX\Writer;
  */
 class LeadSpreadsheet
 {
-    public const HEADINGS = ['ID', 'Diterima (WIB)', 'Nama', 'Email', 'Telepon', 'Perusahaan', 'Negara', 'Layanan', 'Pesan', 'Bahasa'];
+    public const HEADINGS = ['ID', 'Diterima (WIB)', 'Nama', 'Email', 'Telepon', 'Perusahaan', 'Negara', 'Layanan', 'Pesan', 'Bahasa', 'Kategori', 'Jumlah (ton)', 'Kontainer', 'Negara tujuan'];
 
     public const MIME = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
 
@@ -29,7 +29,7 @@ class LeadSpreadsheet
     }
 
     /**
-     * @return list<string|int|null>
+     * @return list<string|int|float|null>
      */
     public static function values(ContactMessage $lead): array
     {
@@ -44,6 +44,10 @@ class LeadSpreadsheet
             $lead->service_title,
             $lead->message,
             $lead->locale,
+            LeadOptions::categoryLabel($lead->category),
+            $lead->quantity_tons === null ? null : (float) $lead->quantity_tons,
+            LeadOptions::containerLabel($lead->container_size),
+            $lead->destination_country,
         ];
     }
 
@@ -58,7 +62,7 @@ class LeadSpreadsheet
             $writer = new Writer;
             $writer->getOptions()->setColumnWidth(8, 1);
             $writer->getOptions()->setColumnWidth(20, 2);
-            $writer->getOptions()->setColumnWidth(24, 3, 4, 5, 6, 7, 8, 10);
+            $writer->getOptions()->setColumnWidth(24, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14);
             $writer->getOptions()->setColumnWidth(70, 9);
             $writer->openToFile($path);
 
@@ -69,7 +73,7 @@ class LeadSpreadsheet
 
             $wrap = (new Style)->setShouldWrapText();
             $writer->addRow(new Row(array_map(
-                fn (string|int|null $value): NumericCell|StringCell => is_int($value) ? new NumericCell($value, null) : new StringCell((string) $value, $wrap),
+                fn (string|int|float|null $value): NumericCell|StringCell => is_int($value) || is_float($value) ? new NumericCell($value, null) : new StringCell((string) $value, $wrap),
                 self::values($lead),
             )));
 
