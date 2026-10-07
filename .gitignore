@@ -53,3 +53,7 @@ yarn-error.log
 # Contact form verification output (screenshots, sample email log): local only
 /docs/screenshots/contact/
 /docs/screenshots/contact/email-log-contoh.txt
+
+# Local AI tool files: never part of the repository
+.claude/
+CLAUDE.md
