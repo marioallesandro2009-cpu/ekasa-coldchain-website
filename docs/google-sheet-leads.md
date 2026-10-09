@@ -31,19 +31,34 @@ function doPost(e) {
     // Dari panel admin: orang yang dihapus dari daftar penerima juga dicabut aksesnya ke Sheet ini.
     if (d.action === 'revoke') return out(revoke(d.email));
 
-    const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
-    // Cegah baris ganda bila pengiriman diulang: kolom A berisi ID pesan.
-    const ids = sheet.getRange(2, 1, Math.max(sheet.getLastRow() - 1, 1), 1).getValues().flat();
-    if (!ids.includes(d.id)) {
-      // Awali sel teks dengan ' agar rumus (=, +, -, @) dari pengunjung tidak dijalankan Sheets.
-      const t = (v) => (v == null ? '' : "'" + String(v));
-      sheet.appendRow([d.id, d.received_at, t(d.name), t(d.email), t(d.phone), t(d.company), t(d.country), t(d.service), t(d.message), d.language, t(d.category), d.quantity_tons == null ? '' : d.quantity_tons, t(d.container), t(d.destination_country)]);
+    // Satu permintaan pada satu waktu, supaya penambahan dan pengurutan baris tidak saling menimpa.
+    const lock = LockService.getScriptLock();
+    lock.waitLock(20000);
+    try {
+      const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheets()[0];
+      // Cegah baris ganda bila pengiriman diulang: kolom A berisi ID pesan.
+      const ids = sheet.getRange(2, 1, Math.max(sheet.getLastRow() - 1, 1), 1).getValues().flat();
+      if (!ids.includes(d.id)) {
+        // Awali sel teks dengan ' agar rumus (=, +, -, @) dari pengunjung tidak dijalankan Sheets.
+        const t = (v) => (v == null ? '' : "'" + String(v));
+        sheet.appendRow([d.id, d.received_at, t(d.name), t(d.email), t(d.phone), t(d.company), t(d.country), t(d.service), t(d.message), d.language, t(d.category), d.quantity_tons == null ? '' : d.quantity_tons, t(d.container), t(d.destination_country)]);
+        // Urutan baris selalu dari ID terkecil (terlama) ke terbesar (terbaru), walau pesan masuk terlambat atau dikirim ulang.
+        sortById(sheet);
+        if (NOTIFY_TO) notify(d);
+      }
+    } finally {
+      lock.releaseLock();
     }
-    if (NOTIFY_TO && !ids.includes(d.id)) notify(d);
     return out({ ok: true });
   } catch (err) {
     return out({ ok: false });
   }
+}
+
+// Mengurutkan semua baris data (di bawah judul) menurut kolom A (ID), dari yang terlama ke terbaru.
+function sortById(sheet) {
+  const last = sheet.getLastRow();
+  if (last > 2) sheet.getRange(2, 1, last - 1, sheet.getLastColumn()).sort({ column: 1, ascending: true });
 }
 
 // Gmail menerima satu email per pesan baru: tabel isi pesan + tombol ke Sheet-nya.
@@ -83,6 +98,12 @@ function out(obj) {
    (alamat web app-nya yang panjang dan acak, ditambah `SECRET`, yang menjaga). Klik **Terapkan**, izinkan akses, lalu
    salin **URL aplikasi web** (berakhiran `/exec`).
 5. Setiap kali kode Apps Script diubah, buat deployment versi baru (URL tetap sama bila memilih "Kelola deployment → edit").
+
+### Urutan baris di Sheet
+
+Kode di atas mengurutkan Sheet menurut kolom **A (ID)** dari kecil ke besar setiap kali ada baris baru, jadi pesan **terlama ada di atas dan terbaru di bawah**,
+bahkan kalau sebuah pesan terlambat masuk (misalnya karena sempat gagal lalu dikirim ulang). Untuk merapikan baris yang sudah terlanjur tidak berurutan:
+blok baris 2 sampai terakhir, lalu menu **Data, Urutkan rentang, Opsi urutan lanjutan, kolom A, A ke Z**.
 
 ### Mencabut akses seseorang dari panel admin
 

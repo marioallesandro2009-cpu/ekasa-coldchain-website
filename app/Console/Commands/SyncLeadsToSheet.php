@@ -23,7 +23,8 @@ class SyncLeadsToSheet extends Command
         $sent = 0;
         $failed = 0;
 
-        ContactMessage::query()->whereNull('sheet_synced_at')->oldest()->limit((int) $this->option('limit'))->get()
+        // Oldest first by id (created_at can tie within a second), so the Sheet fills in the order the leads arrived.
+        ContactMessage::query()->whereNull('sheet_synced_at')->orderBy('id')->limit((int) $this->option('limit'))->get()
             ->each(function (ContactMessage $lead) use (&$sent, &$failed): void {
                 GoogleSheet::send($lead) ? $sent++ : $failed++;
             });
