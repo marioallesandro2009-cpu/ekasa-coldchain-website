@@ -45,7 +45,7 @@ it('uses the fleet side view cropped around its focus point for the Linehaul car
     $linehaul = collect(FrontendData::services('en'))->firstWhere('title', 'Linehaul Transport');
 
     expect($linehaul['image']['focus'])->toBe('70% 50%')
-        ->and($linehaul['image']['large']['url'])->toContain('fleet-fe71-long-side');
+        ->and($linehaul['image']['large']['url'])->toContain('fleet-fuso-fighter-side');
 
     $this->get('/')->assertSee('style="object-position: 70% 50%"', false);
 });

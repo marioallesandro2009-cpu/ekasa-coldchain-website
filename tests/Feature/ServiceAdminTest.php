@@ -50,7 +50,7 @@ it('seeds the default block layouts of the four services, Omnichannel as draft',
         ->and(Service::query()->where('slug', 'omnichannel-integration')->value('detail_status'))->toBe(Service::DRAFT);
 
     $linehaul = Service::query()->where('slug', 'linehaul-transport')->firstOrFail();
-    expect($linehaul->cardFleetVehicle?->model)->toBe('FE 71 Long')
+    expect($linehaul->cardFleetVehicle?->model)->toBe('Fuso Fighter')
         ->and($linehaul->card_focus_x)->toBe(70)
         ->and($linehaul->getMedia('card'))->toHaveCount(0)
         ->and($linehaul->slugFor('id'))->toBe('transportasi-linehaul');
@@ -120,8 +120,8 @@ it('warns when a fleet side view is narrower than 1600 px', function () {
     config(['site.seed_service_images' => true]);
     $this->seed(ServiceDataSeeder::class);
 
-    $vehicle = FleetVehicle::query()->where('model', 'FE 71 Long')->firstOrFail();
-    // The real FE 71 file is exactly 1600 px (tests seed a smaller copy).
+    $vehicle = FleetVehicle::query()->where('model', 'Fuso Fighter')->firstOrFail();
+    // The real Fuso Fighter file is 1774 px (tests seed a smaller copy).
     $vehicle->getFirstMedia('side')->setCustomProperty('width', 1600)->save();
 
     Livewire::test(EditFleetVehicle::class, ['record' => $vehicle->refresh()->getRouteKey()])

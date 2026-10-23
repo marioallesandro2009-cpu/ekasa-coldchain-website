@@ -37,8 +37,10 @@
 --}}
 @props(['item'])
 @php
-    $nameMain = \Illuminate\Support\Str::beforeLast($item['name'], ' ');
-    $nameVariant = \Illuminate\Support\Str::afterLast($item['name'], ' ');
+    // One-word names (L300, CDE, CDD) have no trailing variant to split off.
+    $hasVariant = str_contains($item['name'], ' ');
+    $nameMain = $hasVariant ? \Illuminate\Support\Str::beforeLast($item['name'], ' ') : $item['name'];
+    $nameVariant = $hasVariant ? \Illuminate\Support\Str::afterLast($item['name'], ' ') : '';
 @endphp
 <p class="flex items-center gap-2 text-sm font-semibold tracking-[0.2em] text-white uppercase">
     <span @class([
@@ -51,7 +53,9 @@
 <h3 class="mt-2 leading-[0.95] text-white">
     <span class="sr-only">{{ $item['name'] }}</span>
     <span aria-hidden="true" class="block text-3xl font-extrabold tracking-tight sm:text-4xl lg:text-5xl">{{ $nameMain }}</span>
-    <span aria-hidden="true" class="mt-1 block text-sm font-semibold tracking-[0.15em] text-white uppercase sm:text-base">{{ $nameVariant }}</span>
+    @if ($nameVariant !== '')
+        <span aria-hidden="true" class="mt-1 block text-sm font-semibold tracking-[0.15em] text-white uppercase sm:text-base">{{ $nameVariant }}</span>
+    @endif
 </h3>
 @if ($item['description'])
     <p class="mt-3 line-clamp-2 max-w-md text-sm font-medium text-white sm:text-base">{{ $item['description'] }}</p>

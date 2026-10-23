@@ -32,18 +32,27 @@ class ServiceDataSeeder extends Seeder
 
     private function fleet(): void
     {
-        // DUMMY specifications; the side views are the client's files (not edited).
-        // Brand left empty: to be filled in by the client.
+        // DUMMY specifications (payloads are typical for each class, to be confirmed
+        // by the client); the side views are the client's artwork (not edited).
+        // Two categories: refrigerated box trucks (reefer) and the dry Tronton
+        // chassis & container (up to 40 tons, logistics).
+        // model, image, type, [tempMin, tempMax, payloadKg, length, width, height], [en, id]
         $trucks = [
-            ['FE 71 Long', 'fleet-fe71-long-side', 1600, 900, [-20, 5, 2500, 4.30, 1.90, 1.90],
-                ['Medium refrigerated box truck for city and intercity runs, sized for mixed chilled and frozen loads.', 'Truk boks berpendingin ukuran sedang untuk rute dalam kota dan antarkota, pas untuk muatan chiller dan frozen campuran.']],
-            ['FE 74 Long', 'fleet-fe74-long-side', 1672, 941, [-20, 5, 4000, 5.60, 2.10, 2.10],
-                ['Longer refrigerated box truck for larger volumes between cities, with a steady temperature over long distances.', 'Truk boks berpendingin lebih panjang untuk volume besar antarkota, suhu tetap stabil di perjalanan jauh.']],
+            ['L300', 'fleet-l300-side', 'reefer', [-20, 5, 1000, null, null, null],
+                ['Compact refrigerated box for tight city streets and small, frequent drops.', 'Boks berpendingin ringkas untuk jalan sempit dalam kota dan pengiriman kecil yang sering.']],
+            ['CDE', 'fleet-cde-side', 'reefer', [-20, 5, 3500, null, null, null],
+                ['Medium refrigerated box truck for city runs with mixed chilled and frozen loads.', 'Truk boks berpendingin ukuran sedang untuk rute dalam kota dengan muatan chiller dan frozen campuran.']],
+            ['CDD', 'fleet-cdd-side', 'reefer', [-20, 5, 8000, null, null, null],
+                ['Six-wheel refrigerated box truck for larger volumes between cities.', 'Truk boks berpendingin enam roda untuk volume lebih besar antarkota.']],
+            ['Fuso Fighter', 'fleet-fuso-fighter-side', 'reefer', [-20, 5, 12000, null, null, null],
+                ['Heavy refrigerated box truck for long-haul loads that must stay cold all the way.', 'Truk boks berpendingin kelas berat untuk muatan jarak jauh yang harus tetap dingin sepanjang jalan.']],
+            ['Tronton Container', 'fleet-tronton-side', 'dry', [null, null, 40000, null, null, null],
+                ['Tronton chassis and container for dry, bulk logistics: up to 40 tons per trip.', 'Tronton chassis dan kontainer untuk logistik kering dalam jumlah besar: hingga 40 ton per perjalanan.']],
         ];
 
-        foreach ($trucks as $index => [$model, $image, $width, $height, [$tempMin, $tempMax, $capacity, $length, $boxWidth, $boxHeight], $description]) {
+        foreach ($trucks as $index => [$model, $image, $type, [$tempMin, $tempMax, $capacity, $length, $boxWidth, $boxHeight], $description]) {
             $vehicle = FleetVehicle::query()->updateOrCreate(['model' => $model], [
-                'type' => 'reefer',
+                'type' => $type,
                 'description' => ['en' => $description[0], 'id' => $description[1]],
                 'temp_min' => $tempMin,
                 'temp_max' => $tempMax,
@@ -52,14 +61,14 @@ class ServiceDataSeeder extends Seeder
                 'box_width' => $boxWidth,
                 'box_height' => $boxHeight,
                 'focus_x' => 50,
-                'focus_y' => 35,
+                'focus_y' => 50,
                 'zoom' => 100,
                 'sort_order' => $index + 1,
                 'is_active' => true,
                 'is_sample' => true,
             ]);
             $vehicle->markTranslationsReviewed('id')->save();
-            $this->attachServiceImage($vehicle, 'side', $image, $width, $height);
+            $this->attachServiceImage($vehicle, 'side', $image, 1774, 998);
         }
     }
 

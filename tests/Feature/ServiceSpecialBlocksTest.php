@@ -90,25 +90,28 @@ it('lists every truck in the showcase (all visible without JS) with tabs, live r
     SiteSetting::current()->update(['whatsapp_number' => '0812 3456 7890']);
 
     $html = $this->get('/services/linehaul-transport')->getContent();
-    $section = substr($html, (int) strpos($html, 'id="katalog-armada"'), 30000);
+    $section = substr($html, (int) strpos($html, 'id="katalog-armada"'), 80000);
 
-    expect($section)->toContain('FE 71 Long')
-        ->toContain('FE 74 Long')
+    expect($section)->toContain('L300')
+        ->toContain('Fuso Fighter')
+        ->toContain('Tronton Container')
+        ->toContain('Cold Reefer Truck')
+        ->toContain('Dry Truck &amp; Container')
         ->toContain('role="tablist"')
         ->toContain('role="tabpanel"')
         ->toContain('aria-live="polite"')
-        ->toContain('https://wa.me/6281234567890?text=Hello%2C%20I%20would%20like%20to%20ask%20about%20the%20availability%20of%20the%20FE%2071%20Long.')
-        ->toContain('2,500 kg')
-        ->toContain('4.3 × 1.9 × 1.9 m');
+        ->toContain('https://wa.me/6281234567890?text=Hello%2C%20I%20would%20like%20to%20ask%20about%20the%20availability%20of%20the%20L300.')
+        ->toContain('1,000 kg')
+        ->toContain('40,000 kg');
 
-    $this->get('/id/layanan/transportasi-linehaul')->assertSee('Tanya ketersediaan')->assertSee('4.000 kg');
+    $this->get('/id/layanan/transportasi-linehaul')->assertSee('Tanya ketersediaan')->assertSee('40.000 kg');
 });
 
 it('hides empty fleet specs and asks via #contact without WhatsApp', function () {
-    FleetVehicle::query()->update(['capacity_kg' => null]);
+    FleetVehicle::query()->update(['capacity_kg' => null, 'volume_m3' => 12]);
 
     $html = $this->get('/services/linehaul-transport')->getContent();
-    $section = substr($html, (int) strpos($html, 'id="katalog-armada"'), 30000);
+    $section = substr($html, (int) strpos($html, 'id="katalog-armada"'), 80000);
 
     expect($section)->not->toContain('Payload')
         ->toContain('Box volume')
@@ -116,16 +119,15 @@ it('hides empty fleet specs and asks via #contact without WhatsApp', function ()
 });
 
 it('switches the fleet block to a grid with a type filter', function () {
-    FleetVehicle::query()->where('model', 'FE 74 Long')->update(['type' => 'dry']);
     useLayout('linehaul-transport', 'katalog_armada', ['layout' => 'grid']);
 
     $html = $this->get('/services/linehaul-transport')->getContent();
-    $section = substr($html, (int) strpos($html, 'id="katalog-armada"'), 30000);
+    $section = substr($html, (int) strpos($html, 'id="katalog-armada"'), 80000);
 
     expect($section)->not->toContain('role="tablist"')
         ->toContain("type = 'dry'")
-        ->toContain('Refrigerated')
-        ->toContain('Dry');
+        ->toContain('Cold Reefer Truck')
+        ->toContain('Dry Truck &amp; Container');
 });
 
 it('compares the rental schemes and draws the routes with travel times', function () {

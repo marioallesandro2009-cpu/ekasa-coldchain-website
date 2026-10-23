@@ -194,8 +194,8 @@ class ServiceSeeder extends Seeder
                     'key_points' => $t("Refrigerated box trucks\nRegular routes from Jakarta\nRent per trip or monthly", "Truk boks berpendingin\nRute rutin dari Jakarta\nSewa per trip atau bulanan"),
                     'seo_description' => $t('Refrigerated linehaul from Jakarta to cities in Java and Sumatra. Rent per trip, monthly or dedicated.', 'Linehaul berpendingin dari Jakarta ke kota-kota di Jawa dan Sumatra. Sewa per trip, bulanan, atau dedicated.'),
                     'detail_status' => Service::PUBLISHED,
-                    // Card: the client's FE 71 side view, cropped 4:3 on screen only.
-                    'card_fleet_vehicle_id' => FleetVehicle::query()->where('model', 'FE 71 Long')->value('id'),
+                    // Card: the client's Fuso Fighter side view, cropped 4:3 on screen only.
+                    'card_fleet_vehicle_id' => FleetVehicle::query()->where('model', 'Fuso Fighter')->value('id'),
                     'card_focus_x' => 70,
                     'card_focus_y' => 50,
                     // Bright white truck box: same reason as cold-storage above.

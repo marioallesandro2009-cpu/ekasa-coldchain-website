@@ -277,7 +277,7 @@ final class ServiceSpecialBlocks
                 'id' => $vehicle->id,
                 'name' => $name,
                 'type' => $vehicle->type,
-                'typeLabel' => __($vehicle->type === 'dry' ? 'Dry' : 'Refrigerated', [], $locale),
+                'typeLabel' => __($vehicle->type === 'dry' ? 'Dry Truck & Container' : 'Cold Reefer Truck', [], $locale),
                 'description' => $vehicle->translate('description', $locale),
                 'notes' => $vehicle->translate('notes', $locale),
                 'specs' => $specs,

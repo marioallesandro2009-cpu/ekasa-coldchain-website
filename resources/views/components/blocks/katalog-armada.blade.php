@@ -179,6 +179,12 @@
             @if ($count > 1)
                 <div class="js-only scrollbar-none mt-6 flex items-center gap-6 overflow-x-auto border-t border-white/10 pt-4 sm:gap-8" role="tablist" aria-label="{{ $block['title'] ?? __('Fleet') }}" x-ref="tabs" @keydown="onTabKey($event)">
                     @foreach ($items as $i => $item)
+                        {{-- Category label before the first truck of each type (items arrive in
+                             admin order, so trucks of one category sit together). Presentation
+                             only: the tabs themselves keep their order and keyboard behaviour. --}}
+                        @if (count($block['types']) > 1 && ($i === 0 || $items[$i - 1]['type'] !== $item['type']))
+                            <span role="presentation" class="{{ $i === 0 ? '' : 'ml-2 border-l border-white/15 pl-6 sm:ml-4 sm:pl-8' }} shrink-0 pb-3 text-xs font-bold tracking-[0.14em] whitespace-nowrap text-highlight uppercase">{{ $item['typeLabel'] }}</span>
+                        @endif
                         <button
                             type="button"
                             id="{{ $block['id'] }}-tab-{{ $i }}"
@@ -202,7 +208,7 @@
         <div class="mt-10 sm:mt-12" x-data="{ type: 'all' }">
             @if (count($block['types']) > 1)
                 <div class="js-only mb-6 flex gap-2" role="group" aria-label="{{ __('Filter') }}">
-                    @foreach (['all' => __('All'), 'reefer' => __('Refrigerated'), 'dry' => __('Dry')] as $value => $label)
+                    @foreach (['all' => __('All'), 'reefer' => __('Cold Reefer Truck'), 'dry' => __('Dry Truck & Container')] as $value => $label)
                         <button type="button" @click="type = '{{ $value }}'" x-bind:aria-pressed="(type === '{{ $value }}').toString()" class="rounded-full border px-4 py-1.5 text-sm font-semibold transition" :class="type === '{{ $value }}' ? 'border-brand bg-brand text-white' : 'border-white/20 hover:border-brand'">{{ $label }}</button>
                     @endforeach
                 </div>
