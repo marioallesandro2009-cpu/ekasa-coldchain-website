@@ -53,7 +53,7 @@ class SecurityHeaders
         }
 
         if ($csp && str_contains((string) $headers->get('Content-Type'), 'text/html')) {
-            $headers->set($mode === 'enforce' ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only', $this->policy((string) Vite::cspNonce()));
+            $headers->set($mode === 'enforce' ? 'Content-Security-Policy' : 'Content-Security-Policy-Report-Only', $this->policy((string) Vite::cspNonce(), $mode === 'enforce'));
         }
 
         return $response;
@@ -66,7 +66,7 @@ class SecurityHeaders
         return $request->is($admin, "{$admin}/*", 'livewire*', 'livewire-*/*', 'filament*');
     }
 
-    private function policy(string $nonce): string
+    private function policy(string $nonce, bool $enforce): string
     {
         $turnstile = (bool) config('security.turnstile.enabled');
         $cloudflare = $turnstile ? ' https://challenges.cloudflare.com' : '';
@@ -86,7 +86,8 @@ class SecurityHeaders
             "frame-ancestors 'self'",
         ];
 
-        if (config('security.force_https')) {
+        // Browsers ignore this directive in a report-only policy and log a console error for it.
+        if ($enforce && config('security.force_https')) {
             $directives[] = 'upgrade-insecure-requests';
         }
 

@@ -32,7 +32,8 @@
                 href="{{ Locales::pathFor(request(), $locale) }}"
                 hreflang="{{ $locale }}"
                 lang="{{ $locale }}"
-                aria-label="{{ __('Read in this language', [], $locale) }}"
+                {{-- Starts with the visible code, so voice control ("click ID") still matches. --}}
+                aria-label="{{ strtoupper($locale) }}: {{ __('Read in this language', [], $locale) }}"
                 @class([
                     'rounded text-white/60 transition-colors duration-200 hover:text-white',
                     'inline-grid min-h-11 min-w-11 place-items-center' => $size === 'lg',

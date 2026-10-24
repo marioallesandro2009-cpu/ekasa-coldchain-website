@@ -32,10 +32,12 @@
             {{-- The logo drawn in three clipped layers over the (invisible) sizing image: the round icon, the
                  EKASA line and the COLD CHAIN line. The last one is nudged down a little so the two lines of
                  lettering do not touch, and the two text layers can take a thin white outline (see
-                 .logo-part in app.css). The clip positions belong to the current logo file. --}}
-            <img src="{{ $logo['url'] }}" alt="" aria-hidden="true" class="logo-part logo-part--icon" decoding="async">
-            <img src="{{ $logo['url'] }}" alt="" aria-hidden="true" @class(['logo-part logo-part--line1 logo-part--text', 'logo-outline--always' => $outlined]) decoding="async">
-            <img src="{{ $logo['url'] }}" alt="" aria-hidden="true" @class(['logo-part logo-part--line2 logo-part--text', 'logo-outline--always' => $outlined]) decoding="async">
+                 .logo-part in app.css). The clip positions belong to the current logo file.
+                 The layers reuse the WebP the sizing image already downloaded (the original can be ~110 KB). --}}
+            @php($partSrc = $logo['webp'] ?: $logo['url'])
+            <img src="{{ $partSrc }}" alt="" aria-hidden="true" class="logo-part logo-part--icon" decoding="async">
+            <img src="{{ $partSrc }}" alt="" aria-hidden="true" @class(['logo-part logo-part--line1 logo-part--text', 'logo-outline--always' => $outlined]) decoding="async">
+            <img src="{{ $partSrc }}" alt="" aria-hidden="true" @class(['logo-part logo-part--line2 logo-part--text', 'logo-outline--always' => $outlined]) decoding="async">
         @endif
         </span>
     @else

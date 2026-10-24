@@ -26,10 +26,10 @@ it('links the language switch to the same page in the other language', function 
     $id = $this->get('/id')->getContent();
 
     expect($en)
-        ->toMatch('#href="/id"\s+hreflang="id"\s+lang="id"\s+aria-label="Baca dalam Bahasa Indonesia"#')
+        ->toMatch('#href="/id"\s+hreflang="id"\s+lang="id"\s+aria-label="ID: Baca dalam Bahasa Indonesia"#')
         ->toMatch('#<span aria-current="true"[^>]*>\s*<span aria-hidden="true">EN</span>#')
         ->and($id)
-        ->toMatch('#href="/"\s+hreflang="en"\s+lang="en"\s+aria-label="Read in English"#')
+        ->toMatch('#href="/"\s+hreflang="en"\s+lang="en"\s+aria-label="EN: Read in English"#')
         ->toMatch('#<span aria-current="true"[^>]*>\s*<span aria-hidden="true">ID</span>#');
 
     // Desktop navbar and mobile menu; always the page top, without a #anchor.

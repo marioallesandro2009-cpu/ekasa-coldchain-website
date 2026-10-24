@@ -31,7 +31,7 @@
 
         @if ($navItems)
             <div>
-                <p class="text-xs font-bold tracking-[0.14em] text-white/40 uppercase">{{ __('Quick Links') }}</p>
+                <p class="text-xs font-bold tracking-[0.14em] text-white/55 uppercase">{{ __('Quick Links') }}</p>
                 <ul class="mt-4 space-y-2.5 text-sm" role="list">
                     @foreach ($navItems as $item)
                         <li><a href="{{ \App\Support\Links::section($item['id']) }}" class="text-white/70 transition-colors hover:text-white">{{ $item['navLabel'] }}</a></li>
@@ -42,7 +42,7 @@
 
         @if ($waHref || $settings['phone'] || $settings['email'])
             <div>
-                <p class="text-xs font-bold tracking-[0.14em] text-white/40 uppercase">{{ __('Contact') }}</p>
+                <p class="text-xs font-bold tracking-[0.14em] text-white/55 uppercase">{{ __('Contact') }}</p>
                 <ul class="mt-4 space-y-2.5 text-sm" role="list">
                     @if ($waHref)
                         <li><a href="{{ $waHref }}" target="_blank" rel="noopener" class="text-white/70 transition-colors hover:text-white">{{ $settings['texts']['whatsapp_button'] }}</a></li>

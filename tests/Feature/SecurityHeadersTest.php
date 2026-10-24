@@ -98,7 +98,10 @@ it('does not force https unless FORCE_HTTPS is on, but always keeps the canonica
 
     config(['security.force_https' => true]);
     $this->get('http://example.co.id/x')->assertStatus(301)->assertRedirect('https://example.co.id/x');
-    expect((string) $this->get('https://example.co.id/')->headers->get('Content-Security-Policy-Report-Only'))->toContain('upgrade-insecure-requests');
+    // Ignored (with a console error) in a report-only policy, so only sent when enforcing.
+    expect((string) $this->get('https://example.co.id/')->headers->get('Content-Security-Policy-Report-Only'))->not->toContain('upgrade-insecure-requests');
+    config(['security.csp.mode' => 'enforce']);
+    expect((string) $this->get('https://example.co.id/')->headers->get('Content-Security-Policy'))->toContain('upgrade-insecure-requests');
 });
 
 it('has no fixed https redirect left in .htaccess, and blocks hidden and sensitive files (G-2, G-4)', function () {

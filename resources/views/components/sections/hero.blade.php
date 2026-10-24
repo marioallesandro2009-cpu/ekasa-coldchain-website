@@ -172,7 +172,7 @@
                             <button
                                 type="button"
                                 class="group min-w-0 py-2 text-left"
-                                aria-label="{{ $settings['texts']['slide_show'] }} {{ $slide['label'] }}"
+                                aria-label="{{ $settings['texts']['slide_show'] }} {{ $slide['label'] }}@if ($slide['comingSoon'] ?? false) {{ $settings['texts']['coming_soon'] }}@endif"
                                 :aria-current="index === {{ $i }} ? 'true' : null"
                                 @click="hover = false; goTo({{ $i }})"
                             >
