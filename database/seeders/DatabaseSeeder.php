@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             AboutStatSeeder::class,
             AboutValueSeeder::class,
             PostSeeder::class,
+            BusinessPostSeeder::class,
             ServiceSeeder::class,
             HeroSlideSeeder::class,
             HeroStatSeeder::class,
